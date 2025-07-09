@@ -1,0 +1,14 @@
+flowchart TD
+    Agents["Agents Commit Files"] -->|"push"| Inbox["content/inbox/"]
+    Inbox -->|"classify-inbox.mjs"| Classified["content/<section>/"]
+    AgentsManifest["content/agents/*.yml"] -->|"agent-bus.mjs"| GitHubIssue["#agent-bus Issue"]
+    RepoScan["fetch-gh-repos.mjs"] --> ToolsDir["content/tools/"]
+    Classified -->|"build-insights.mjs"| Insights["*.insight.md"]
+    ToolsDir -->|"Astro Build"| Site["Static Site"]
+    Insights -->|"Astro Build"| Site
+    GitHubActions["GitHub Actions CI"] -->|"run scripts"| RepoScan
+    GitHubActions -->|"run scripts"| ClassifyScript[classify-inbox.mjs]
+    GitHubActions -->|"run scripts"| InsightsScript[build-insights.mjs]
+    GitHubActions -->|"run scripts"| AgentBusScript[agent-bus.mjs]
+    GitHubActions -->|"build"| Site
+    Site -->|"deploy"| GitHubPages["GitHub Pages"]
