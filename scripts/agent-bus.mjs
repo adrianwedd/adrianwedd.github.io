@@ -12,10 +12,7 @@ async function loadManifests(dir = path.join('content', 'agents')) {
   try {
     files = await fs.readdir(dir);
   } catch (err) {
-    log.error(
-      `Error reading agent manifests directory ${dir}:`,
-      err.message
-    );
+    log.error(`Error reading agent manifests directory ${dir}:`, err.message);
     return [];
   }
   const manifests = [];
@@ -81,6 +78,10 @@ async function updateIssue(number, body, owner, repo) {
 }
 
 async function main() {
+  if (!process.env.GH_TOKEN) {
+    log.error('GH_TOKEN not set; skipping agent-bus update');
+    return;
+  }
   if (!REPO) throw new Error('GH_REPO or GITHUB_REPOSITORY not set'); // Moved check here
   const [owner, repo] = REPO.split('/');
   const manifests = await loadManifests();

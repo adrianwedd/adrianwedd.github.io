@@ -93,4 +93,15 @@ describe('fetch-gh-repos', () => {
     mkdir.mockRestore();
     write.mockRestore();
   });
+
+  it('main skips when GH_TOKEN not set', async () => {
+    delete process.env.GH_TOKEN;
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await main();
+    expect(error).toHaveBeenCalledWith(
+      '[ERROR]',
+      'GH_TOKEN not set; skipping fetch-gh-repos'
+    );
+    error.mockRestore();
+  });
 });
