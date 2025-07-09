@@ -450,7 +450,7 @@ phases:
     component: 'Automation Scripts'
     dependencies: [6, 18]
     priority: 3
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-SCALE-1'
     area: Scalability

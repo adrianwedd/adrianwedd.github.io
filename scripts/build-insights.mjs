@@ -35,21 +35,55 @@ async function main() {
     return;
   }
 
-  for (const dir of TARGET_DIRS) {
-    try {
-      const files = await fs.readdir(dir);
-      const markdownFiles = files.filter(file => file.endsWith('.md') && !file.endsWith('.insight.md'));
+  // Get files to process from arguments or read from target directories
+  let filesToProcess = [];
+  const args = process.argv.slice(2); // Get arguments after script name
 
-      for (const file of markdownFiles) {
-        await processMarkdownFile(path.join(dir, file));
-      }
-    } catch (err) {
-      if (err.code === 'ENOENT') {
-        console.warn(`Directory not found: ${dir}. Skipping.`);
-      } else {
-        console.error(`Error processing directory ${dir}:`, err.message);
+  if (args.length > 0) {
+    // Arguments are provided, assume they are comma-separated file paths
+    const changedFilesString = args[0];
+    const changedFiles = changedFilesString.split(',').map(f => f.trim()).filter(f => f.length > 0);
+
+    // Filter for files that are markdown and within target directories
+    for (const changedFile of changedFiles) {
+      const absolutePath = path.resolve(changedFile); // Resolve to absolute path
+      const isMarkdown = absolutePath.endsWith('.md') && !absolutePath.endsWith('.insight.md');
+      const isInTargetDir = TARGET_DIRS.some(dir => absolutePath.startsWith(dir + path.sep));
+
+      if (isMarkdown && isInTargetDir) {
+        filesToProcess.push(absolutePath);
       }
     }
+
+    if (filesToProcess.length === 0) {
+      console.log('No relevant changed markdown files to process.');
+      return;
+    }
+  } else {
+    // No arguments, process all files in target directories
+    for (const dir of TARGET_DIRS) {
+      try {
+        const files = await fs.readdir(dir);
+        const markdownFiles = files.filter(file => file.endsWith('.md') && !file.endsWith('.insight.md'));
+        for (const file of markdownFiles) {
+          filesToProcess.push(path.join(dir, file));
+        }
+      } catch (err) {
+        if (err.code === 'ENOENT') {
+          console.warn(`Directory not found: ${dir}. Skipping.`);
+        } else {
+          console.error(`Error processing directory ${dir}:`, err.message);
+        }
+      }
+    }
+    if (filesToProcess.length === 0) {
+      console.log('No markdown files to process.');
+      return;
+    }
+  }
+
+  for (const filePath of filesToProcess) {
+    await processMarkdownFile(filePath);
   }
   console.log('Insight generation complete.');
 }

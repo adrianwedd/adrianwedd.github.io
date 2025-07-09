@@ -71,18 +71,37 @@ async function main() {
     console.error('OPENAI_API_KEY not set; skipping classification');
     return;
   }
-  const inboxDir = path.join('content', 'inbox');
-  const files = (await fs.readdir(inboxDir)).filter(f => f !== '.gitkeep');
-  if (files.length === 0) {
-    console.log('No inbox files to process.');
-    return;
-  }
 
+  const inboxDir = path.join('content', 'inbox');
   const failedDir = path.join(inboxDir, 'failed');
 
-  for (const name of files) {
-    if (name === 'failed') continue; // Skip the failed directory itself
+  // Get files to process from arguments or read from inboxDir
+  let filesToProcess = [];
+  const args = process.argv.slice(2); // Get arguments after script name
 
+  if (args.length > 0) {
+    // Arguments are provided, assume they are comma-separated file paths
+    const changedFilesString = args[0];
+    const changedFiles = changedFilesString.split(',').map(f => f.trim()).filter(f => f.length > 0);
+
+    // Filter for files that are actually in the inbox directory
+    const allInboxFiles = (await fs.readdir(inboxDir)).filter(f => f !== '.gitkeep' && f !== 'failed');
+    filesToProcess = changedFiles.filter(f => allInboxFiles.includes(path.basename(f)) && path.dirname(f) === inboxDir);
+
+    if (filesToProcess.length === 0) {
+      console.log('No relevant changed inbox files to process.');
+      return;
+    }
+  } else {
+    // No arguments, process all files in inbox
+    filesToProcess = (await fs.readdir(inboxDir)).filter(f => f !== '.gitkeep' && f !== 'failed');
+    if (filesToProcess.length === 0) {
+      console.log('No inbox files to process.');
+      return;
+      }
+  }
+
+  for (const name of filesToProcess) {
     const filePath = path.join(inboxDir, name);
     let targetDir;
 
