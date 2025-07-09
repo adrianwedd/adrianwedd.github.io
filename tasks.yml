@@ -916,3 +916,24 @@ phases:
       - 'New contributors can easily understand how to get started and contribute.'
     assigned_to: human-operator
     epic: 'Phase 6: Iterative Growth'
+
+  - id: 46
+    title: 'Investigate build-insights.mjs Test Failures'
+    description: 'Investigate and fix the intermittent test failures for `build-insights.mjs`.'
+    component: 'Testing'
+    dependencies: [32]
+    priority: 5
+    status: pending
+    command: 'npm test'
+    task_id: 'PIN-QA-15'
+    area: QA
+    actionable_steps:
+      - 'Analyze test logs and code to identify root cause of failures.'
+      - 'Reproduce failures consistently.'
+      - 'Implement fixes in test or source code.'
+      - 'Ensure 100% test pass rate for `build-insights.mjs`.'
+    acceptance_criteria:
+      - 'All tests for `build-insights.mjs` pass consistently.'
+      - 'Test coverage for `build-insights.mjs` is maintained or improved.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
