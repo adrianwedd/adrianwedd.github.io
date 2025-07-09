@@ -48,7 +48,7 @@ Format the codebase using Prettier:
 npm run format
 ```
 
-See `docs/scripts` for details on each automation script.
+See `docs/scripts` for details on each automation script. For troubleshooting CI failures, consult [docs/DEBUGGING.md](docs/DEBUGGING.md).
 
 ## License
 
