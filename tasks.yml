@@ -490,7 +490,7 @@ phases:
     component: Automation Scripts
     dependencies: [6]
     priority: 3
-    status: pending
+    status: done
     command: null
     task_id: PIN-REF-2
     area: Maintainability
