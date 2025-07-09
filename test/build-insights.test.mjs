@@ -77,7 +77,7 @@ describe('build-insights.mjs', () => {
 
   it('processMarkdownFile should handle LLM API errors gracefully', async () => {
     callOpenAI.mockRejectedValue(new Error('LLM API error'));
-  const consoleErrorSpy = vi
+    const consoleErrorSpy = vi
       .spyOn(console, 'error')
       .mockImplementation(() => {});
     const filePath = path.join('content', 'garden', 'file1.md');

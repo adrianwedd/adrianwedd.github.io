@@ -30,6 +30,10 @@ function repoToMarkdown(repo) {
 }
 
 async function main() {
+  if (!process.env.GH_TOKEN) {
+    log.error('GH_TOKEN not set; skipping fetch-gh-repos');
+    return;
+  }
   const login = await getLogin();
   const repos = await fetchRepos(login);
   const tools = repos.filter(

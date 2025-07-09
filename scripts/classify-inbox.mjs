@@ -15,10 +15,7 @@ async function getDynamicSections() {
       .filter((name) => !['inbox', 'untagged'].includes(name)); // Filter out special directories
     return sections;
   } catch (err) {
-    log.error(
-      `Error reading content directory ${contentDir}:`,
-      err.message
-    );
+    log.error(`Error reading content directory ${contentDir}:`, err.message);
     return []; // Return empty array to prevent further errors
   }
 }
@@ -32,7 +29,6 @@ async function buildPrompt(content) {
     `Text:\n${content}`
   );
 }
-
 
 async function classifyFile(filePath) {
   let content;
@@ -74,10 +70,7 @@ async function moveFile(src, destDir) {
   try {
     await fs.mkdir(destDir, { recursive: true });
   } catch (err) {
-    log.error(
-      `Error creating destination directory ${destDir}:`,
-      err.message
-    );
+    log.error(`Error creating destination directory ${destDir}:`, err.message);
     throw err;
   }
   const dest = path.join(destDir, path.basename(src));
@@ -179,10 +172,7 @@ async function main() {
             try {
               await fs.writeFile(filePath, fm + data);
             } catch (err) {
-              log.error(
-                `Error writing tags to file ${filePath}:`,
-                err.message
-              );
+              log.error(`Error writing tags to file ${filePath}:`, err.message);
               targetDir = failedDir; // Move to failed if cannot write tags
             }
           }

@@ -5,6 +5,7 @@ This guide collects tips for diagnosing failures in the GitHub Actions pipeline 
 ## Common Failure Scenarios
 
 - **Missing environment variables** – most scripts rely on secrets like `GH_TOKEN` or `OPENAI_API_KEY`. Ensure these are configured under *Settings → Secrets* in the repository.
+- **Secrets unavailable on forks** – GitHub does not expose repository secrets to workflows triggered from forked pull requests. Scripts that rely on `GH_TOKEN` will now log `GH_TOKEN not set; skipping` instead of failing.
 - **File not found errors** – check that expected paths exist (e.g. `content/inbox` or `content/tools`).
 - **Malformed LLM responses** – the `classify-inbox` script expects valid JSON from OpenAI. A broken or truncated response will cause it to skip files.
 - **Dependency issues** – if a script cannot find a package, run `npm ci` to install all dependencies exactly as defined in `package-lock.json`.
