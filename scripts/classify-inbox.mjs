@@ -1,13 +1,25 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { pathToFileURL } from 'url';
+import { pathToFileURL } = 'url';
 
 const MODEL = process.env.OPENAI_MODEL || 'gpt-3.5-turbo-1106';
-const SECTIONS = ['tools', 'logs', 'garden', 'mirror', 'resume', 'agents'];
+// REMOVE: const SECTIONS = ['tools', 'logs', 'garden', 'mirror', 'resume', 'agents'];
 
-function buildPrompt(content) {
+// Function to dynamically discover content sections
+async function getDynamicSections() {
+  const contentDir = path.join('content');
+  const entries = await fs.readdir(contentDir, { withFileTypes: true });
+  const sections = entries
+    .filter(dirent => dirent.isDirectory())
+    .map(dirent => dirent.name)
+    .filter(name => !['inbox', 'untagged', 'agents', 'codex', 'tools', 'logs', 'garden', 'mirror', 'resume'].includes(name)); // Filter out non-content directories
+  return sections;
+}
+
+async function buildPrompt(content) {
+  const dynamicSections = await getDynamicSections(); // Get dynamic sections
   return `You are an AI assistant helping organise a Personal Intelligence Node.\n` +
-    `Classify the following text into one of these sections: ${SECTIONS.join(', ')}.\n` +
+    `Classify the following text into one of these sections: ${dynamicSections.join(', ')}.\n` +
     `Return JSON with keys section, tags (array), and confidence (0-1).\n` +
     `Text:\n${content}`;
 }
@@ -75,6 +87,8 @@ async function main() {
   const inboxDir = path.join('content', 'inbox');
   const failedDir = path.join(inboxDir, 'failed');
 
+  const dynamicSections = await getDynamicSections(); // Get dynamic sections for validation
+
   // Get files to process from arguments or read from inboxDir
   let filesToProcess = [];
   const args = process.argv.slice(2); // Get arguments after script name
@@ -107,7 +121,8 @@ async function main() {
 
     try {
       const result = await classifyFile(filePath);
-      if (SECTIONS.includes(result.section) && result.confidence >= 0.8) {
+      // Use dynamicSections for validation
+      if (dynamicSections.includes(result.section) && result.confidence >= 0.8) {
         targetDir = path.join('content', result.section);
         if (result.tags && result.tags.length) {
           const data = await fs.readFile(filePath, 'utf8');
@@ -127,7 +142,7 @@ async function main() {
   }
 }
 
-export { buildPrompt, callOpenAI, classifyFile, moveFile, main };
+export { buildPrompt, callOpenAI, classifyFile, moveFile, main, getDynamicSections };
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch(err => {
