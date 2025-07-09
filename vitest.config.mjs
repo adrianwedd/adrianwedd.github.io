@@ -4,7 +4,10 @@ export default defineConfig({
   test: {
     environment: 'node',
     coverage: {
-      include: ['scripts/fetch-gh-repos.mjs'],
+      include: [
+        'scripts/fetch-gh-repos.mjs',
+        'scripts/classify-inbox.mjs',
+      ],
       reporter: ['text', 'lcov'],
       statements: 80,
       branches: 80,
