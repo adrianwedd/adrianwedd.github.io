@@ -70,6 +70,10 @@ Build a self-updating, agent-fed, static knowledge hub—a "personal intelligenc
 
 ---
 
+### 3a. Architecture Diagram
+
+See [`docs/architecture.mmd`](docs/architecture.mmd) for a mermaid diagram depicting the data flow between automation scripts, content folders, and the GitHub Actions workflow.
+
 ### 4. Automation Scripts (CI)
 
 | Script               | Purpose                                                                | Invoked By       |
