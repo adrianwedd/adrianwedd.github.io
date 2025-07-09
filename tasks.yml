@@ -461,3 +461,81 @@ phases:
       - 'This provides an automated safety net against malformed task definitions.'
     assigned_to: 'codex-agent'
     epic: 'Phase 4: Process Hardening & Agent Bus'
+
+  - id: 23
+    title: Dynamically Discover Content Sections in classify-inbox.mjs
+    description: The `classify-inbox.mjs` script uses a hardcoded array of section names. This means that if a new content directory (e.g., `content/projects/`) is added, the script must be manually updated. This task refactors the script to discover these sections dynamically by reading the directory structure, making the system more maintainable and extensible.
+    component: Automation Scripts
+    dependencies: [6]
+    priority: 3
+    status: pending
+    command: null
+    task_id: PIN-REF-2
+    area: Maintainability
+    actionable_steps:
+      - In `classify-inbox.mjs`, replace the static `SECTIONS` array with a function that reads the directories in `content/`.
+      - Filter out non-content directories like `inbox`, `untagged`, and any others that are not valid classification targets.
+      - Pass the dynamically generated list of sections into the `buildPrompt` function.
+    acceptance_criteria:
+      - The script automatically uses any new directory added to `content/` as a valid classification target.
+      - The hardcoded `SECTIONS` array is removed from the script.
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
+  - id: 24
+    title: Unit Tests for build-insights.mjs
+    description: The `build-insights.mjs` script, once implemented, will contain critical logic for summarizing content with an LLM. This task adds a dedicated unit test suite to ensure this logic is correct, handles errors, and can be refactored safely in the future.
+    component: Testing
+    dependencies: [18]
+    priority: 4
+    status: pending
+    command: npm test
+    task_id: PIN-QA-8
+    area: Testing
+    actionable_steps:
+      - Create a new test file `test/build-insights.test.mjs`.
+      - Mock the OpenAI API and `fs` modules to simulate reading content and receiving LLM summaries.
+      - Write tests to verify that changed files are correctly identified and that insight files are generated with the expected content.
+      - Test edge cases, such as API failures or empty content.
+    acceptance_criteria:
+      - Test coverage for `build-insights.mjs` reaches 80% or higher.
+      - The new tests are integrated into the CI pipeline and pass successfully.
+    assigned_to: codex-agent
+    epic: 'Phase 3: LLM Integration'
+  - id: 25
+    title: Enable Dependabot for Automated Dependency Updates
+    description: To improve security and maintainability, this task involves setting up Dependabot to automatically scan for outdated npm dependencies and create pull requests to update them. This ensures the project does not fall behind on important security patches and package updates.
+    component: CI/CD
+    dependencies: [3]
+    priority: 3
+    status: pending
+    command: null
+    task_id: PIN-SEC-2
+    area: Security
+    actionable_steps:
+      - Create a `.github/dependabot.yml` configuration file.
+      - Configure it to check the npm ecosystem on a weekly schedule.
+      - Set it to target the `main` branch and assign a reviewer (e.g., `@adrianwedd`).
+    acceptance_criteria:
+      - A `dependabot.yml` file is present in the `.github` directory.
+      - Dependabot is active and will create PRs for outdated dependencies.
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
+  - id: 26
+    title: Configure Site URL in astro.config.mjs
+    description: The `astro.config.mjs` file is missing the recommended `site` property. Setting this property is crucial for SEO, generating correct canonical URLs, and ensuring sitemaps are built correctly. This task adds the production URL to the configuration.
+    component: Core Infrastructure
+    dependencies: [2]
+    priority: 4
+    status: pending
+    command: npm run build
+    task_id: PIN-CFG-1
+    area: Configuration
+    actionable_steps:
+      - Read the `CNAME` file to determine the production hostname.
+      - Edit `astro.config.mjs` and add a `site` property to the exported configuration object.
+      - The value should be the full URL, e.g., `https://github.adrianwedd.com`.
+    acceptance_criteria:
+      - The `astro.config.mjs` file contains a `site` property with the correct production URL.
+      - The Astro build completes successfully with the new configuration.
+    assigned_to: codex-agent
+    epic: 'Phase 1: Bootstrap'
