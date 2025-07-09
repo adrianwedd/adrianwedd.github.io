@@ -1,0 +1,21 @@
+---
+export interface Props {
+  title: string;
+  repo: string;
+  description: string;
+  updated?: string;
+}
+const { title, repo, description, updated } = Astro.props;
+---
+<article class="border rounded-lg shadow p-4 bg-white">
+  <h3 class="text-xl font-semibold">
+    <a href={repo} class="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
+      {title}
+    </a>
+  </h3>
+  <p class="mt-2 text-sm text-gray-700">{description}</p>
+  {updated && (
+    <p class="mt-2 text-xs text-gray-500">Updated: {new Date(updated).toLocaleDateString()}</p>
+  )}
+</article>
+

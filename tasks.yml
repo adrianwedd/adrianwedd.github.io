@@ -209,7 +209,7 @@ phases:
     component: "UI/UX"
     dependencies: [3]
     priority: 3
-    status: pending
+    status: done
     command: "npm run dev"
     task_id: "PIN-UI-1"
     area: Frontend
