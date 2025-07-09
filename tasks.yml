@@ -481,3 +481,23 @@ phases:
       - 'Users can search without a backend.'
     assigned_to: codex-agent
     epic: 'Phase 5: UI Expansion'
+
+  - id: 24
+    title: 'RSS Feed Generation'
+    description: 'Produce an RSS feed from markdown metadata for subscribers.'
+    component: 'Automation'
+    dependencies: [5]
+    priority: 3
+    status: done
+    command: null
+    task_id: 'PIN-AUTO-4'
+    area: Deployment
+    actionable_steps:
+      - 'Create build-rss.mjs to output rss.xml.'
+      - 'Add script invocation to deploy workflow before publishing.'
+      - 'Link the feed in site navigation.'
+    acceptance_criteria:
+      - 'Workflow writes `public/rss.xml`.'
+      - 'Site exposes an RSS link.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
