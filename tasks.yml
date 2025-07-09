@@ -411,7 +411,7 @@ phases:
     component: 'Testing'
     dependencies: [14, 16, 18]
     priority: 3
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-QA-6'
     area: Testing
