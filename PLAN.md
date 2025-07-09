@@ -35,6 +35,7 @@ Build a self-updating, agent-fed, static knowledge hub—a "personal intelligenc
 | Diagrams            | Mermaid.js (client-side) |
 | Markdown-with-JS    | MDX (built-in to Astro) |
 | CI / CD             | GitHub Actions + JamesIves/github-pages-deploy-action |
+| Testing             | Vitest with coverage enforced |
 | Agent Scripting     | Node 20 ESM (`*.mjs` scripts) |
 | LLM APIs            | OpenAI, Gemini, or other—invoked from CI scripts |
 
@@ -109,6 +110,7 @@ jobs:
         with: { node-version: '20' }
 
       - run: npm ci
+      - run: npm test
 
       # 1. ingest & classify
       - run: node scripts/fetch-gh-repos.mjs
