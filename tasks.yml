@@ -903,8 +903,8 @@ phases:
     component: 'Documentation'
     dependencies: []
     priority: 3
-    status: pending
-    command: null
+    status: done
+    command: 'add CONTRIBUTING.md'
     task_id: 'PIN-DOC-2'
     area: Documentation
     actionable_steps:
