@@ -1,7 +1,11 @@
 ---
+import NavBar from '../components/NavBar.astro';
 ---
-<html>
-  <body>
-    <slot />
+<html lang="en">
+  <body class="min-h-screen flex flex-col">
+    <NavBar />
+    <main class="flex-grow">
+      <slot />
+    </main>
   </body>
 </html>
