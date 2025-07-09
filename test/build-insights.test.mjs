@@ -24,8 +24,6 @@ vi.mock('../scripts/utils/file-utils.mjs', () => ({
   rename: vi.fn(),
 }));
 
-// Alias imports from the mocked LLM API
-
 // Import the module to be tested
 import * as buildInsights from '../scripts/build-insights.mjs';
 import { callOpenAI } from '../scripts/utils/llm-api.mjs';
