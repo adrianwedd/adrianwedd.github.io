@@ -37,9 +37,19 @@ async function classifyFile(filePath) {
   const reply = await callOpenAI(buildPrompt(content));
   try {
     return JSON.parse(reply);
-  } catch {
+  } catch (err) {
+    console.error(`Invalid JSON from OpenAI for ${path.basename(filePath)}:`, err);
     return null;
   }
+}
+
+function isValidResult(result) {
+  return result &&
+    typeof result.section === 'string' &&
+    Array.isArray(result.tags) &&
+    typeof result.confidence === 'number' &&
+    SECTIONS.includes(result.section) &&
+    result.confidence >= 0 && result.confidence <= 1;
 }
 
 async function moveFile(src, destDir) {
@@ -68,8 +78,12 @@ async function main() {
     } catch (err) {
       console.error(`Failed to classify ${name}:`, err);
     }
+
     let targetDir = path.join('content', 'untagged');
-    if (result && SECTIONS.includes(result.section) && result.confidence >= 0.8) {
+    if (!isValidResult(result)) {
+      console.error(`Validation failed for ${name}:`, result);
+      targetDir = path.join('content', 'inbox', 'failed');
+    } else if (result.confidence >= 0.8) {
       targetDir = path.join('content', result.section);
       if (result.tags && result.tags.length) {
         const data = await fs.readFile(filePath, 'utf8');
@@ -77,6 +91,7 @@ async function main() {
         await fs.writeFile(filePath, fm + data);
       }
     }
+
     const dest = await moveFile(filePath, targetDir);
     console.log(`Moved ${name} to ${dest}`);
   }
