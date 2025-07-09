@@ -1,55 +1,129 @@
-name: Build & Deploy
-# Deploy static site to the `gh-pages` branch
+# .github/workflows/deploy.yml
+name: Build & Deploy Site
 
 on:
+  # Runs on pushes targeting the default branch
   push:
-    branches: [main]
-  schedule:
-    - cron: '0 2 * * *'
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  issues: write # Required for the agent-bus script
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   build:
-    permissions:
-      contents: write
-      issues: write
-      pages: write
+    name: Build & Process
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v35
-      - name: Node
+
+      - name: Detect package manager
+        id: detect-package-manager
+        run: |
+          if [ -f "${{ github.workspace }}/yarn.lock" ]; then
+            echo "manager=yarn" >> $GITHUB_OUTPUT
+            echo "command=install" >> $GITHUB_OUTPUT
+            echo "runner=yarn" >> $GITHUB_OUTPUT
+            echo "lockfile=yarn.lock" >> $GITHUB_OUTPUT
+            exit 0
+          elif [ -f "${{ github.workspace }}/package.json" ]; then
+            echo "manager=npm" >> $GITHUB_OUTPUT
+            echo "command=ci" >> $GITHUB_OUTPUT
+            echo "runner=npx --no-install" >> $GITHUB_OUTPUT
+            echo "lockfile=package-lock.json" >> $GITHUB_OUTPUT
+            exit 0
+          else
+            echo "Unable to determine package manager"
+            exit 1
+          fi
+
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm' # Add caching for npm
-      - run: npm ci
+          node-version: "20"
+          cache: ${{ steps.detect-package-manager.outputs.manager }}
+          cache-dependency-path: ./${{ steps.detect-package-manager.outputs.lockfile }}
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Install dependencies
+        run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
+
+      # --- Custom Script Execution Steps ---
       - name: Security Audit
         run: npm audit --audit-level=high
-      - run: npm run lint
-      - run: npm test
+
+      - name: Lint Code
+        run: npm run lint
+
+      - name: Run Tests
+        run: npm test
+
       - name: Lint & Validate tasks.yml
         run: |
           pip install yamllint pyyaml jsonschema
           yamllint tasks.yml
           python scripts/validate-tasks.py
-      - run: node scripts/fetch-gh-repos.mjs
-      - run: node scripts/classify-inbox.mjs ${{ steps.changed-files.outputs.changed_files }}
-      - run: node scripts/build-insights.mjs ${{ steps.changed-files.outputs.changed_files }}
-      - run: node scripts/agent-bus.mjs
-      - run: npm run build
-      - run: node scripts/build-rss.mjs
-      - uses: JamesIves/github-pages-deploy-action@v4
+
+      - name: Run Automation Scripts
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          BASE_URL: ${{ steps.pages.outputs.origin }}${{ steps.pages.outputs.base_path }}
+        run: |
+          node scripts/fetch-gh-repos.mjs
+          node scripts/classify-inbox.mjs ${{ steps.changed-files.outputs.all_changed_files }}
+          node scripts/build-insights.mjs ${{ steps.changed-files.outputs.all_changed_files }}
+          node scripts/agent-bus.mjs
+          node scripts/build-search-index.mjs
+          node scripts/build-rss.mjs
+
+      - name: Build with Astro
+        run: |
+          ${{ steps.detect-package-manager.outputs.runner }} astro build \
+            --site "${{ steps.pages.outputs.origin }}" \
+            --base "${{ steps.pages.outputs.base_path }}"
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          branch: gh-pages
-          folder: dist
-      - name: Slack Notify
-        uses: 8398a7/action-slack@v3
+          path: ./dist
+
+      - name: Slack Notify on Failure
         if: failure()
+        uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
