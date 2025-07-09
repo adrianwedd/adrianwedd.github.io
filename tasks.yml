@@ -171,7 +171,7 @@ phases:
     component: "Project Management"
     dependencies: [3]
     priority: 4
-    status: pending
+    status: done
     command: null
     task_id: "PIN-CR-1"
     area: "Code Review"
@@ -182,7 +182,7 @@ phases:
     acceptance_criteria:
       - "Pull requests cannot be merged to `main` without passing CI tests and getting one approval."
     assigned_to: human-operator
-    epic: "Phase 4: Process & Hardening"
+    epic: "Phase 4: Process Hardening & Agent Bus"
 
   - id: 9
     title: "Implement Agent Bus"
