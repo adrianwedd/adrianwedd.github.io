@@ -10,18 +10,20 @@ async function getDynamicSections() {
   const contentDir = path.join('content');
   const entries = await fs.readdir(contentDir, { withFileTypes: true });
   const sections = entries
-    .filter(dirent => dirent.isDirectory())
-    .map(dirent => dirent.name)
-    .filter(name => !['inbox', 'untagged'].includes(name)); // Filter out special directories
+    .filter((dirent) => dirent.isDirectory())
+    .map((dirent) => dirent.name)
+    .filter((name) => !['inbox', 'untagged'].includes(name)); // Filter out special directories
   return sections;
 }
 
 async function buildPrompt(content) {
   const dynamicSections = await getDynamicSections(); // Get dynamic sections
-  return `You are an AI assistant helping organise a Personal Intelligence Node.\n` +
+  return (
+    `You are an AI assistant helping organise a Personal Intelligence Node.\n` +
     `Classify the following text into one of these sections: ${dynamicSections.join(', ')}.\n` +
     `Return JSON with keys section, tags (array), and confidence (0-1).\n` +
-    `Text:\n${content}`;
+    `Text:\n${content}`
+  );
 }
 
 async function callOpenAI(prompt) {
@@ -59,7 +61,9 @@ async function classifyFile(filePath) {
 
   const { section, tags, confidence } = result;
   if (!section || !tags || confidence === undefined) {
-    throw new Error(`Malformed response, missing keys: ${JSON.stringify(result)}`);
+    throw new Error(
+      `Malformed response, missing keys: ${JSON.stringify(result)}`
+    );
   }
   if (typeof confidence !== 'number' || confidence < 0 || confidence > 1) {
     throw new Error(`Invalid confidence value: ${confidence}`);
@@ -96,11 +100,19 @@ async function main() {
   if (args.length > 0) {
     // Arguments are provided, assume they are comma-separated file paths
     const changedFilesString = args[0];
-    const changedFiles = changedFilesString.split(',').map(f => f.trim()).filter(f => f.length > 0);
+    const changedFiles = changedFilesString
+      .split(',')
+      .map((f) => f.trim())
+      .filter((f) => f.length > 0);
 
     // Filter for files that are actually in the inbox directory
-    const allInboxFiles = (await fs.readdir(inboxDir)).filter(f => f !== '.gitkeep' && f !== 'failed');
-    filesToProcess = changedFiles.filter(f => allInboxFiles.includes(path.basename(f)) && path.dirname(f) === inboxDir);
+    const allInboxFiles = (await fs.readdir(inboxDir)).filter(
+      (f) => f !== '.gitkeep' && f !== 'failed'
+    );
+    filesToProcess = changedFiles.filter(
+      (f) =>
+        allInboxFiles.includes(path.basename(f)) && path.dirname(f) === inboxDir
+    );
 
     if (filesToProcess.length === 0) {
       console.log('No relevant changed inbox files to process.');
@@ -108,11 +120,13 @@ async function main() {
     }
   } else {
     // No arguments, process all files in inbox
-    filesToProcess = (await fs.readdir(inboxDir)).filter(f => f !== '.gitkeep' && f !== 'failed');
+    filesToProcess = (await fs.readdir(inboxDir)).filter(
+      (f) => f !== '.gitkeep' && f !== 'failed'
+    );
     if (filesToProcess.length === 0) {
       console.log('No inbox files to process.');
       return;
-      }
+    }
   }
 
   for (const name of filesToProcess) {
@@ -122,7 +136,10 @@ async function main() {
     try {
       const result = await classifyFile(filePath);
       // Use dynamicSections for validation
-      if (dynamicSections.includes(result.section) && result.confidence >= 0.8) {
+      if (
+        dynamicSections.includes(result.section) &&
+        result.confidence >= 0.8
+      ) {
         targetDir = path.join('content', result.section);
         if (result.tags && result.tags.length) {
           const data = await fs.readFile(filePath, 'utf8');
@@ -142,10 +159,17 @@ async function main() {
   }
 }
 
-export { buildPrompt, callOpenAI, classifyFile, moveFile, main, getDynamicSections };
+export {
+  buildPrompt,
+  callOpenAI,
+  classifyFile,
+  moveFile,
+  main,
+  getDynamicSections,
+};
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main().catch(err => {
+  main().catch((err) => {
     console.error(err);
     process.exit(1);
   });

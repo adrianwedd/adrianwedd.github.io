@@ -3,12 +3,14 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import fs from 'fs/promises';
 let fetchRepos, repoToMarkdown, getLogin, main;
 async function loadModule() {
-  ({ fetchRepos, repoToMarkdown, getLogin, main } = await import('../scripts/fetch-gh-repos.mjs'));
+  ({ fetchRepos, repoToMarkdown, getLogin, main } = await import(
+    '../scripts/fetch-gh-repos.mjs'
+  ));
 }
 
 function mockFetch(responses) {
   global.fetch = vi.fn();
-  responses.forEach(resp => {
+  responses.forEach((resp) => {
     global.fetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -39,7 +41,12 @@ describe('fetch-gh-repos', () => {
   });
 
   it('repoToMarkdown formats frontmatter', () => {
-    const repo = { name: 'tool', html_url: 'url', description: 'desc', updated_at: 'date' };
+    const repo = {
+      name: 'tool',
+      html_url: 'url',
+      description: 'desc',
+      updated_at: 'date',
+    };
     const md = repoToMarkdown(repo);
     expect(md).toContain('title: tool');
     expect(md).toContain('repo: url');
@@ -62,8 +69,20 @@ describe('fetch-gh-repos', () => {
     mockFetch([
       { login: 'user' },
       [
-        { name: 'tool1', html_url: 'url1', description: 'd1', updated_at: 'date1', topics: ['tool'] },
-        { name: 'not', html_url: 'url2', description: 'd2', updated_at: 'date2', topics: [] }
+        {
+          name: 'tool1',
+          html_url: 'url1',
+          description: 'd1',
+          updated_at: 'date1',
+          topics: ['tool'],
+        },
+        {
+          name: 'not',
+          html_url: 'url2',
+          description: 'd2',
+          updated_at: 'date2',
+          topics: [],
+        },
       ],
     ]);
     const mkdir = vi.spyOn(fs, 'mkdir').mockResolvedValue();

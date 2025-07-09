@@ -23,7 +23,9 @@ describe('github.mjs', () => {
 
     it('should throw an error when GH_TOKEN is not set', () => {
       delete process.env.GH_TOKEN;
-      expect(() => getGitHubHeaders()).toThrow('GH_TOKEN environment variable is required for GitHub API calls.');
+      expect(() => getGitHubHeaders()).toThrow(
+        'GH_TOKEN environment variable is required for GitHub API calls.'
+      );
     });
   });
 

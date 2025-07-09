@@ -20,8 +20,8 @@ async function loadManifests(dir = path.join('content', 'agents')) {
 
 function manifestsToMarkdown(manifests) {
   if (manifests.length === 0) return 'No agents found.';
-  let md = '| id | status | last updated | owner | role |\n|---|---|---|---|---|
-';
+  let md =
+    '| id | status | last updated | owner | role |\n|---|---|---|---|---|\n';
   for (const m of manifests) {
     md += `| ${m.id} | ${m.status} | ${m.last_updated} | ${m.owner || ''} | ${m.role || ''} |\n`;
   }
@@ -29,24 +29,34 @@ function manifestsToMarkdown(manifests) {
 }
 
 async function getIssueNumber(title, owner, repo) {
-  const issues = await githubFetch(`https://api.github.com/repos/${owner}/${repo}/issues?per_page=100&state=open`);
-  const found = issues.find((i) => i.title.toLowerCase() === title.toLowerCase());
+  const issues = await githubFetch(
+    `https://api.github.com/repos/${owner}/${repo}/issues?per_page=100&state=open`
+  );
+  const found = issues.find(
+    (i) => i.title.toLowerCase() === title.toLowerCase()
+  );
   return found ? found.number : null;
 }
 
 async function createIssue(title, body, owner, repo) {
-  const issue = await githubFetch(`https://api.github.com/repos/${owner}/${repo}/issues`, {
-    method: 'POST',
-    body: JSON.stringify({ title, body }),
-  });
+  const issue = await githubFetch(
+    `https://api.github.com/repos/${owner}/${repo}/issues`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ title, body }),
+    }
+  );
   return issue.number;
 }
 
 async function updateIssue(number, body, owner, repo) {
-  await githubFetch(`https://api.github.com/repos/${owner}/${repo}/issues/${number}`, {
-    method: 'PATCH',
-    body: JSON.stringify({ body }),
-  });
+  await githubFetch(
+    `https://api.github.com/repos/${owner}/${repo}/issues/${number}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ body }),
+    }
+  );
 }
 
 async function main() {

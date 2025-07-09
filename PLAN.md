@@ -98,14 +98,14 @@ GitHub Issue with a summary table.
 
 ### 4. Automation Scripts (CI)
 
-| Script               | Purpose                                                                                                                         | Invoked By            |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
-| `fetch-gh-repos.mjs` | Scan GitHub user/org, create `content/tools/<repo>.md` for any repo tagged tool.                                                | Manual & nightly cron |
-| `classify-inbox.mjs` | For every file in `content/inbox/`, call LLM → `{section,tags}`; move file accordingly. Confidence < 0.8 ⇒ move to `untagged/`. | Before build step     |
-| `build-insights.mjs` | Parse new/changed markdown (logs, garden, mirror); generate `<slug>.insight.md` with summary + cross-links.                     | After classification  |
-| `build-search-index.mjs` | Generate `public/search-index.json` for client-side Lunr search. | Before build step |
-| `build-rss.mjs` | Generate `public/rss.xml` feed from markdown metadata. | Before deploy step |
-| `agent-bus.mjs`      | Read `content/agents/*.yml`, update or create GitHub Issue `#agent-bus` with latest agent statuses.                             | Last step in workflow |
+| Script                   | Purpose                                                                                                                         | Invoked By            |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| `fetch-gh-repos.mjs`     | Scan GitHub user/org, create `content/tools/<repo>.md` for any repo tagged tool.                                                | Manual & nightly cron |
+| `classify-inbox.mjs`     | For every file in `content/inbox/`, call LLM → `{section,tags}`; move file accordingly. Confidence < 0.8 ⇒ move to `untagged/`. | Before build step     |
+| `build-insights.mjs`     | Parse new/changed markdown (logs, garden, mirror); generate `<slug>.insight.md` with summary + cross-links.                     | After classification  |
+| `build-search-index.mjs` | Generate `public/search-index.json` for client-side Lunr search.                                                                | Before build step     |
+| `build-rss.mjs`          | Generate `public/rss.xml` feed from markdown metadata.                                                                          | Before deploy step    |
+| `agent-bus.mjs`          | Read `content/agents/*.yml`, update or create GitHub Issue `#agent-bus` with latest agent statuses.                             | Last step in workflow |
 
 ---
 

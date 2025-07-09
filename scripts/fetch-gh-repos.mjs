@@ -15,7 +15,6 @@ async function fetchRepos(login) {
   const perPage = 100;
   for (;;) {
     const url = `https://api.github.com/users/${login}/repos?per_page=${perPage}&page=${page}`;
-<<<<<<< HEAD
     const data = await githubFetch(url); // Use githubFetch
     repos.push(...data);
     if (data.length < perPage) break;
@@ -56,5 +55,4 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     console.error(err);
     process.exit(1);
   });
-<<<<<<< HEAD
 }

@@ -42,13 +42,19 @@ async function main() {
   if (args.length > 0) {
     // Arguments are provided, assume they are comma-separated file paths
     const changedFilesString = args[0];
-    const changedFiles = changedFilesString.split(',').map(f => f.trim()).filter(f => f.length > 0);
+    const changedFiles = changedFilesString
+      .split(',')
+      .map((f) => f.trim())
+      .filter((f) => f.length > 0);
 
     // Filter for files that are markdown and within target directories
     for (const changedFile of changedFiles) {
       const absolutePath = path.resolve(changedFile); // Resolve to absolute path
-      const isMarkdown = absolutePath.endsWith('.md') && !absolutePath.endsWith('.insight.md');
-      const isInTargetDir = TARGET_DIRS.some(dir => absolutePath.startsWith(dir + path.sep));
+      const isMarkdown =
+        absolutePath.endsWith('.md') && !absolutePath.endsWith('.insight.md');
+      const isInTargetDir = TARGET_DIRS.some((dir) =>
+        absolutePath.startsWith(dir + path.sep)
+      );
 
       if (isMarkdown && isInTargetDir) {
         filesToProcess.push(absolutePath);
@@ -64,7 +70,9 @@ async function main() {
     for (const dir of TARGET_DIRS) {
       try {
         const files = await fs.readdir(dir);
-        const markdownFiles = files.filter(file => file.endsWith('.md') && !file.endsWith('.insight.md'));
+        const markdownFiles = files.filter(
+          (file) => file.endsWith('.md') && !file.endsWith('.insight.md')
+        );
         for (const file of markdownFiles) {
           filesToProcess.push(path.join(dir, file));
         }
@@ -91,7 +99,7 @@ async function main() {
 export { main, buildSummaryPrompt, processMarkdownFile };
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main().catch(err => {
+  main().catch((err) => {
     console.error(err);
     process.exit(1);
   });
