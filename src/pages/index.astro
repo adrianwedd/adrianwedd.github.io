@@ -1,10 +1,24 @@
 ---
+import BaseLayout from '../layouts/Base.astro';
+
+const sections = [
+  { href: '/tools/', title: 'Tools', description: 'Code and utilities.' },
+  { href: '/logs/', title: 'Logs', description: 'Journals and transcripts.' },
+  { href: '/garden/', title: 'Garden', description: 'Zettels and notes.' },
+  { href: '/mirror/', title: 'Mirror', description: 'Narrative and creative work.' },
+  { href: '/resume/', title: 'Resume', description: 'Professional profile.' },
+  { href: '/agents/', title: 'Agents', description: 'Agent manifests.' },
+  { href: '/codex/', title: 'Codex', description: 'Agent blueprints.' },
+];
 ---
-<html>
-  <head>
-    <title>Personal Intelligence Node</title>
-  </head>
-  <body>
-    <h1>Welcome to the Personal Intelligence Node</h1>
-  </body>
-</html>
+<BaseLayout>
+  <h1 class="text-2xl font-bold my-4">Personal Intelligence Node</h1>
+  <div class="grid gap-4 md:grid-cols-2">
+    {sections.map(section => (
+      <a href={section.href} class="block p-4 border rounded-lg hover:bg-gray-50">
+        <h2 class="text-xl font-semibold">{section.title}</h2>
+        <p class="text-sm text-gray-600">{section.description}</p>
+      </a>
+    ))}
+  </div>
+</BaseLayout>
