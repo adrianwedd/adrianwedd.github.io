@@ -1,0 +1,7 @@
+id: test-agent
+name: Test Agent
+owner: '@testuser'
+role: Testing automation
+status: active
+last_updated: 2025-01-01T00:00:00Z
+description: An agent for testing purposes.

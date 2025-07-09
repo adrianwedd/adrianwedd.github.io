@@ -2,24 +2,38 @@ import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const MODEL = process.env.OPENAI_MODEL || 'gpt-3.5-turbo-1106';
-const SECTIONS = ['tools', 'logs', 'garden', 'mirror', 'resume', 'agents'];
+// REMOVE: const SECTIONS = ['tools', 'logs', 'garden', 'mirror', 'resume', 'agents'];
 
-function buildPrompt(content) {
-  return `You are an AI assistant helping organise a Personal Intelligence Node.\n` +
-    `Classify the following text into one of these sections: ${SECTIONS.join(', ')}.\n` +
+// Function to dynamically discover content sections
+async function getDynamicSections() {
+  const contentDir = path.join('content');
+  const entries = await fs.readdir(contentDir, { withFileTypes: true });
+  const sections = entries
+    .filter((dirent) => dirent.isDirectory())
+    .map((dirent) => dirent.name)
+    .filter((name) => !['inbox', 'untagged'].includes(name)); // Filter out special directories
+  return sections;
+}
+
+async function buildPrompt(content) {
+  const dynamicSections = await getDynamicSections(); // Get dynamic sections
+  return (
+    `You are an AI assistant helping organise a Personal Intelligence Node.\n` +
+    `Classify the following text into one of these sections: ${dynamicSections.join(', ')}.\n` +
     `Return JSON with keys section, tags (array), and confidence (0-1).\n` +
-    `Text:\n${content}`;
+    `Text:\n${content}`
+  );
 }
 
 async function callOpenAI(prompt) {
-  if (!OPENAI_API_KEY) throw new Error('OPENAI_API_KEY not set');
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error('OPENAI_API_KEY not set');
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
       model: MODEL,
@@ -27,7 +41,10 @@ async function callOpenAI(prompt) {
       temperature: 0,
     }),
   });
-  if (!res.ok) throw new Error(`OpenAI error ${res.status}`);
+  if (!res.ok) {
+    const errorBody = await res.text();
+    throw new Error(`OpenAI API error ${res.status}: ${errorBody}`);
+  }
   const data = await res.json();
   return data.choices[0].message.content.trim();
 }
@@ -35,12 +52,19 @@ async function callOpenAI(prompt) {
 async function classifyFile(filePath) {
   const content = await fs.readFile(filePath, 'utf8');
   const reply = await callOpenAI(buildPrompt(content));
+  let result;
   try {
     return JSON.parse(reply);
   } catch (err) {
     console.error(`Invalid JSON from OpenAI for ${path.basename(filePath)}:`, err);
     return null;
+
   }
+  if (!Array.isArray(tags)) {
+    throw new Error(`Invalid tags value: ${tags}`);
+  }
+
+  return result;
 }
 
 function isValidResult(result) {
@@ -60,19 +84,56 @@ async function moveFile(src, destDir) {
 }
 
 async function main() {
-  if (!OPENAI_API_KEY) {
+  if (!process.env.OPENAI_API_KEY) {
     console.error('OPENAI_API_KEY not set; skipping classification');
     return;
   }
+
   const inboxDir = path.join('content', 'inbox');
-  const files = (await fs.readdir(inboxDir)).filter(f => f !== '.gitkeep');
-  if (files.length === 0) {
-    console.log('No inbox files to process.');
-    return;
+  const failedDir = path.join(inboxDir, 'failed');
+
+  const dynamicSections = await getDynamicSections(); // Get dynamic sections for validation
+
+  // Get files to process from arguments or read from inboxDir
+  let filesToProcess = [];
+  const args = process.argv.slice(2); // Get arguments after script name
+
+  if (args.length > 0) {
+    // Arguments are provided, assume they are comma-separated file paths
+    const changedFilesString = args[0];
+    const changedFiles = changedFilesString
+      .split(',')
+      .map((f) => f.trim())
+      .filter((f) => f.length > 0);
+
+    // Filter for files that are actually in the inbox directory
+    const allInboxFiles = (await fs.readdir(inboxDir)).filter(
+      (f) => f !== '.gitkeep' && f !== 'failed'
+    );
+    filesToProcess = changedFiles.filter(
+      (f) =>
+        allInboxFiles.includes(path.basename(f)) && path.dirname(f) === inboxDir
+    );
+
+    if (filesToProcess.length === 0) {
+      console.log('No relevant changed inbox files to process.');
+      return;
+    }
+  } else {
+    // No arguments, process all files in inbox
+    filesToProcess = (await fs.readdir(inboxDir)).filter(
+      (f) => f !== '.gitkeep' && f !== 'failed'
+    );
+    if (filesToProcess.length === 0) {
+      console.log('No inbox files to process.');
+      return;
+    }
   }
-  for (const name of files) {
+
+  for (const name of filesToProcess) {
     const filePath = path.join(inboxDir, name);
-    let result;
+    let targetDir;
+
     try {
       result = await classifyFile(filePath);
     } catch (err) {
@@ -89,7 +150,11 @@ async function main() {
         const data = await fs.readFile(filePath, 'utf8');
         const fm = `---\ntags: [${result.tags.join(', ')}]\n---\n`;
         await fs.writeFile(filePath, fm + data);
+
       }
+    } catch (err) {
+      console.error(`Failed to classify ${name}:`, err.message);
+      targetDir = failedDir;
     }
 
     const dest = await moveFile(filePath, targetDir);
@@ -97,10 +162,17 @@ async function main() {
   }
 }
 
-export { buildPrompt, callOpenAI, classifyFile, moveFile, main };
+export {
+  buildPrompt,
+  callOpenAI,
+  classifyFile,
+  moveFile,
+  main,
+  getDynamicSections,
+};
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main().catch(err => {
+  main().catch((err) => {
     console.error(err);
     process.exit(1);
   });

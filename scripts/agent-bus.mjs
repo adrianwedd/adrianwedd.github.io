@@ -2,21 +2,9 @@ import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { parse } from 'yaml';
+import { githubFetch } from './utils/github.mjs'; // Import the new utility
 
-const GH_TOKEN = process.env.GH_TOKEN;
 const REPO = process.env.GH_REPO || process.env.GITHUB_REPOSITORY;
-
-const headers = GH_TOKEN
-  ? {
-      Accept: 'application/vnd.github+json',
-      Authorization: `Bearer ${GH_TOKEN}`,
-    }
-  : null;
-
-function requireEnv() {
-  if (!headers) throw new Error('GH_TOKEN not set');
-  if (!REPO) throw new Error('GH_REPO or GITHUB_REPOSITORY not set');
-}
 
 async function loadManifests(dir = path.join('content', 'agents')) {
   const files = await fs.readdir(dir);
@@ -32,7 +20,8 @@ async function loadManifests(dir = path.join('content', 'agents')) {
 
 function manifestsToMarkdown(manifests) {
   if (manifests.length === 0) return 'No agents found.';
-  let md = '| id | status | last updated | owner | role |\n|---|---|---|---|---|\n';
+  let md =
+    '| id | status | last updated | owner | role |\n|---|---|---|---|---|\n';
   for (const m of manifests) {
     md += `| ${m.id} | ${m.status} | ${m.last_updated} | ${m.owner || ''} | ${m.role || ''} |\n`;
   }
@@ -40,35 +29,38 @@ function manifestsToMarkdown(manifests) {
 }
 
 async function getIssueNumber(title, owner, repo) {
-  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues?per_page=100&state=open`, { headers });
-  if (!res.ok) throw new Error(`Failed to list issues: ${res.status}`);
-  const issues = await res.json();
-  const found = issues.find((i) => i.title.toLowerCase() === title.toLowerCase());
+  const issues = await githubFetch(
+    `https://api.github.com/repos/${owner}/${repo}/issues?per_page=100&state=open`
+  );
+  const found = issues.find(
+    (i) => i.title.toLowerCase() === title.toLowerCase()
+  );
   return found ? found.number : null;
 }
 
 async function createIssue(title, body, owner, repo) {
-  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ title, body }),
-  });
-  if (!res.ok) throw new Error(`Failed to create issue: ${res.status}`);
-  const issue = await res.json();
+  const issue = await githubFetch(
+    `https://api.github.com/repos/${owner}/${repo}/issues`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ title, body }),
+    }
+  );
   return issue.number;
 }
 
 async function updateIssue(number, body, owner, repo) {
-  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues/${number}`, {
-    method: 'PATCH',
-    headers,
-    body: JSON.stringify({ body }),
-  });
-  if (!res.ok) throw new Error(`Failed to update issue: ${res.status}`);
+  await githubFetch(
+    `https://api.github.com/repos/${owner}/${repo}/issues/${number}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ body }),
+    }
+  );
 }
 
 async function main() {
-  requireEnv();
+  if (!REPO) throw new Error('GH_REPO or GITHUB_REPOSITORY not set'); // Moved check here
   const [owner, repo] = REPO.split('/');
   const manifests = await loadManifests();
   const body = manifestsToMarkdown(manifests);

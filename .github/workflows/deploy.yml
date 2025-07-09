@@ -8,24 +8,37 @@ on:
     - cron: '0 2 * * *'
 jobs:
   build:
+    permissions:
+      contents: write
+      issues: write
+      pages: write
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - uses: actions/checkout@v4
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35
       - name: Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm' # Add caching for npm
       - run: npm ci
       - name: Security Audit
         run: npm audit --audit-level=high
       - run: npm run lint
       - run: npm test
+      - name: Lint & Validate tasks.yml
+        run: |
+          pip install yamllint pyyaml jsonschema
+          yamllint tasks.yml
+          python scripts/validate-tasks.py
       - run: node scripts/fetch-gh-repos.mjs
-      - run: node scripts/classify-inbox.mjs
-      - run: node scripts/build-insights.mjs
+      - run: node scripts/classify-inbox.mjs ${{ steps.changed-files.outputs.changed_files }}
+      - run: node scripts/build-insights.mjs ${{ steps.changed-files.outputs.changed_files }}
       - run: node scripts/agent-bus.mjs
       - run: npm run build
       - run: node scripts/build-rss.mjs

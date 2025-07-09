@@ -1,39 +1,21 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
-
-const GH_TOKEN = process.env.GH_TOKEN;
-const headers = GH_TOKEN
-  ? {
-      Accept: 'application/vnd.github+json',
-      Authorization: `Bearer ${GH_TOKEN}`,
-    }
-  : null;
-
-function requireToken() {
-  if (!headers) throw new Error('GH_TOKEN environment variable is required');
-}
+import { githubFetch } from './utils/github.mjs'; // Import the new utility
 
 async function getLogin() {
-  requireToken();
   if (process.env.GH_USER) return process.env.GH_USER;
-  const res = await fetch('https://api.github.com/user', { headers });
-  if (!res.ok) throw new Error(`Failed to fetch user: ${res.status}`);
-  const data = await res.json();
+  const data = await githubFetch('https://api.github.com/user'); // Use githubFetch
   return data.login;
 }
 
 async function fetchRepos(login) {
-  requireToken();
   const repos = [];
   let page = 1;
   const perPage = 100;
   for (;;) {
     const url = `https://api.github.com/users/${login}/repos?per_page=${perPage}&page=${page}`;
-    const res = await fetch(url, { headers });
-    if (!res.ok)
-      throw new Error(`Failed to fetch repos page ${page}: ${res.status}`);
-    const data = await res.json();
+    const data = await githubFetch(url); // Use githubFetch
     repos.push(...data);
     if (data.length < perPage) break;
     page += 1;
@@ -54,14 +36,24 @@ async function main() {
   );
 
   const dir = path.join('content', 'tools');
-  await fs.mkdir(dir, { recursive: true });
+  try {
+    await fs.mkdir(dir, { recursive: true });
+  } catch (err) {
+    console.error(`Error creating directory ${dir}:`, err.message);
+    // Depending on severity, might want to exit or throw here
+    return;
+  }
 
   await Promise.all(
     tools.map(async (repo) => {
       const md = repoToMarkdown(repo);
       const filePath = path.join(dir, `${repo.name}.md`);
-      await fs.writeFile(filePath, md);
-      console.log(`Wrote ${filePath}`);
+      try {
+        await fs.writeFile(filePath, md);
+        console.log(`Wrote ${filePath}`);
+      } catch (err) {
+        console.error(`Error writing file ${filePath}:`, err.message);
+      }
     })
   );
 }

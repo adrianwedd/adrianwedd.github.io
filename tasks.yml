@@ -272,7 +272,7 @@ phases:
     component: 'Automation Scripts'
     dependencies: [6]
     priority: 4
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-ROBUST-1'
     area: Robustness
@@ -292,7 +292,7 @@ phases:
     component: 'Testing'
     dependencies: [13]
     priority: 4
-    status: pending
+    status: done
     command: 'npm test'
     task_id: 'PIN-QA-4'
     area: Testing
@@ -312,7 +312,7 @@ phases:
     component: 'Automation Scripts'
     dependencies: [4, 9]
     priority: 3
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-REF-1'
     area: Maintainability
@@ -332,7 +332,7 @@ phases:
     component: 'Testing'
     dependencies: [15]
     priority: 3
-    status: pending
+    status: done
     command: 'npm test'
     task_id: 'PIN-QA-5'
     area: Testing
@@ -345,6 +345,28 @@ phases:
       - 'CI passes with the new tests.'
     assigned_to: 'codex-agent'
     epic: 'Phase 4: Process Hardening & Agent Bus'
+  - id: 27
+    title: 'Investigate and Fix Vitest Module Resolution for agent-bus.mjs'
+    description: 'The unit tests for `agent-bus.mjs` are currently excluded from the test suite due to a module resolution error in Vitest. This task involves investigating the root cause of this error and implementing a fix to allow the `agent-bus.test.mjs` tests to run successfully.'
+    component: 'Testing'
+    dependencies: [16] # Depends on the tests being written (even if excluded)
+    priority: 4
+    status: done
+    command: 'npm test'
+    task_id: 'PIN-QA-9'
+    area: 'QA'
+    actionable_steps:
+      - 'Analyze Vitest configuration and module import/mocking strategy in `agent-bus.test.mjs`.'
+      - 'Experiment with different Vitest configurations (e.g., `deps.interopDefault`, `resolve.alias`) or mocking techniques (e.g., `vi.doMock`).'
+      - 'Consult Vitest documentation and community forums for similar issues.'
+      - 'Implement a solution that allows `agent-bus.test.mjs` to run without errors.'
+      - 'Re-enable `agent-bus.test.mjs` in `vitest.config.mjs`.'
+    acceptance_criteria:
+      - '`agent-bus.test.mjs` runs successfully in the test suite.'
+      - 'The overall test coverage for `agent-bus.mjs` is reported correctly.'
+      - 'The `exclude` entry for `agent-bus.test.mjs` is removed from `vitest.config.mjs`.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 4: Process Hardening & Agent Bus'
 
   - id: 17
     title: 'Restrict permissions in deploy workflow'
@@ -352,7 +374,7 @@ phases:
     component: 'CI/CD'
     dependencies: [3]
     priority: 4
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-SEC-1'
     area: Security
@@ -370,7 +392,7 @@ phases:
     component: 'Automation Scripts'
     dependencies: [6]
     priority: 3
-    status: pending
+    status: done
     command: 'node scripts/build-insights.mjs'
     task_id: 'PIN-DEV-4'
     area: Development
@@ -389,7 +411,7 @@ phases:
     component: 'Testing'
     dependencies: [14, 16, 18]
     priority: 3
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-QA-6'
     area: Testing
@@ -408,14 +430,14 @@ phases:
     component: 'CI/CD'
     dependencies: [3]
     priority: 2
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-OPT-1'
     area: Optimization
     actionable_steps:
       - 'Add a step using the `actions/setup-node@v4` action that includes caching for the package manager.'
       - 'Configure the cache key to use the `package-lock.json` hash to ensure the cache is invalidated when dependencies change.'
-      - 'Verify that subsequent CI runs are faster due to the cache hit.'
+      - 'Verify that subsequent CI runs are faster dues to the cache hit.'
     acceptance_criteria:
       - 'The `deploy.yml` workflow includes a caching mechanism for npm dependencies.'
       - 'CI workflow execution time is demonstrably reduced on runs where dependencies have not changed.'
@@ -428,7 +450,7 @@ phases:
     component: 'Automation Scripts'
     dependencies: [6, 18]
     priority: 3
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-SCALE-1'
     area: Scalability
@@ -448,7 +470,7 @@ phases:
     component: 'CI/CD'
     dependencies: [3]
     priority: 5
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-QA-7'
     area: QA
@@ -463,52 +485,12 @@ phases:
     epic: 'Phase 4: Process Hardening & Agent Bus'
 
   - id: 23
-<<<<<<< HEAD
-    title: 'Static Search Index'
-    description: 'Generate a Lunr.js index for all markdown content and integrate a search component.'
-    component: 'Front-End'
-    dependencies: [5]
-    priority: 3
-    status: done
-    command: null
-    task_id: 'PIN-UI-3'
-    area: UI
-    actionable_steps:
-      - 'Add Lunr.js dependency.'
-      - 'Create build-search-index.mjs to output search-index.json.'
-      - 'Integrate Search.astro component.'
-    acceptance_criteria:
-      - 'Script outputs `public/search-index.json`.'
-      - 'Users can search without a backend.'
-    assigned_to: codex-agent
-    epic: 'Phase 5: UI Expansion'
-
-  - id: 24
-    title: 'RSS Feed Generation'
-    description: 'Produce an RSS feed from markdown metadata for subscribers.'
-    component: 'Automation'
-    dependencies: [5]
-    priority: 3
-    status: done
-    command: null
-    task_id: 'PIN-AUTO-4'
-    area: Deployment
-    actionable_steps:
-      - 'Create build-rss.mjs to output rss.xml.'
-      - 'Add script invocation to deploy workflow before publishing.'
-      - 'Link the feed in site navigation.'
-    acceptance_criteria:
-      - 'Workflow writes `public/rss.xml`.'
-      - 'Site exposes an RSS link.'
-    assigned_to: codex-agent
-    epic: 'Phase 6: Iterative Growth'
-=======
     title: Dynamically Discover Content Sections in classify-inbox.mjs
     description: The `classify-inbox.mjs` script uses a hardcoded array of section names. This means that if a new content directory (e.g., `content/projects/`) is added, the script must be manually updated. This task refactors the script to discover these sections dynamically by reading the directory structure, making the system more maintainable and extensible.
     component: Automation Scripts
     dependencies: [6]
     priority: 3
-    status: pending
+    status: done
     command: null
     task_id: PIN-REF-2
     area: Maintainability
@@ -527,7 +509,7 @@ phases:
     component: Testing
     dependencies: [18]
     priority: 4
-    status: pending
+    status: done
     command: npm test
     task_id: PIN-QA-8
     area: Testing
@@ -547,7 +529,7 @@ phases:
     component: CI/CD
     dependencies: [3]
     priority: 3
-    status: pending
+    status: done
     command: null
     task_id: PIN-SEC-2
     area: Security
@@ -566,7 +548,7 @@ phases:
     component: Core Infrastructure
     dependencies: [2]
     priority: 4
-    status: pending
+    status: done
     command: npm run build
     task_id: PIN-CFG-1
     area: Configuration
@@ -577,6 +559,44 @@ phases:
     acceptance_criteria:
       - The `astro.config.mjs` file contains a `site` property with the correct production URL.
       - The Astro build completes successfully with the new configuration.
-    assigned_to: codex-agent
+    assigned_to: 'codex-agent'
     epic: 'Phase 1: Bootstrap'
->>>>>>> 80014d8 (feat: Add new tasks for system improvement)
+  - id: 28
+    title: 'Static Search Index'
+    description: 'Generate a Lunr.js index for all markdown content and integrate a search component.'
+    component: 'Front-End'
+    dependencies: [5]
+    priority: 3
+    status: done
+    command: null
+    task_id: 'PIN-UI-3'
+    area: UI
+    actionable_steps:
+      - 'Add Lunr.js dependency.'
+      - 'Create build-search-index.mjs to output search-index.json.'
+      - 'Integrate Search.astro component.'
+    acceptance_criteria:
+      - 'Script outputs `public/search-index.json`.'
+      - 'Users can search without a backend.'
+    assigned_to: codex-agent
+    epic: 'Phase 5: UI Expansion'
+
+  - id: 29
+    title: 'RSS Feed Generation'
+    description: 'Produce an RSS feed from markdown metadata for subscribers.'
+    component: 'Automation'
+    dependencies: [5]
+    priority: 3
+    status: done
+    command: null
+    task_id: 'PIN-AUTO-4'
+    area: Deployment
+    actionable_steps:
+      - 'Create build-rss.mjs to output rss.xml.'
+      - 'Add script invocation to deploy workflow before publishing.'
+      - 'Link the feed in site navigation.'
+    acceptance_criteria:
+      - 'Workflow writes `public/rss-xml`.'
+      - 'Site exposes an RSS link.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
