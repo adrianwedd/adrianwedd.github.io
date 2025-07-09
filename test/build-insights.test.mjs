@@ -8,7 +8,7 @@ import path from 'path';
 vi.mock('fs/promises');
 
 // Mock the callOpenAI function from classify-inbox.mjs
-vi.mock('../../scripts/classify-inbox.mjs', async (importOriginal) => {
+vi.mock('../scripts/classify-inbox.mjs', async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
@@ -17,8 +17,8 @@ vi.mock('../../scripts/classify-inbox.mjs', async (importOriginal) => {
 });
 
 // Import the module to be tested
-import * as buildInsights from '../../scripts/build-insights.mjs';
-import { callOpenAI } from '../../scripts/classify-inbox.mjs'; // Import the mocked function
+import * as buildInsights from '../scripts/build-insights.mjs';
+import { callOpenAI } from '../scripts/classify-inbox.mjs'; // Import the mocked function
 
 describe('build-insights.mjs', () => {
   const mockMarkdownContent = '# Test Content\nThis is some test content.';
@@ -75,20 +75,17 @@ describe('build-insights.mjs', () => {
   });
 
   it('main should process markdown files in target directories', async () => {
-    const processMarkdownFileSpy = vi.spyOn(
-      buildInsights,
-      'processMarkdownFile'
-    );
     await buildInsights.main();
     expect(fs.readdir).toHaveBeenCalledWith(path.join('content', 'garden'));
     expect(fs.readdir).toHaveBeenCalledWith(path.join('content', 'logs'));
     expect(fs.readdir).toHaveBeenCalledWith(path.join('content', 'mirror'));
-    expect(processMarkdownFileSpy).toHaveBeenCalledTimes(6); // 2 files per directory
-    expect(processMarkdownFileSpy).toHaveBeenCalledWith(
-      path.join('content', 'garden', 'file1.md')
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      path.join('content', 'garden', 'file1.insight.md'),
+      mockSummary
     );
-    expect(processMarkdownFileSpy).toHaveBeenCalledWith(
-      path.join('content', 'garden', 'file2.md')
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      path.join('content', 'garden', 'file2.insight.md'),
+      mockSummary
     );
   });
 
@@ -113,19 +110,13 @@ describe('build-insights.mjs', () => {
       .mockImplementation(() => {});
     await buildInsights.main();
     expect(consoleWarnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Directory not found'),
-      expect.stringContaining('garden')
+      expect.stringContaining('Directory not found: content/garden')
     );
   });
 
   it('main should skip insight generation if API key is not set', async () => {
     delete process.env.OPENAI_API_KEY;
-    const processMarkdownFileSpy = vi.spyOn(
-      buildInsights,
-      'processMarkdownFile'
-    );
     await buildInsights.main();
-    expect(processMarkdownFileSpy).not.toHaveBeenCalled();
     expect(fs.readdir).not.toHaveBeenCalled();
   });
 });
