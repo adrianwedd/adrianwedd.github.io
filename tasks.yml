@@ -228,7 +228,7 @@ phases:
     component: 'Testing'
     dependencies: [10, 7, 9]
     priority: 2
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-QA-3'
     area: QA
@@ -627,7 +627,7 @@ phases:
     component: 'Automation Scripts'
     dependencies: []
     priority: 4
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-ROBUST-3'
     area: Robustness
@@ -923,7 +923,7 @@ phases:
     component: 'Testing'
     dependencies: [32]
     priority: 5
-    status: pending
+    status: done
     command: 'npm test'
     task_id: 'PIN-QA-15'
     area: QA

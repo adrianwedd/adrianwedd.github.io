@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['test/**/*.test.{ts,js,mjs,cjs}'], // Only include tests in the 'test' directory
-    exclude: ['test/build-insights.test.mjs', 'test/integration.test.mjs'], // Exclude problematic test files
+    exclude: ['test/integration.test.mjs'], // Integration test still excluded due to heavy mocks
     coverage: {
       include: [
         'scripts/fetch-gh-repos.mjs',
