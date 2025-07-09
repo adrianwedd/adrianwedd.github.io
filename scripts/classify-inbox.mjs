@@ -27,7 +27,10 @@ async function callOpenAI(prompt) {
       temperature: 0,
     }),
   });
-  if (!res.ok) throw new Error(`OpenAI error ${res.status}`);
+  if (!res.ok) {
+    const errorBody = await res.text();
+    throw new Error(`OpenAI API error ${res.status}: ${errorBody}`);
+  }
   const data = await res.json();
   return data.choices[0].message.content.trim();
 }
@@ -35,11 +38,25 @@ async function callOpenAI(prompt) {
 async function classifyFile(filePath) {
   const content = await fs.readFile(filePath, 'utf8');
   const reply = await callOpenAI(buildPrompt(content));
+  let result;
   try {
-    return JSON.parse(reply);
-  } catch {
-    return null;
+    result = JSON.parse(reply);
+  } catch (err) {
+    throw new Error(`Invalid JSON response: ${reply}`);
   }
+
+  const { section, tags, confidence } = result;
+  if (!section || !tags || confidence === undefined) {
+    throw new Error(`Malformed response, missing keys: ${JSON.stringify(result)}`);
+  }
+  if (typeof confidence !== 'number' || confidence < 0 || confidence > 1) {
+    throw new Error(`Invalid confidence value: ${confidence}`);
+  }
+  if (!Array.isArray(tags)) {
+    throw new Error(`Invalid tags value: ${tags}`);
+  }
+
+  return result;
 }
 
 async function moveFile(src, destDir) {
@@ -60,23 +77,32 @@ async function main() {
     console.log('No inbox files to process.');
     return;
   }
+
+  const failedDir = path.join(inboxDir, 'failed');
+
   for (const name of files) {
+    if (name === 'failed') continue; // Skip the failed directory itself
+
     const filePath = path.join(inboxDir, name);
-    let result;
+    let targetDir;
+
     try {
-      result = await classifyFile(filePath);
-    } catch (err) {
-      console.error(`Failed to classify ${name}:`, err);
-    }
-    let targetDir = path.join('content', 'untagged');
-    if (result && SECTIONS.includes(result.section) && result.confidence >= 0.8) {
-      targetDir = path.join('content', result.section);
-      if (result.tags && result.tags.length) {
-        const data = await fs.readFile(filePath, 'utf8');
-        const fm = `---\ntags: [${result.tags.join(', ')}]\n---\n`;
-        await fs.writeFile(filePath, fm + data);
+      const result = await classifyFile(filePath);
+      if (SECTIONS.includes(result.section) && result.confidence >= 0.8) {
+        targetDir = path.join('content', result.section);
+        if (result.tags && result.tags.length) {
+          const data = await fs.readFile(filePath, 'utf8');
+          const fm = `---\ntags: [${result.tags.join(', ')}]\n---\n`;
+          await fs.writeFile(filePath, fm + data);
+        }
+      } else {
+        targetDir = path.join('content', 'untagged');
       }
+    } catch (err) {
+      console.error(`Failed to classify ${name}:`, err.message);
+      targetDir = failedDir;
     }
+
     const dest = await moveFile(filePath, targetDir);
     console.log(`Moved ${name} to ${dest}`);
   }
