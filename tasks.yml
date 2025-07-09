@@ -437,7 +437,7 @@ phases:
     actionable_steps:
       - 'Add a step using the `actions/setup-node@v4` action that includes caching for the package manager.'
       - 'Configure the cache key to use the `package-lock.json` hash to ensure the cache is invalidated when dependencies change.'
-      - 'Verify that subsequent CI runs are faster due to the cache hit.'
+      - 'Verify that subsequent CI runs are faster dues to the cache hit.'
     acceptance_criteria:
       - 'The `deploy.yml` workflow includes a caching mechanism for npm dependencies.'
       - 'CI workflow execution time is demonstrably reduced on runs where dependencies have not changed.'
@@ -523,28 +523,6 @@ phases:
       - The new tests are integrated into the CI pipeline and pass successfully.
     assigned_to: codex-agent
     epic: 'Phase 3: LLM Integration'
-  - id: 28
-    title: 'Investigate and Fix Vitest Module Resolution for build-insights.mjs'
-    description: 'The unit tests for `build-insights.mjs` are currently excluded from the test suite due to a module resolution error in Vitest. This task involves investigating the root cause of this error and implementing a fix to allow the `build-insights.test.mjs` tests to run successfully.'
-    component: 'Testing'
-    dependencies: [24] # Depends on the tests being written (even if excluded)
-    priority: 4
-    status: done
-    command: 'npm test'
-    task_id: 'PIN-QA-10'
-    area: 'QA'
-    actionable_steps:
-      - 'Analyze Vitest configuration and module import/mocking strategy in `build-insights.test.mjs`.'
-      - 'Experiment with different Vitest configurations (e.g., `deps.interopDefault`, `resolve.alias`) or mocking techniques (e.g., `vi.doMock`).'
-      - 'Consult Vitest documentation and community forums for similar issues.'
-      - 'Implement a solution that allows `build-insights.test.mjs` to run without errors.'
-      - 'Re-enable `build-insights.test.mjs` in `vitest.config.mjs`.'
-    acceptance_criteria:
-      - '`build-insights.test.mjs` runs successfully in the test suite.'
-      - 'The overall test coverage for `build-insights.mjs` is reported correctly.'
-      - 'The `exclude` entry for `build-insights.test.mjs` is removed from `vitest.config.mjs`.'
-    assigned_to: 'codex-agent'
-    epic: 'Phase 3: LLM Integration'
   - id: 25
     title: Enable Dependabot for Automated Dependency Updates
     description: To improve security and maintainability, this task involves setting up Dependabot to automatically scan for outdated npm dependencies and create pull requests to update them. This ensures the project does not fall behind on important security patches and package updates.
@@ -583,3 +561,42 @@ phases:
       - The Astro build completes successfully with the new configuration.
     assigned_to: 'codex-agent'
     epic: 'Phase 1: Bootstrap'
+  - id: 28
+    title: 'Static Search Index'
+    description: 'Generate a Lunr.js index for all markdown content and integrate a search component.'
+    component: 'Front-End'
+    dependencies: [5]
+    priority: 3
+    status: done
+    command: null
+    task_id: 'PIN-UI-3'
+    area: UI
+    actionable_steps:
+      - 'Add Lunr.js dependency.'
+      - 'Create build-search-index.mjs to output search-index.json.'
+      - 'Integrate Search.astro component.'
+    acceptance_criteria:
+      - 'Script outputs `public/search-index.json`.'
+      - 'Users can search without a backend.'
+    assigned_to: codex-agent
+    epic: 'Phase 5: UI Expansion'
+
+  - id: 29
+    title: 'RSS Feed Generation'
+    description: 'Produce an RSS feed from markdown metadata for subscribers.'
+    component: 'Automation'
+    dependencies: [5]
+    priority: 3
+    status: done
+    command: null
+    task_id: 'PIN-AUTO-4'
+    area: Deployment
+    actionable_steps:
+      - 'Create build-rss.mjs to output rss.xml.'
+      - 'Add script invocation to deploy workflow before publishing.'
+      - 'Link the feed in site navigation.'
+    acceptance_criteria:
+      - 'Workflow writes `public/rss-xml`.'
+      - 'Site exposes an RSS link.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'

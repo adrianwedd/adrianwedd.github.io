@@ -13,8 +13,9 @@ async function fetchRepos(login) {
   const repos = [];
   let page = 1;
   const perPage = 100;
-  while (true) {
+  for (;;) {
     const url = `https://api.github.com/users/${login}/repos?per_page=${perPage}&page=${page}`;
+<<<<<<< HEAD
     const data = await githubFetch(url); // Use githubFetch
     repos.push(...data);
     if (data.length < perPage) break;
@@ -31,17 +32,21 @@ function repoToMarkdown(repo) {
 async function main() {
   const login = await getLogin();
   const repos = await fetchRepos(login);
-  const tools = repos.filter(r => Array.isArray(r.topics) && r.topics.includes('tool'));
+  const tools = repos.filter(
+    (r) => Array.isArray(r.topics) && r.topics.includes('tool')
+  );
 
   const dir = path.join('content', 'tools');
   await fs.mkdir(dir, { recursive: true });
 
-  await Promise.all(tools.map(async (repo) => {
-    const md = repoToMarkdown(repo);
-    const filePath = path.join(dir, `${repo.name}.md`);
-    await fs.writeFile(filePath, md);
-    console.log(`Wrote ${filePath}`);
-  }));
+  await Promise.all(
+    tools.map(async (repo) => {
+      const md = repoToMarkdown(repo);
+      const filePath = path.join(dir, `${repo.name}.md`);
+      await fs.writeFile(filePath, md);
+      console.log(`Wrote ${filePath}`);
+    })
+  );
 }
 
 export { getLogin, fetchRepos, repoToMarkdown, main };
@@ -51,4 +56,5 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     console.error(err);
     process.exit(1);
   });
+<<<<<<< HEAD
 }

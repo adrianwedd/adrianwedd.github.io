@@ -1,0 +1,33 @@
+---
+---
+<div class="my-4">
+  <input id="search-input" type="search" placeholder="Search..." class="border p-2 w-full mb-2" />
+  <ul id="search-results" class="space-y-1"></ul>
+</div>
+<script client:load type="module">
+  import lunr from 'lunr';
+  const input = document.getElementById('search-input');
+  const list = document.getElementById('search-results');
+  let idx, docs;
+  fetch('/search-index.json')
+    .then(r => r.json())
+    .then(data => {
+      idx = lunr.Index.load(data.index);
+      docs = Object.fromEntries(data.docs.map(d => [d.url, d]));
+    });
+  input.addEventListener('input', () => {
+    const q = input.value.trim();
+    list.innerHTML = '';
+    if (!q || !idx) return;
+    idx.search(q).forEach(r => {
+      const doc = docs[r.ref];
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = doc.url;
+      a.textContent = doc.title;
+      a.className = 'text-blue-600 hover:underline';
+      li.appendChild(a);
+      list.appendChild(li);
+    });
+  });
+</script>

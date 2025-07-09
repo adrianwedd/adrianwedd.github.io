@@ -41,6 +41,7 @@ jobs:
       - run: node scripts/build-insights.mjs ${{ steps.changed-files.outputs.changed_files }}
       - run: node scripts/agent-bus.mjs
       - run: npm run build
+      - run: node scripts/build-rss.mjs
       - uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
