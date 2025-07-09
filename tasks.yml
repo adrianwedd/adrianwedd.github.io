@@ -33,7 +33,7 @@ phases:
     component: "Project Management"
     dependencies: []
     priority: 5
-    status: pending
+    status: done
     command: null
     task_id: "PIN-ID-1"
     area: Planning
@@ -54,7 +54,7 @@ phases:
     component: "Core Infrastructure"
     dependencies: [1]
     priority: 5
-    status: pending
+    status: done
     command: "git init && git add . && git commit -m 'Initial commit: project scaffold'"
     task_id: "PIN-BS-1"
     area: Setup
@@ -150,7 +150,7 @@ phases:
     component: "Testing"
     dependencies: [6]
     priority: 3
-    status: pending
+    status: done
     command: null
     task_id: "PIN-QA-2"
     area: QA
@@ -250,7 +250,7 @@ phases:
     component: "Core Infrastructure"
     dependencies: [11]
     priority: 1
-    status: pending
+    status: done
     command: null
     task_id: "PIN-PROD-1"
     area: Production
@@ -263,5 +263,4 @@ phases:
       - "CI pipeline includes a security audit step."
       - "The project has clear, detailed documentation for all its parts."
       - "A monitoring plan is in place for CI/CD failures."
-    assigned_to: codex-agent
-    epic: "Phase 6: Iterative Growth"
+    assigned_to: codex-agent    epic: "Phase 6: Iterative Growth"
