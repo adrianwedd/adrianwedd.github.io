@@ -1,45 +1,267 @@
-# Execution tasks derived from PLAN.md
+# jsonschema block
+jsonschema: |
+  {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "array",
+    "items": {
+      "type": "object",
+      "required": ["id", "description", "dependencies", "priority", "status"],
+      "properties": {
+        "id": { "type": "integer" },
+        "description": { "type": "string" },
+        "component": { "type": "string" },
+        "dependencies": { "type": "array", "items": { "type": "integer" } },
+        "priority": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "status": { "type": "string", "enum": ["pending", "in_progress", "done"] },
+        "command": { "type": ["string", "null"] },
+        "task_id": { "type": "string" },
+        "title": { "type": "string" },
+        "area": { "type": "string" },
+        "actionable_steps": { "type": "array", "items": { "type": "string" } },
+        "acceptance_criteria": { "type": "array", "items": { "type": "string" } },
+        "assigned_to": { "type": ["string", "null"] },
+        "epic": { "type": "string" }
+      }
+    }
+  }
 
+# Array of tasks (phases) that conforms to the schema
 phases:
-  - phase: 1
-    name: Bootstrap
-    objective: "Repository + CI running"
-    tasks:
-      - "Commit scaffold"
-      - "Configure Pages to gh-pages"
-      - "Verify manual npm run dev / npm run build"
-  - phase: 2
-    name: Automation Hooks
-    objective: "Data ingestion operational"
-    tasks:
-      - "Add GH_TOKEN secret"
-      - "Finish & test fetch-gh-repos.mjs"
-      - "Push – confirm tools page autogenerates"
-  - phase: 3
-    name: LLM Integration
-    objective: "Classification & insights"
-    tasks:
-      - "Implement classify-inbox.mjs with chosen LLM"
-      - "Implement build-insights.mjs"
-      - "Store API keys in Secrets"
-      - "Dry-run on sample inbox files"
-  - phase: 4
-    name: Agent Bus
-    objective: "Status visibility"
-    tasks:
-      - "Design simple YAML manifest schema"
-      - "Implement agent-bus.mjs to update Issue"
-  - phase: 5
-    name: UI Expansion
-    objective: "Flesh out components & pages"
-    tasks:
-      - "Build ToolCard, AgentDiagram, etc."
-      - "Style with Tailwind"
-      - "Populate content folders"
-  - phase: 6
-    name: Iterative Growth
-    objective: "Continuous enhancement"
-    tasks:
-      - "Add more scripts (dataset stats, changelog diffing)"
-      - "Hook additional agents via commits"
-      - "Refine design/branding"
+  - id: 1
+    title: "Project & Architecture Ideation"
+    description: "Define the high-level goals, detailed architecture, and user stories for the Personal Intelligence Node."
+    component: "Project Management"
+    dependencies: []
+    priority: 5
+    status: pending
+    command: null
+    task_id: "PIN-ID-1"
+    area: Planning
+    actionable_steps:
+      - "Create a detailed System Architecture Diagram showing data flow between scripts, content, and GitHub Actions."
+      - "Write user stories for each core feature (e.g., 'As an agent, I want to drop a file in the inbox so it can be automatically classified')."
+      - "Set up a GitHub Project board to track all subsequent tasks."
+    acceptance_criteria:
+      - "Architecture diagram is checked into the repository."
+      - "User stories are documented in GitHub Issues."
+      - "A project board is created and populated with initial tasks."
+    assigned_to: human-operator
+    epic: "Phase 1: Bootstrap"
+
+  - id: 2
+    title: "Commit Scaffold"
+    description: "Create the initial repository structure and commit all the boilerplate files for the Astro project, including configs, layouts, and empty content directories."
+    component: "Core Infrastructure"
+    dependencies: [1]
+    priority: 5
+    status: pending
+    command: "git init && git add . && git commit -m 'Initial commit: project scaffold'"
+    task_id: "PIN-BS-1"
+    area: Setup
+    actionable_steps:
+      - "Create the directory structure as defined in the plan."
+      - "Create placeholder files like `astro.config.mjs`, `package.json`, etc."
+      - "Initialize a git repository and commit all files."
+    acceptance_criteria:
+      - "The main branch contains the complete file and directory scaffold."
+    assigned_to: codex-agent
+    epic: "Phase 1: Bootstrap"
+
+  - id: 3
+    title: "Configure GitHub Pages & CI"
+    description: "Set up the GitHub repository settings and the initial `deploy.yml` workflow to enable automated deployment to GitHub Pages."
+    component: "CI/CD"
+    dependencies: [2]
+    priority: 5
+    status: pending
+    command: null
+    task_id: "PIN-CI-1"
+    area: Deployment
+    actionable_steps:
+      - "Configure the repository's 'Pages' section to deploy from the `gh-pages` branch."
+      - "Commit the initial `deploy.yml` workflow file."
+    acceptance_criteria:
+      - "The GitHub Pages settings are correctly configured."
+      - "A push to `main` triggers the deploy action successfully."
+    assigned_to: human-operator
+    epic: "Phase 1: Bootstrap"
+
+  - id: 4
+    title: "Implement fetch-gh-repos.mjs"
+    description: "Develop the Node.js script that fetches repository metadata from the GitHub API and creates markdown files in the `content/tools` directory."
+    component: "Automation Scripts"
+    dependencies: [3]
+    priority: 4
+    status: pending
+    command: "node scripts/fetch-gh-repos.mjs"
+    task_id: "PIN-DEV-1"
+    area: Development
+    actionable_steps:
+      - "Write the script logic to call the GitHub API using `GH_TOKEN`."
+      - "Filter repositories based on a 'tool' topic."
+      - "Generate markdown files with frontmatter for each matched repo."
+    acceptance_criteria:
+      - "The script populates the `content/tools` directory with `.md` files."
+    assigned_to: codex-agent
+    epic: "Phase 2: Automation Hooks"
+
+  - id: 5
+    title: "Unit Test Automation Scripts"
+    description: "Write unit tests for the automation scripts, starting with `fetch-gh-repos.mjs`, to ensure they are robust and handle edge cases."
+    component: "Testing"
+    dependencies: [4]
+    priority: 4
+    status: pending
+    command: "npm test"
+    task_id: "PIN-QA-1"
+    area: QA
+    actionable_steps:
+      - "Set up a testing framework like Vitest or Jest."
+      - "Write unit tests for `fetch-gh-repos.mjs`, mocking the GitHub API response."
+      - "Integrate the test command into the CI workflow."
+    acceptance_criteria:
+      - "Test coverage for the script is above 80%."
+      - "The CI pipeline fails if tests do not pass."
+    assigned_to: codex-agent
+    epic: "Phase 2: Automation Hooks"
+
+  - id: 6
+    title: "Implement classify-inbox.mjs"
+    description: "Write the script that processes files in `content/inbox`, calls an LLM to determine tags and section, and moves the files accordingly."
+    component: "Automation Scripts"
+    dependencies: [5]
+    priority: 3
+    status: pending
+    command: "node scripts/classify-inbox.mjs"
+    task_id: "PIN-DEV-2"
+    area: Development
+    actionable_steps:
+      - "Implement logic to read files from the inbox directory."
+      - "Construct a robust prompt for the LLM to classify content."
+      - "Implement file moving logic based on the LLM's parsed response."
+    acceptance_criteria:
+      - "The script successfully moves files from the inbox to categorized directories."
+    assigned_to: codex-agent
+    epic: "Phase 3: LLM Integration"
+
+  - id: 7
+    title: "LLM Integration Testing"
+    description: "Perform integration and QA testing on the classification script using a sample set of documents to validate the accuracy and reliability of the LLM's output."
+    component: "Testing"
+    dependencies: [6]
+    priority: 3
+    status: pending
+    command: null
+    task_id: "PIN-QA-2"
+    area: QA
+    actionable_steps:
+      - "Create a test suite of 10-15 diverse documents in the `inbox`."
+      - "Run the `classify-inbox.mjs` script manually."
+      - "Review the classification results for accuracy."
+      - "Fine-tune the prompt based on any classification errors."
+    acceptance_criteria:
+      - "Classification accuracy on the test suite is above 90%."
+      - "The script correctly handles API errors and low-confidence fallbacks."
+    assigned_to: human-operator
+    epic: "Phase 3: LLM Integration"
+
+  - id: 8
+    title: "Code Review Process"
+    description: "Establish and enforce a code review process for all new code, requiring at least one approval before merging to the main branch."
+    component: "Project Management"
+    dependencies: [3]
+    priority: 4
+    status: pending
+    command: null
+    task_id: "PIN-CR-1"
+    area: "Code Review"
+    actionable_steps:
+      - "Configure branch protection rules for the `main` branch on GitHub."
+      - "Require status checks to pass before merging."
+      - "Require at least one review from a team member or a designated reviewer-agent."
+    acceptance_criteria:
+      - "Pull requests cannot be merged to `main` without passing CI tests and getting one approval."
+    assigned_to: human-operator
+    epic: "Phase 4: Process & Hardening"
+
+  - id: 9
+    title: "Implement Agent Bus"
+    description: "Develop the `agent-bus.mjs` script and define the agent manifest schema."
+    component: "Automation Scripts"
+    dependencies: [8]
+    priority: 2
+    status: pending
+    command: "node scripts/agent-bus.mjs"
+    task_id: "PIN-DEV-3"
+    area: Development
+    actionable_steps:
+      - "Finalize the YAML schema for agent manifests."
+      - "Write the script to read all manifests and format them into a markdown summary."
+      - "Implement the GitHub API call to create or update the `#agent-bus` issue."
+    acceptance_criteria:
+      - "The script successfully updates a GitHub Issue with the latest agent statuses."
+    assigned_to: codex-agent
+    epic: "Phase 4: Agent Bus"
+
+  - id: 10
+    title: "Build Core UI Components"
+    description: "Develop the primary Astro components for rendering content, such as `ToolCard.astro` and `AgentDiagram.astro`."
+    component: "UI/UX"
+    dependencies: [3]
+    priority: 3
+    status: pending
+    command: "npm run dev"
+    task_id: "PIN-UI-1"
+    area: Frontend
+    actionable_steps:
+      - "Create `src/components/ToolCard.astro` to display tool info from frontmatter."
+      - "Create `src/components/AgentDiagram.astro` to render Mermaid diagrams."
+      - "Style components with placeholder Tailwind CSS."
+    acceptance_criteria:
+      - "Components render correctly when viewed in the Astro dev server."
+    assigned_to: codex-agent
+    epic: "Phase 5: UI Expansion"
+
+  - id: 11
+    title: "End-to-End & UAT Testing"
+    description: "Perform end-to-end (E2E) testing of the full user flow, from an agent committing a file to the content appearing on the live site."
+    component: "Testing"
+    dependencies: [10, 7, 9]
+    priority: 2
+    status: pending
+    command: null
+    task_id: "PIN-QA-3"
+    area: QA
+    actionable_steps:
+      - "Manually perform the full workflow: commit a file to `inbox`, push, wait for CI, check the live site."
+      - "Verify that classification, insight generation, and the agent bus update all work as expected."
+      - "Test the site on multiple browsers (Chrome, Firefox, Safari)."
+      - "Perform accessibility checks using browser dev tools (Lighthouse)."
+    acceptance_criteria:
+      - "The E2E flow works without manual intervention."
+      - "The site renders correctly on major browsers."
+      - "Lighthouse accessibility score is above 90."
+    assigned_to: human-operator
+    epic: "Phase 5: UI Expansion"
+
+  - id: 12
+    title: "Production Hardening & Documentation"
+    description: "Prepare the system for production use by adding security scans, comprehensive documentation, and robust monitoring."
+    component: "Core Infrastructure"
+    dependencies: [11]
+    priority: 1
+    status: pending
+    command: null
+    task_id: "PIN-PROD-1"
+    area: Production
+    actionable_steps:
+      - "Add a security vulnerability scan (e.g., `npm audit`) to the CI pipeline."
+      - "Set up monitoring for GitHub Actions to get alerts on failures."
+      - "Write comprehensive README.md files for both developers and contributing agents."
+      - "Create documentation for each automation script, explaining its purpose and environment variables."
+    acceptance_criteria:
+      - "CI pipeline includes a security audit step."
+      - "The project has clear, detailed documentation for all its parts."
+      - "A monitoring plan is in place for CI/CD failures."
+    assigned_to: codex-agent
+    epic: "Phase 6: Iterative Growth"
