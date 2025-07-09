@@ -461,3 +461,23 @@ phases:
       - 'This provides an automated safety net against malformed task definitions.'
     assigned_to: 'codex-agent'
     epic: 'Phase 4: Process Hardening & Agent Bus'
+
+  - id: 23
+    title: 'Static Search Index'
+    description: 'Generate a Lunr.js index for all markdown content and integrate a search component.'
+    component: 'Front-End'
+    dependencies: [5]
+    priority: 3
+    status: done
+    command: null
+    task_id: 'PIN-UI-3'
+    area: UI
+    actionable_steps:
+      - 'Add Lunr.js dependency.'
+      - 'Create build-search-index.mjs to output search-index.json.'
+      - 'Integrate Search.astro component.'
+    acceptance_criteria:
+      - 'Script outputs `public/search-index.json`.'
+      - 'Users can search without a backend.'
+    assigned_to: codex-agent
+    epic: 'Phase 5: UI Expansion'
