@@ -430,7 +430,7 @@ phases:
     component: 'CI/CD'
     dependencies: [3]
     priority: 2
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-OPT-1'
     area: Optimization
