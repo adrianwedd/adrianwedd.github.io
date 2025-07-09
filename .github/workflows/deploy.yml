@@ -19,6 +19,8 @@ jobs:
         with:
           node-version: '20'
       - run: npm ci
+      - name: Security Audit
+        run: npm audit --audit-level=high
       - run: npm test
       - run: node scripts/fetch-gh-repos.mjs
       - run: node scripts/classify-inbox.mjs
@@ -29,4 +31,11 @@ jobs:
         with:
           branch: gh-pages
           folder: dist
+      - name: Slack Notify
+        uses: 8398a7/action-slack@v3
+        if: failure()
+        with:
+          status: ${{ job.status }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 

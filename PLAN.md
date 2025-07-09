@@ -155,6 +155,7 @@ jobs:
 |-------------------------|---------------------------------------|----------------------|
 | `GH_TOKEN`              | `fetch-gh-repos.mjs`, `agent-bus.mjs` | repo scope minimal token |
 | `OPENAI_API_KEY` / `GEMINI_API_KEY` | Classification & insight scripts | LLM usage only |
+| `SLACK_WEBHOOK_URL` | deploy workflow | Slack notifications on failure |
 
 (Add more secrets as additional agents/scripts come online.)
 
@@ -181,7 +182,7 @@ jobs:
 | 3. LLM Integration | Classification & insights | • Implement `classify-inbox.mjs` with chosen LLM. • Implement `build-insights.mjs`. • Store API keys in Secrets. • Dry-run on sample inbox files. |
 | 4. Process Hardening & Agent Bus | Status visibility & quality gate | • Enforce branch protection on `main` requiring passing checks and one approving review. • Design simple YAML manifest schema. • Implement `agent-bus.mjs` to update Issue. |
 | 5. UI Expansion | Flesh out components & pages | • Build ToolCard, AgentDiagram, etc. • Style with Tailwind. • Populate content folders. |
-| 6. Iterative Growth | Continuous enhancement | • Add more scripts (dataset stats, changelog diffing). • Hook additional agents via commits. • Refine design/branding. |
+| 6. Iterative Growth | Continuous enhancement | • Add more scripts (dataset stats, changelog diffing). • Hook additional agents via commits. • Refine design/branding. • Introduce `npm audit` checks and Slack alerts for CI failures. |
 
 ---
 
