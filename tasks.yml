@@ -937,3 +937,89 @@ phases:
       - 'Test coverage for `build-insights.mjs` is maintained or improved.'
     assigned_to: codex-agent
     epic: 'Phase 6: Iterative Growth'
+  - id: 47
+    title: 'Implement DNS Verification for Agents'
+    description: 'Provide agents with the ability to verify DNS records to confirm their custom domain configurations.'
+    component: 'Automation Scripts'
+    dependencies: [15]
+    priority: 3
+    status: pending
+    command: 'node scripts/verify-dns.mjs'
+    task_id: 'PIN-VERIFY-1'
+    area: 'Verification'
+    actionable_steps:
+      - 'Create a new script `scripts/verify-dns.mjs` that takes a domain as input.'
+      - 'The script should use a library or shell out to `dig` to check for `A` and `CNAME` records.'
+      - 'The script should output whether the DNS records are correctly configured for GitHub Pages.'
+    acceptance_criteria:
+      - 'Agents can run the script to verify their custom domain settings.'
+      - 'The script provides clear success or failure messages.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 48
+    title: 'Debug and Fix Workflow Errors'
+    description: 'Systematically identify and resolve errors occurring in the GitHub Actions workflow to ensure reliable and successful builds and deployments.'
+    component: 'CI/CD'
+    dependencies: [3]
+    priority: 5
+    status: in_progress
+    command: null
+    task_id: 'PIN-DEBUG-1'
+    area: 'Debugging'
+    actionable_steps:
+      - 'Analyze workflow logs from failed runs to identify specific error messages and failing steps.'
+      - 'Replicate failures locally where possible by running the scripts with the same inputs and environment variables.'
+      - 'Add more detailed logging to scripts to trace execution flow and variable states.'
+      - 'Create isolated test cases that specifically target the failing conditions.'
+      - 'Incrementally apply fixes and re-run the workflow to verify the solution.'
+    acceptance_criteria:
+      - 'The `deploy.yml` workflow completes successfully without errors.'
+      - 'Root causes of previous failures are identified and documented.'
+      - 'The system is more robust against similar future failures.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 7: Debugging and Stability'
+
+  - id: 49
+    title: 'Enhance Script Error Handling and Reporting'
+    description: 'Improve error handling within all automation scripts to provide clearer, more actionable error messages and prevent silent failures.'
+    component: 'Automation Scripts'
+    dependencies: [30, 31, 32, 33]
+    priority: 4
+    status: pending
+    command: null
+    task_id: 'PIN-ROBUST-6'
+    area: 'Robustness'
+    actionable_steps:
+      - 'Review all `try...catch` blocks in the automation scripts.'
+      - 'Ensure that caught errors are logged with sufficient context (e.g., file path, API endpoint).'
+      - 'Implement a consistent error logging format across all scripts, potentially using a centralized logger.'
+      - 'For critical errors, ensure the script exits with a non-zero status code to fail the CI step explicitly.'
+    acceptance_criteria:
+      - 'Script failures produce clear, informative log output in the CI.'
+      - 'Silent failures are eliminated.'
+      - 'It is easier to diagnose the cause of a script failure from the workflow logs.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 7: Debugging and Stability'
+
+  - id: 50
+    title: 'Create a Debugging Guide for Agents'
+    description: 'Develop a `DEBUGGING.md` document that provides a step-by-step guide for agents (and humans) to diagnose and fix common issues with the automation pipeline.'
+    component: 'Documentation'
+    dependencies: [48]
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-DOC-3'
+    area: 'Documentation'
+    actionable_steps:
+      - 'Create a `DEBUGGING.md` file in the `docs/` directory.'
+      - 'Document common failure scenarios (e.g., API key errors, file not found, LLM response malformed).'
+      - 'Provide instructions on how to read workflow logs and identify the failing script.'
+      - 'Include steps for running scripts locally to reproduce issues.'
+      - 'Link to this guide from the main `README.md`.'
+    acceptance_criteria:
+      - 'A clear and concise debugging guide is available to all contributors.'
+      - 'The time to diagnose and resolve common issues is reduced.'
+    assigned_to: 'human-operator'
+    epic: 'Phase 7: Debugging and Stability'
