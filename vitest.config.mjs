@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['test/**/*.test.{ts,js,mjs,cjs}'], // Only include tests in the 'test' directory
-    exclude: ['test/agent-bus.test.mjs', 'test/build-insights.test.mjs', 'test/integration.test.mjs'], // Exclude problematic test files
+    exclude: ['test/agent-bus.test.mjs', 'test/build-insights.test.mjs'], // Exclude problematic test files
     coverage: {
       include: [
         'scripts/fetch-gh-repos.mjs',
