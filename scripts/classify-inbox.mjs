@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
+import { log } from './utils/logger.mjs';
 
 const MODEL = process.env.OPENAI_MODEL || 'gpt-3.5-turbo-1106';
 
@@ -15,7 +16,7 @@ async function getDynamicSections() {
       .filter((name) => !['inbox', 'untagged'].includes(name)); // Filter out special directories
     return sections;
   } catch (err) {
-    console.error(
+    log.error(
       `Error reading content directory ${contentDir}:`,
       err.message
     );
@@ -61,7 +62,7 @@ async function classifyFile(filePath) {
   try {
     content = await fs.readFile(filePath, 'utf8');
   } catch (err) {
-    console.error(
+    log.error(
       `Error reading file ${filePath} for classification:`,
       err.message
     );
@@ -96,7 +97,7 @@ async function moveFile(src, destDir) {
   try {
     await fs.mkdir(destDir, { recursive: true });
   } catch (err) {
-    console.error(
+    log.error(
       `Error creating destination directory ${destDir}:`,
       err.message
     );
@@ -106,7 +107,7 @@ async function moveFile(src, destDir) {
   try {
     await fs.rename(src, dest);
   } catch (err) {
-    console.error(`Error moving file from ${src} to ${dest}:`, err.message);
+    log.error(`Error moving file from ${src} to ${dest}:`, err.message);
     throw err;
   }
   return dest;
@@ -114,7 +115,7 @@ async function moveFile(src, destDir) {
 
 async function main() {
   if (!process.env.OPENAI_API_KEY) {
-    console.error('OPENAI_API_KEY not set; skipping classification');
+    log.error('OPENAI_API_KEY not set; skipping classification');
     return;
   }
 
@@ -142,7 +143,7 @@ async function main() {
         (f) => f !== '.gitkeep' && f !== 'failed'
       );
     } catch (err) {
-      console.error(`Error reading inbox directory ${inboxDir}:`, err.message);
+      log.error(`Error reading inbox directory ${inboxDir}:`, err.message);
       return; // Cannot proceed without reading inbox
     }
 
@@ -162,12 +163,12 @@ async function main() {
         (f) => f !== '.gitkeep' && f !== 'failed'
       );
     } catch (err) {
-      console.error(`Error reading inbox directory ${inboxDir}:`, err.message);
+      log.error(`Error reading inbox directory ${inboxDir}:`, err.message);
       return; // Cannot proceed without reading inbox
     }
 
     if (filesToProcess.length === 0) {
-      console.log('No inbox files to process.');
+      log.info('No inbox files to process.');
       return;
     }
   }
@@ -189,7 +190,7 @@ async function main() {
           try {
             data = await fs.readFile(filePath, 'utf8');
           } catch (err) {
-            console.error(
+            log.error(
               `Error reading file ${filePath} to add tags:`,
               err.message
             );
@@ -201,7 +202,7 @@ async function main() {
             try {
               await fs.writeFile(filePath, fm + data);
             } catch (err) {
-              console.error(
+              log.error(
                 `Error writing tags to file ${filePath}:`,
                 err.message
               );
@@ -213,12 +214,12 @@ async function main() {
         targetDir = path.join('content', 'untagged');
       }
     } catch (err) {
-      console.error(`Failed to classify ${name}:`, err.message);
+      log.error(`Failed to classify ${name}:`, err.message);
       targetDir = failedDir;
     }
 
     const dest = await moveFile(filePath, targetDir);
-    console.log(`Moved ${name} to ${dest}`);
+    log.info(`Moved ${name} to ${dest}`);
   }
 }
 
@@ -233,7 +234,7 @@ export {
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {
-    console.error(err);
+    log.error(err);
     process.exit(1);
   });
 }
