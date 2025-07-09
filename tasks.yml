@@ -529,7 +529,7 @@ phases:
     component: 'Testing'
     dependencies: [24] # Depends on the tests being written (even if excluded)
     priority: 4
-    status: pending
+    status: done
     command: 'npm test'
     task_id: 'PIN-QA-10'
     area: 'QA'
