@@ -1,38 +1,21 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
-
-const GH_TOKEN = process.env.GH_TOKEN;
-const headers = GH_TOKEN
-  ? {
-      Accept: 'application/vnd.github+json',
-      Authorization: `Bearer ${GH_TOKEN}`,
-    }
-  : null;
-
-function requireToken() {
-  if (!headers) throw new Error('GH_TOKEN environment variable is required');
-}
+import { githubFetch } from './utils/github.mjs'; // Import the new utility
 
 async function getLogin() {
-  requireToken();
   if (process.env.GH_USER) return process.env.GH_USER;
-  const res = await fetch('https://api.github.com/user', { headers });
-  if (!res.ok) throw new Error(`Failed to fetch user: ${res.status}`);
-  const data = await res.json();
+  const data = await githubFetch('https://api.github.com/user'); // Use githubFetch
   return data.login;
 }
 
 async function fetchRepos(login) {
-  requireToken();
   const repos = [];
   let page = 1;
   const perPage = 100;
   while (true) {
     const url = `https://api.github.com/users/${login}/repos?per_page=${perPage}&page=${page}`;
-    const res = await fetch(url, { headers });
-    if (!res.ok) throw new Error(`Failed to fetch repos page ${page}: ${res.status}`);
-    const data = await res.json();
+    const data = await githubFetch(url); // Use githubFetch
     repos.push(...data);
     if (data.length < perPage) break;
     page += 1;
@@ -69,4 +52,3 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     process.exit(1);
   });
 }
-
