@@ -19,6 +19,7 @@ jobs:
         with:
           node-version: '20'
       - run: npm ci
+      - run: npm test
       - run: node scripts/fetch-gh-repos.mjs
       - run: node scripts/classify-inbox.mjs
       - run: node scripts/build-insights.mjs

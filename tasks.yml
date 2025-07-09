@@ -111,7 +111,7 @@ phases:
     component: "Testing"
     dependencies: [4]
     priority: 4
-    status: pending
+    status: done
     command: "npm test"
     task_id: "PIN-QA-1"
     area: QA

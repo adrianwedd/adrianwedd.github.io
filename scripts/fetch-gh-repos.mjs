@@ -1,18 +1,21 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { pathToFileURL } from 'url';
 
 const GH_TOKEN = process.env.GH_TOKEN;
-if (!GH_TOKEN) {
-  console.error('GH_TOKEN environment variable is required');
-  process.exit(1);
+const headers = GH_TOKEN
+  ? {
+      Accept: 'application/vnd.github+json',
+      Authorization: `Bearer ${GH_TOKEN}`,
+    }
+  : null;
+
+function requireToken() {
+  if (!headers) throw new Error('GH_TOKEN environment variable is required');
 }
 
-const headers = {
-  Accept: 'application/vnd.github+json',
-  Authorization: `Bearer ${GH_TOKEN}`,
-};
-
 async function getLogin() {
+  requireToken();
   if (process.env.GH_USER) return process.env.GH_USER;
   const res = await fetch('https://api.github.com/user', { headers });
   if (!res.ok) throw new Error(`Failed to fetch user: ${res.status}`);
@@ -21,6 +24,7 @@ async function getLogin() {
 }
 
 async function fetchRepos(login) {
+  requireToken();
   const repos = [];
   let page = 1;
   const perPage = 100;
@@ -57,8 +61,12 @@ async function main() {
   }));
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+export { getLogin, fetchRepos, repoToMarkdown, main };
+
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
 
