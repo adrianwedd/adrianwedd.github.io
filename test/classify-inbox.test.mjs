@@ -3,9 +3,14 @@ import fs from 'fs/promises';
 
 // Mock fs before importing the module under test
 vi.mock('fs/promises');
+// Mock the LLM API utility
+vi.mock('../scripts/utils/llm-api.mjs', () => ({
+  callOpenAI: vi.fn(),
+}));
 
 // Import the module to be tested
 import * as classifyInbox from '../scripts/classify-inbox.mjs';
+import { callOpenAI } from '../scripts/utils/llm-api.mjs';
 
 describe('classify-inbox.mjs', () => {
   // Helper to create Dirent-like objects for mocking fs.readdir
@@ -56,7 +61,6 @@ describe('classify-inbox.mjs', () => {
     fs.mkdir.mockResolvedValue(undefined);
     fs.rename.mockResolvedValue(undefined);
     fs.writeFile.mockResolvedValue(undefined);
-    global.fetch = vi.fn();
   });
 
   afterEach(() => {
@@ -64,15 +68,8 @@ describe('classify-inbox.mjs', () => {
     delete process.env.OPENAI_API_KEY;
   });
 
-  const mockOpenAIResponse = (response, status = 200) => {
-    global.fetch.mockResolvedValue({
-      ok: status === 200,
-      status,
-      json: async () => ({
-        choices: [{ message: { content: JSON.stringify(response) } }],
-      }),
-      text: async () => 'Error text',
-    });
+  const mockOpenAIResponse = (response) => {
+    callOpenAI.mockResolvedValue(JSON.stringify(response));
   };
 
   it('should move a file to the correct section on successful classification', async () => {
@@ -108,12 +105,7 @@ describe('classify-inbox.mjs', () => {
   });
 
   it('should move a file to failed on invalid JSON response', async () => {
-    global.fetch.mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        choices: [{ message: { content: 'invalid-json' } }],
-      }),
-    });
+    callOpenAI.mockResolvedValue('invalid-json');
     await classifyInbox.main();
     expect(fs.rename).toHaveBeenCalledWith(
       expect.stringContaining('file1.txt'),
@@ -131,7 +123,7 @@ describe('classify-inbox.mjs', () => {
   });
 
   it('should move a file to failed on OpenAI API error', async () => {
-    mockOpenAIResponse({}, 500);
+    callOpenAI.mockRejectedValue(new Error('API error'));
     await classifyInbox.main();
     expect(fs.rename).toHaveBeenCalledWith(
       expect.stringContaining('file1.txt'),

@@ -1,8 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
-
-const MODEL = process.env.OPENAI_MODEL || 'gpt-3.5-turbo-1106';
+import { callOpenAI } from './utils/llm-api.mjs';
 
 // Function to dynamically discover content sections
 async function getDynamicSections() {
@@ -33,28 +32,6 @@ async function buildPrompt(content) {
   );
 }
 
-async function callOpenAI(prompt) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) throw new Error('OPENAI_API_KEY not set');
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0,
-    }),
-  });
-  if (!res.ok) {
-    const errorBody = await res.text();
-    throw new Error(`OpenAI API error ${res.status}: ${errorBody}`);
-  }
-  const data = await res.json();
-  return data.choices[0].message.content.trim();
-}
 
 async function classifyFile(filePath) {
   let content;
