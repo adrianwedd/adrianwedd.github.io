@@ -21,6 +21,7 @@ jobs:
       - run: npm ci
       - name: Security Audit
         run: npm audit --audit-level=high
+      - run: npm run lint
       - run: npm test
       - run: node scripts/fetch-gh-repos.mjs
       - run: node scripts/classify-inbox.mjs
@@ -38,4 +39,3 @@ jobs:
           status: ${{ job.status }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
