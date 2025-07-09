@@ -1,16 +1,16 @@
-import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { parse } from 'yaml';
 import { githubFetch } from './utils/github.mjs'; // Import the new utility
 import { log } from './utils/logger.mjs';
+import { readFile, readdir } from './utils/file-utils.mjs';
 
 const REPO = process.env.GH_REPO || process.env.GITHUB_REPOSITORY;
 
 async function loadManifests(dir = path.join('content', 'agents')) {
   let files = [];
   try {
-    files = await fs.readdir(dir);
+    files = await readdir(dir);
   } catch (err) {
     log.error(`Error reading agent manifests directory ${dir}:`, err.message);
     return [];
@@ -19,7 +19,7 @@ async function loadManifests(dir = path.join('content', 'agents')) {
   for (const file of files) {
     if (!file.endsWith('.yml') && !file.endsWith('.yaml')) continue;
     try {
-      const data = await fs.readFile(path.join(dir, file), 'utf8');
+      const data = await readFile(path.join(dir, file), 'utf8');
       const doc = parse(data);
       manifests.push({ file, ...doc });
     } catch (err) {

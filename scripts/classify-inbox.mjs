@@ -1,7 +1,7 @@
-import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { log } from './utils/logger.mjs';
+import { readFile, writeFile, mkdir, readdir, rename } from './utils/file-utils.mjs';
 
 const MODEL = process.env.OPENAI_MODEL || 'gpt-3.5-turbo-1106';
 
@@ -9,7 +9,7 @@ const MODEL = process.env.OPENAI_MODEL || 'gpt-3.5-turbo-1106';
 async function getDynamicSections() {
   const contentDir = path.join('content');
   try {
-    const entries = await fs.readdir(contentDir, { withFileTypes: true });
+    const entries = await readdir(contentDir, { withFileTypes: true });
     const sections = entries
       .filter((dirent) => dirent.isDirectory())
       .map((dirent) => dirent.name)
@@ -60,7 +60,7 @@ async function callOpenAI(prompt) {
 async function classifyFile(filePath) {
   let content;
   try {
-    content = await fs.readFile(filePath, 'utf8');
+    content = await readFile(filePath, 'utf8');
   } catch (err) {
     log.error(
       `Error reading file ${filePath} for classification:`,
@@ -95,7 +95,7 @@ async function classifyFile(filePath) {
 
 async function moveFile(src, destDir) {
   try {
-    await fs.mkdir(destDir, { recursive: true });
+    await mkdir(destDir, { recursive: true });
   } catch (err) {
     log.error(
       `Error creating destination directory ${destDir}:`,
@@ -105,7 +105,7 @@ async function moveFile(src, destDir) {
   }
   const dest = path.join(destDir, path.basename(src));
   try {
-    await fs.rename(src, dest);
+    await rename(src, dest);
   } catch (err) {
     log.error(`Error moving file from ${src} to ${dest}:`, err.message);
     throw err;
@@ -139,7 +139,7 @@ async function main() {
     // Filter for files that are actually in the inbox directory
     let allInboxFiles = [];
     try {
-      allInboxFiles = (await fs.readdir(inboxDir)).filter(
+      allInboxFiles = (await readdir(inboxDir)).filter(
         (f) => f !== '.gitkeep' && f !== 'failed'
       );
     } catch (err) {
@@ -200,7 +200,7 @@ async function main() {
             // Only write if not already marked for failed
             const fm = `---\ntags: [${result.tags.join(', ')}]\n---\n`;
             try {
-              await fs.writeFile(filePath, fm + data);
+              await writeFile(filePath, fm + data);
             } catch (err) {
               log.error(
                 `Error writing tags to file ${filePath}:`,

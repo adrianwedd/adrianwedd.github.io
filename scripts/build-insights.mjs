@@ -1,8 +1,8 @@
-import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { callOpenAI } from './classify-inbox.mjs'; // Reusing callOpenAI
 import { log } from './utils/logger.mjs';
+import { readFile, writeFile, readdir } from './utils/file-utils.mjs';
 
 const TARGET_DIRS = [
   path.join('content', 'garden'),
@@ -15,7 +15,7 @@ function buildSummaryPrompt(content) {
 }
 
 async function processMarkdownFile(filePath) {
-  const content = await fs.readFile(filePath, 'utf8');
+  const content = await readFile(filePath, 'utf8');
   const fileName = path.basename(filePath);
   const dirName = path.dirname(filePath);
 
@@ -23,7 +23,7 @@ async function processMarkdownFile(filePath) {
     const summary = await callOpenAI(buildSummaryPrompt(content));
     const insightFileName = fileName.replace(/\.md$/, '.insight.md');
     const insightFilePath = path.join(dirName, insightFileName);
-    await fs.writeFile(insightFilePath, summary);
+    await writeFile(insightFilePath, summary);
     log.info(`Generated insight for ${fileName} -> ${insightFileName}`);
   } catch (err) {
     log.error(`Failed to generate insight for ${fileName}:`, err.message);
@@ -70,7 +70,7 @@ async function main() {
     // No arguments, process all files in target directories
     for (const dir of TARGET_DIRS) {
       try {
-        const files = await fs.readdir(dir);
+        const files = await readdir(dir);
         const markdownFiles = files.filter(
           (file) => file.endsWith('.md') && !file.endsWith('.insight.md')
         );
