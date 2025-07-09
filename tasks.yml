@@ -600,3 +600,319 @@ phases:
       - 'Site exposes an RSS link.'
     assigned_to: codex-agent
     epic: 'Phase 6: Iterative Growth'
+
+  - id: 30
+    title: 'Add File System Error Handling to `fetch-gh-repos.mjs`'
+    description: 'Enhance the robustness of `fetch-gh-repos.mjs` by adding `try...catch` blocks around file system operations (`fs.readdir`, `fs.mkdir`, `fs.writeFile`) to gracefully handle potential I/O errors.'
+    component: 'Automation Scripts'
+    dependencies: []
+    priority: 4
+    status: pending
+    command: null
+    task_id: 'PIN-ROBUST-2'
+    area: Robustness
+    actionable_steps:
+      - 'Wrap `fs.readdir`, `fs.mkdir`, and `fs.writeFile` calls in `try...catch` blocks.'
+      - 'Log errors using `console.error` or a new centralized logging utility.'
+      - 'Consider appropriate fallback or exit strategies for critical errors.'
+    acceptance_criteria:
+      - 'File system operations in `fetch-gh-repos.mjs` are resilient to I/O errors.'
+      - 'Errors are logged, providing clear diagnostic information.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 31
+    title: 'Add File System Error Handling to `classify-inbox.mjs`'
+    description: 'Improve the resilience of `classify-inbox.mjs` by implementing `try...catch` blocks around file system operations (`fs.readdir`, `fs.readFile`, `fs.mkdir`, `fs.rename`, `fs.writeFile`) to manage I/O errors effectively.'
+    component: 'Automation Scripts'
+    dependencies: []
+    priority: 4
+    status: pending
+    command: null
+    task_id: 'PIN-ROBUST-3'
+    area: Robustness
+    actionable_steps:
+      - 'Wrap `fs.readdir`, `fs.readFile`, `fs.mkdir`, `fs.rename`, and `fs.writeFile` calls in `try...catch` blocks.'
+      - 'Log errors using `console.error` or a new centralized logging utility.'
+      - 'Ensure that file operations failing do not crash the script.'
+    acceptance_criteria:
+      - '`classify-inbox.mjs` handles file system errors gracefully.'
+      - 'Errors are logged, and the script continues processing other files where possible.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 32
+    title: 'Add File System Error Handling to `build-insights.mjs`'
+    description: 'Enhance the robustness of `build-insights.mjs` by adding `try...catch` blocks around file system operations (`fs.readdir`, `fs.readFile`, `fs.writeFile`) to handle I/O errors.'
+    component: 'Automation Scripts'
+    dependencies: []
+    priority: 4
+    status: pending
+    command: null
+    task_id: 'PIN-ROBUST-4'
+    area: Robustness
+    actionable_steps:
+      - 'Wrap `fs.readdir`, `fs.readFile`, and `fs.writeFile` calls in `try...catch` blocks.'
+      - 'Log errors using `console.error` or a new centralized logging utility.'
+      - 'Ensure that file operations failing do not prevent other insights from being built.'
+    acceptance_criteria:
+      - '`build-insights.mjs` is resilient to file system errors.'
+      - 'Errors are logged, and the script attempts to process other files.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 33
+    title: 'Add File System Error Handling to `agent-bus.mjs`'
+    description: 'Improve the reliability of `agent-bus.mjs` by adding `try...catch` blocks around file system operations (`fs.readdir`, `fs.readFile`) to handle potential I/O errors.'
+    component: 'Automation Scripts'
+    dependencies: []
+    priority: 4
+    status: pending
+    command: null
+    task_id: 'PIN-ROBUST-5'
+    area: Robustness
+    actionable_steps:
+      - 'Wrap `fs.readdir` and `fs.readFile` calls in `try...catch` blocks.'
+      - 'Log errors using `console.error` or a new centralized logging utility.'
+      - 'Ensure the script can still attempt to update the GitHub Issue even if some manifest files are unreadable.'
+    acceptance_criteria:
+      - '`agent-bus.mjs` handles file system errors gracefully.'
+      - 'Errors are logged, and the script attempts to process other manifests.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 34
+    title: 'Implement Centralized Logging Utility'
+    description: 'Create a shared utility module for centralized logging across all Node.js automation scripts, allowing for consistent error reporting and easier debugging.'
+    component: 'Core Infrastructure'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-MAINT-1'
+    area: Maintainability
+    actionable_steps:
+      - 'Create `scripts/utils/logger.mjs`.'
+      - 'Implement functions for different log levels (e.g., `log.info`, `log.warn`, `log.error`).'
+      - 'Replace existing `console.log` and `console.error` calls in automation scripts with the new logging utility.'
+    acceptance_criteria:
+      - 'A `logger.mjs` utility exists and is used by all automation scripts.'
+      - 'Log messages are consistently formatted.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 35
+    title: 'Create Shared File System Utility Module'
+    description: 'Extract common file system operations (`fs.readdir`, `fs.readFile`, `fs.writeFile`, `fs.mkdir`, `fs.rename`) into a shared utility module to reduce code duplication and improve maintainability across automation scripts.'
+    component: 'Automation Scripts'
+    dependencies: [30, 31, 32, 33, 34]
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-REF-3'
+    area: Refactoring
+    actionable_steps:
+      - 'Create `scripts/utils/file-utils.mjs`.'
+      - 'Move common `fs` operations into functions within `file-utils.mjs`, incorporating error handling and logging.'
+      - 'Update `fetch-gh-repos.mjs`, `classify-inbox.mjs`, `build-insights.mjs`, and `agent-bus.mjs` to use the new utility.'
+    acceptance_criteria:
+      - '`file-utils.mjs` exists and is used by all relevant scripts.'
+      - 'Code duplication for file system operations is significantly reduced.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 36
+    title: 'Refactor LLM API Calls into Dedicated Utility'
+    description: "Consolidate LLM API interaction logic (currently in `classify-inbox.mjs`'s `callOpenAI` function) into a dedicated `llm-api.mjs` utility to prepare for potential future LLM integrations and improve modularity."
+    component: 'Automation Scripts'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-REF-4'
+    area: Refactoring
+    actionable_steps:
+      - 'Create `scripts/utils/llm-api.mjs`.'
+      - "Move `callOpenAI` (and potentially `buildSummaryPrompt` if it's generic enough) into `llm-api.mjs`."
+      - 'Update `classify-inbox.mjs` and `build-insights.mjs` to import and use the new utility.'
+    acceptance_criteria:
+      - '`llm-api.mjs` exists and encapsulates LLM API logic.'
+      - 'Scripts use the new utility for LLM interactions.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 37
+    title: 'Improve Readability of Markdown Table Generation in `agent-bus.mjs`'
+    description: 'Refactor the `manifestsToMarkdown` function in `agent-bus.mjs` to improve the readability of the markdown table header generation, potentially using template literals or an array join.'
+    component: 'Automation Scripts'
+    dependencies: []
+    priority: 2
+    status: pending
+    command: null
+    task_id: 'PIN-MAINT-2'
+    area: Maintainability
+    actionable_steps:
+      - 'Modify the `md` variable assignment in `manifestsToMarkdown` to use a more readable string construction method.'
+    acceptance_criteria:
+      - 'The markdown table header generation is clearer and easier to understand.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 38
+    title: 'Increase Unit Test Coverage for `agent-bus.mjs`'
+    description: 'Write additional unit tests for `agent-bus.mjs` to improve its test coverage, focusing on edge cases and ensuring all functions are adequately tested.'
+    component: 'Testing'
+    dependencies: [27]
+    priority: 4
+    status: pending
+    command: null
+    task_id: 'PIN-QA-10'
+    area: Testing
+    actionable_steps:
+      - 'Analyze current coverage report for `agent-bus.mjs`.'
+      - 'Write new tests to cover uncovered lines, branches, and functions.'
+      - 'Ensure mocks are comprehensive for GitHub API and file system interactions.'
+    acceptance_criteria:
+      - 'Test coverage for `agent-bus.mjs` reaches at least 80%.'
+      - 'All new tests pass.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 39
+    title: 'Increase Unit Test Coverage for `build-insights.mjs`'
+    description: 'Write additional unit tests for `build-insights.mjs` to improve its test coverage, focusing on edge cases and ensuring all functions are adequately tested.'
+    component: 'Testing'
+    dependencies: [24]
+    priority: 4
+    status: pending
+    command: null
+    task_id: 'PIN-QA-11'
+    area: Testing
+    actionable_steps:
+      - 'Analyze current coverage report for `build-insights.mjs`.'
+      - 'Write new tests to cover uncovered lines, branches, and functions.'
+      - 'Ensure mocks are comprehensive for LLM API and file system interactions.'
+    acceptance_criteria:
+      - 'Test coverage for `build-insights.mjs` reaches at least 80%.'
+      - 'All new tests pass.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 40
+    title: 'Increase Unit Test Coverage for `classify-inbox.mjs`'
+    description: 'Write additional unit tests for `classify-inbox.mjs` to improve its test coverage, focusing on edge cases and ensuring all functions are adequately tested.'
+    component: 'Testing'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-QA-12'
+    area: Testing
+    actionable_steps:
+      - 'Analyze current coverage report for `classify-inbox.mjs`.'
+      - 'Write new tests to cover uncovered lines, branches, and functions.'
+      - 'Ensure mocks are comprehensive for LLM API and file system interactions.'
+    acceptance_criteria:
+      - 'Test coverage for `classify-inbox.mjs` reaches at least 90%.'
+      - 'All new tests pass.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 41
+    title: 'Increase Unit Test Coverage for `fetch-gh-repos.mjs`'
+    description: 'Write additional unit tests for `fetch-gh-repos.mjs` to improve its test coverage, focusing on edge cases and ensuring all functions are adequately tested.'
+    component: 'Testing'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-QA-13'
+    area: Testing
+    actionable_steps:
+      - 'Analyze current coverage report for `fetch-gh-repos.mjs`.'
+      - 'Write new tests to cover uncovered lines, branches, and functions.'
+      - 'Ensure mocks are comprehensive for GitHub API and file system interactions.'
+    acceptance_criteria:
+      - 'Test coverage for `fetch-gh-repos.mjs` reaches at least 90%.'
+      - 'All new tests pass.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 42
+    title: 'Expand Integration Tests to Cover Error Scenarios'
+    description: 'Enhance the existing integration test suite (`test/integration.test.mjs`) to include scenarios where external API calls (GitHub, LLM) fail or return unexpected data, ensuring the pipeline handles these gracefully.'
+    component: 'Testing'
+    dependencies: [19]
+    priority: 4
+    status: pending
+    command: null
+    task_id: 'PIN-QA-14'
+    area: Testing
+    actionable_steps:
+      - 'Add test cases to `test/integration.test.mjs` that mock failed GitHub API responses.'
+      - 'Add test cases that mock failed LLM API responses or malformed LLM output.'
+      - 'Verify that the pipeline logs errors and handles them without crashing.'
+    acceptance_criteria:
+      - 'Integration tests cover various error conditions for external dependencies.'
+      - 'The pipeline demonstrates resilience to external service failures.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 43
+    title: 'Implement Content Sanitization for Markdown Files'
+    description: 'Add a sanitization step for markdown content, especially files processed by LLMs, to prevent potential injection attacks if the content is rendered directly on the static site without proper escaping.'
+    component: 'Security'
+    dependencies: []
+    priority: 5
+    status: pending
+    command: null
+    task_id: 'PIN-SEC-3'
+    area: Security
+    actionable_steps:
+      - 'Identify appropriate sanitization library (e.g., `dompurify` if used in browser, or a server-side markdown sanitizer).'
+      - 'Integrate the sanitization step into `classify-inbox.mjs` or `build-insights.mjs` before content is written to the `content/` directory.'
+      - 'Consider adding a sanitization step to the Astro build process if content is directly embedded.'
+    acceptance_criteria:
+      - 'Markdown content is sanitized to remove potentially malicious scripts or tags.'
+      - 'The static site remains secure against content injection.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 44
+    title: 'Add Detailed Code Comments for Complex Logic'
+    description: 'Review all Node.js automation scripts and add more detailed code comments, especially for complex functions, non-obvious logic, or areas that might be difficult for new contributors to understand.'
+    component: 'Documentation'
+    dependencies: []
+    priority: 2
+    status: pending
+    command: null
+    task_id: 'PIN-DOC-1'
+    area: Documentation
+    actionable_steps:
+      - 'Go through each function in `scripts/*.mjs` and `scripts/utils/*.mjs`.'
+      - 'Add comments explaining the purpose, parameters, and return values of functions.'
+      - 'Explain any complex algorithms or design decisions.'
+    acceptance_criteria:
+      - 'Automation scripts are well-commented, improving code readability and maintainability.'
+    assigned_to: codex-agent
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 45
+    title: 'Create `CONTRIBUTING.md` Guide'
+    description: 'Develop a `CONTRIBUTING.md` guide to provide clear instructions for new developers or AI agents on how to contribute to the project, including setup, coding standards, testing, and pull request guidelines.'
+    component: 'Documentation'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-DOC-2'
+    area: Documentation
+    actionable_steps:
+      - 'Create `CONTRIBUTING.md` in the root directory.'
+      - 'Include sections on: project setup, running tests, linting/formatting, adding new features, submitting pull requests.'
+      - 'Reference existing documentation (`README.md`, `PLAN.md`, `AGENTS.md`).'
+    acceptance_criteria:
+      - 'A comprehensive `CONTRIBUTING.md` file exists.'
+      - 'New contributors can easily understand how to get started and contribute.'
+    assigned_to: human-operator
+    epic: 'Phase 6: Iterative Growth'

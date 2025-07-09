@@ -44,18 +44,16 @@ async function main() {
     return;
   }
 
-  await Promise.all(
-    tools.map(async (repo) => {
-      const md = repoToMarkdown(repo);
-      const filePath = path.join(dir, `${repo.name}.md`);
-      try {
-        await fs.writeFile(filePath, md);
-        console.log(`Wrote ${filePath}`);
-      } catch (err) {
-        console.error(`Error writing file ${filePath}:`, err.message);
-      }
-    })
-  );
+  for (const repo of tools) {
+    const md = repoToMarkdown(repo);
+    const filePath = path.join(dir, `${repo.name}.md`);
+    try {
+      await fs.writeFile(filePath, md);
+      console.log(`Wrote ${filePath}`);
+    } catch (err) {
+      console.error(`Error writing file ${filePath}:`, err.message);
+    }
+  }
 }
 
 export { getLogin, fetchRepos, repoToMarkdown, main };
