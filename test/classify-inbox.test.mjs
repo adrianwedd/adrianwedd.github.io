@@ -8,14 +8,46 @@ vi.mock('fs/promises');
 import * as classifyInbox from '../scripts/classify-inbox.mjs';
 
 describe('classify-inbox.mjs', () => {
-  const mockFiles = ['file1.txt', 'file2.txt', '.gitkeep'];
+  // Helper to create Dirent-like objects for mocking fs.readdir
+  const createDirent = (name, isDirectory = false) => ({
+    name,
+    isDirectory: () => isDirectory,
+  });
+
+  const mockFiles = [
+    createDirent('file1.txt'),
+    createDirent('file2.txt'),
+    createDirent('.gitkeep'),
+    createDirent('garden', true), // Add a directory for dynamic sections
+    createDirent('logs', true),
+    createDirent('mirror', true),
+    createDirent('inbox', true),
+    createDirent('untagged', true),
+    createDirent('agents', true),
+    createDirent('codex', true),
+    createDirent('tools', true),
+    createDirent('resume', true),
+  ];
 
   beforeEach(() => {
     // Set env var for most tests
     process.env.OPENAI_API_KEY = 'test-key';
 
     // Mock implementations
-    vi.spyOn(fs, 'readdir').mockResolvedValue(mockFiles);
+    vi.spyOn(fs, 'readdir').mockImplementation((dirPath, options) => {
+      if (options && options.withFileTypes) {
+        // Return Dirent-like objects for 'content' directory
+        if (dirPath === 'content') {
+          return Promise.resolve(mockFiles);
+        }
+        // For inboxDir, return only files, not directories
+        if (dirPath.endsWith('content/inbox')) {
+          return Promise.resolve(mockFiles.filter(d => !d.isDirectory()).map(d => d.name));
+        }
+      }
+      // Default behavior for other readdir calls (e.g., in main for inboxDir without withFileTypes)
+      return Promise.resolve(mockFiles.filter(d => !d.isDirectory()).map(d => d.name));
+    });
     vi.spyOn(fs, 'readFile').mockResolvedValue('Test content');
     vi.spyOn(fs, 'mkdir').mockResolvedValue(undefined);
     vi.spyOn(fs, 'rename').mockResolvedValue(undefined);

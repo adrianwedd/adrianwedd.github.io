@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { pathToFileURL } = 'url';
+import { pathToFileURL } from 'url';
 
 const MODEL = process.env.OPENAI_MODEL || 'gpt-3.5-turbo-1106';
 // REMOVE: const SECTIONS = ['tools', 'logs', 'garden', 'mirror', 'resume', 'agents'];
@@ -12,7 +12,7 @@ async function getDynamicSections() {
   const sections = entries
     .filter(dirent => dirent.isDirectory())
     .map(dirent => dirent.name)
-    .filter(name => !['inbox', 'untagged', 'agents', 'codex', 'tools', 'logs', 'garden', 'mirror', 'resume'].includes(name)); // Filter out non-content directories
+    .filter(name => !['inbox', 'untagged'].includes(name)); // Filter out special directories
   return sections;
 }
 
