@@ -49,3 +49,7 @@ npm run format
 ```
 
 See `docs/scripts` for details on each automation script.
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
