@@ -131,7 +131,7 @@ phases:
     component: "Automation Scripts"
     dependencies: [5]
     priority: 3
-    status: pending
+    status: done
     command: "node scripts/classify-inbox.mjs"
     task_id: "PIN-DEV-2"
     area: Development
