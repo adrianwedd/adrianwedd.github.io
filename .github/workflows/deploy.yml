@@ -1,4 +1,5 @@
 name: Build & Deploy
+# Deploy static site to the `gh-pages` branch
 
 on:
   push:

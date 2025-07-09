@@ -73,7 +73,7 @@ phases:
     component: "CI/CD"
     dependencies: [2]
     priority: 5
-    status: pending
+    status: done
     command: null
     task_id: "PIN-CI-1"
     area: Deployment
