@@ -526,7 +526,7 @@ phases:
     component: Core Infrastructure
     dependencies: [2]
     priority: 4
-    status: pending
+    status: done
     command: npm run build
     task_id: PIN-CFG-1
     area: Configuration
@@ -537,5 +537,5 @@ phases:
     acceptance_criteria:
       - The `astro.config.mjs` file contains a `site` property with the correct production URL.
       - The Astro build completes successfully with the new configuration.
-    assigned_to: codex-agent
+    assigned_to: 'codex-agent'
     epic: 'Phase 1: Bootstrap'
