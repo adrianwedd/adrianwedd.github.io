@@ -75,6 +75,25 @@ Build a self-updating, agent-fed, static knowledge hub—a "personal intelligenc
 
 See [`docs/architecture.mmd`](docs/architecture.mmd) for a mermaid diagram depicting the data flow between automation scripts, content folders, and the GitHub Actions workflow.
 
+### 3b. Agent Manifest Schema
+
+Agent status files live in `content/agents/` and must conform to the schema in
+[`docs/agent-manifest-schema.yml`](docs/agent-manifest-schema.yml). A minimal
+example looks like:
+
+```yaml
+id: codex-agent
+name: Codex Agent
+owner: "@adrian"
+role: Repository automation
+status: active        # active | idle | offline | error
+last_updated: 2024-01-01T00:00:00Z
+description: Handles GitHub automation tasks.
+```
+
+The `agent-bus.mjs` script reads these manifests and updates the `#agent-bus`
+GitHub Issue with a summary table.
+
 ### 4. Automation Scripts (CI)
 
 | Script               | Purpose                                                                | Invoked By       |

@@ -190,7 +190,7 @@ phases:
     component: "Automation Scripts"
     dependencies: [8]
     priority: 2
-    status: pending
+    status: done
     command: "node scripts/agent-bus.mjs"
     task_id: "PIN-DEV-3"
     area: Development
