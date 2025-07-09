@@ -1,0 +1,45 @@
+# Execution tasks derived from PLAN.md
+
+phases:
+  - phase: 1
+    name: Bootstrap
+    objective: "Repository + CI running"
+    tasks:
+      - "Commit scaffold"
+      - "Configure Pages to gh-pages"
+      - "Verify manual npm run dev / npm run build"
+  - phase: 2
+    name: Automation Hooks
+    objective: "Data ingestion operational"
+    tasks:
+      - "Add GH_TOKEN secret"
+      - "Finish & test fetch-gh-repos.mjs"
+      - "Push – confirm tools page autogenerates"
+  - phase: 3
+    name: LLM Integration
+    objective: "Classification & insights"
+    tasks:
+      - "Implement classify-inbox.mjs with chosen LLM"
+      - "Implement build-insights.mjs"
+      - "Store API keys in Secrets"
+      - "Dry-run on sample inbox files"
+  - phase: 4
+    name: Agent Bus
+    objective: "Status visibility"
+    tasks:
+      - "Design simple YAML manifest schema"
+      - "Implement agent-bus.mjs to update Issue"
+  - phase: 5
+    name: UI Expansion
+    objective: "Flesh out components & pages"
+    tasks:
+      - "Build ToolCard, AgentDiagram, etc."
+      - "Style with Tailwind"
+      - "Populate content folders"
+  - phase: 6
+    name: Iterative Growth
+    objective: "Continuous enhancement"
+    tasks:
+      - "Add more scripts (dataset stats, changelog diffing)"
+      - "Hook additional agents via commits"
+      - "Refine design/branding"
