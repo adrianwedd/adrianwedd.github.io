@@ -37,6 +37,9 @@ describe('classify-inbox.mjs', () => {
   beforeEach(() => {
     // Set env var for most tests
     process.env.OPENAI_API_KEY = 'test-key';
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
 
     // Mock implementations
     fs.readdir.mockImplementation((dirPath, options) => {
@@ -135,5 +138,9 @@ describe('classify-inbox.mjs', () => {
     delete process.env.OPENAI_API_KEY;
     await classifyInbox.main();
     expect(fs.readdir).not.toHaveBeenCalled();
+    expect(console.error).toHaveBeenCalledWith(
+      '[ERROR]',
+      expect.stringContaining('OPENAI_API_KEY not set')
+    );
   });
 });

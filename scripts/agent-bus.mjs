@@ -3,6 +3,7 @@ import path from 'path';
 import { pathToFileURL } from 'url';
 import { parse } from 'yaml';
 import { githubFetch } from './utils/github.mjs'; // Import the new utility
+import { log } from './utils/logger.mjs';
 
 const REPO = process.env.GH_REPO || process.env.GITHUB_REPOSITORY;
 
@@ -11,7 +12,7 @@ async function loadManifests(dir = path.join('content', 'agents')) {
   try {
     files = await fs.readdir(dir);
   } catch (err) {
-    console.error(
+    log.error(
       `Error reading agent manifests directory ${dir}:`,
       err.message
     );
@@ -25,7 +26,7 @@ async function loadManifests(dir = path.join('content', 'agents')) {
       const doc = parse(data);
       manifests.push({ file, ...doc });
     } catch (err) {
-      console.error(
+      log.error(
         `Error reading or parsing agent manifest ${file}:`,
         err.message
       );
@@ -88,10 +89,10 @@ async function main() {
   const num = await getIssueNumber(title, owner, repo);
   if (num) {
     await updateIssue(num, body, owner, repo);
-    console.log(`Updated issue #${num}`);
+    log.info(`Updated issue #${num}`);
   } else {
     const newNum = await createIssue(title, body, owner, repo);
-    console.log(`Created issue #${newNum}`);
+    log.info(`Created issue #${newNum}`);
   }
 }
 
@@ -106,7 +107,7 @@ export {
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {
-    console.error(err);
+    log.error(err);
     process.exit(1);
   });
 }
