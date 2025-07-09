@@ -7,14 +7,10 @@ import path from 'path';
 // Mock fs before any imports
 vi.mock('fs/promises');
 
-// Mock the callOpenAI function from classify-inbox.mjs
-vi.mock('../scripts/classify-inbox.mjs', async (importOriginal) => {
-  const actual = await importOriginal();
-  return {
-    ...actual,
-    callOpenAI: vi.fn(),
-  };
-});
+// Mock the LLM API utility
+vi.mock('../scripts/utils/llm-api.mjs', () => ({
+  callOpenAI: vi.fn(),
+}));
 
 // Import the module to be tested
 import { log } from '../scripts/utils/logger.mjs';
@@ -28,14 +24,11 @@ vi.mock('../scripts/utils/file-utils.mjs', () => ({
   rename: vi.fn(),
 }));
 
-// Mock the callOpenAI function from classify-inbox.mjs
-vi.mock('../scripts/classify-inbox.mjs', () => ({
-  callOpenAI: vi.fn(),
-}));
+// Alias imports from the mocked LLM API
 
 // Import the module to be tested
 import * as buildInsights from '../scripts/build-insights.mjs';
-import { callOpenAI } from '../scripts/classify-inbox.mjs'; // Import the mocked function
+import { callOpenAI } from '../scripts/utils/llm-api.mjs';
 import { readFile, writeFile, readdir } from '../scripts/utils/file-utils.mjs'; // Import mocked file-utils functions
 
 describe('build-insights.mjs', () => {
@@ -86,12 +79,13 @@ describe('build-insights.mjs', () => {
 
   it('processMarkdownFile should handle LLM API errors gracefully', async () => {
     callOpenAI.mockRejectedValue(new Error('LLM API error'));
-    const consoleErrorSpy = vi
+  const consoleErrorSpy = vi
       .spyOn(console, 'error')
       .mockImplementation(() => {});
     const filePath = path.join('content', 'garden', 'file1.md');
     await buildInsights.processMarkdownFile(filePath);
     expect(consoleErrorSpy).toHaveBeenCalledWith(
+      '[ERROR]',
       expect.stringContaining('Failed to generate insight'),
       'LLM API error'
     );
@@ -103,11 +97,11 @@ describe('build-insights.mjs', () => {
     expect(readdir).toHaveBeenCalledWith(path.join('content', 'garden'));
     expect(readdir).toHaveBeenCalledWith(path.join('content', 'logs'));
     expect(readdir).toHaveBeenCalledWith(path.join('content', 'mirror'));
-    expect(fs.writeFile).toHaveBeenCalledWith(
+    expect(writeFile).toHaveBeenCalledWith(
       path.join('content', 'garden', 'file1.insight.md'),
       mockSummary
     );
-    expect(fs.writeFile).toHaveBeenCalledWith(
+    expect(writeFile).toHaveBeenCalledWith(
       path.join('content', 'garden', 'file2.insight.md'),
       mockSummary
     );
@@ -125,7 +119,7 @@ describe('build-insights.mjs', () => {
   });
 
   it('main should handle missing directories gracefully', async () => {
-    vi.spyOn(fs, 'readdir').mockImplementation((dirPath) => {
+    readdir.mockImplementation((dirPath) => {
       if (dirPath.includes('garden')) return Promise.reject({ code: 'ENOENT' });
       return Promise.resolve([]);
     });
@@ -134,6 +128,7 @@ describe('build-insights.mjs', () => {
       .mockImplementation(() => {});
     await buildInsights.main();
     expect(consoleWarnSpy).toHaveBeenCalledWith(
+      '[WARN]',
       expect.stringContaining('Directory not found: content/garden')
     );
   });

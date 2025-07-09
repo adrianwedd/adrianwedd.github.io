@@ -1,17 +1,16 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import {
-  readFile,
-  writeFile,
-  mkdir,
-  readdir,
-  rename,
-} from '../scripts/utils/file-utils.mjs';
+import fs from 'fs/promises';
 
-// Mock fs before any imports
+// Mock fs before importing the module under test
 vi.mock('fs/promises');
+// Mock the LLM API utility
+vi.mock('../scripts/utils/llm-api.mjs', () => ({
+  callOpenAI: vi.fn(),
+}));
 
 // Import the module to be tested
 import * as classifyInbox from '../scripts/classify-inbox.mjs';
+import { callOpenAI } from '../scripts/utils/llm-api.mjs';
 
 describe('classify-inbox.mjs', () => {
   // Helper to create Dirent-like objects for mocking fs.readdir
@@ -38,9 +37,12 @@ describe('classify-inbox.mjs', () => {
   beforeEach(() => {
     // Set env var for most tests
     process.env.OPENAI_API_KEY = 'test-key';
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
 
     // Mock implementations
-    readdir.mockImplementation((dirPath, options) => {
+    fs.readdir.mockImplementation((dirPath, options) => {
       if (options && options.withFileTypes) {
         // Return Dirent-like objects for 'content' directory
         if (dirPath === 'content') {
@@ -58,11 +60,10 @@ describe('classify-inbox.mjs', () => {
         mockFiles.filter((d) => !d.isDirectory()).map((d) => d.name)
       );
     });
-    readFile.mockResolvedValue('Test content');
-    mkdir.mockResolvedValue(undefined);
-    rename.mockResolvedValue(undefined);
-    writeFile.mockResolvedValue(undefined);
-    global.fetch = vi.fn();
+    fs.readFile.mockResolvedValue('Test content');
+    fs.mkdir.mockResolvedValue(undefined);
+    fs.rename.mockResolvedValue(undefined);
+    fs.writeFile.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -70,15 +71,8 @@ describe('classify-inbox.mjs', () => {
     delete process.env.OPENAI_API_KEY;
   });
 
-  const mockOpenAIResponse = (response, status = 200) => {
-    global.fetch.mockResolvedValue({
-      ok: status === 200,
-      status,
-      json: async () => ({
-        choices: [{ message: { content: JSON.stringify(response) } }],
-      }),
-      text: async () => 'Error text',
-    });
+  const mockOpenAIResponse = (response) => {
+    callOpenAI.mockResolvedValue(JSON.stringify(response));
   };
 
   it('should move a file to the correct section on successful classification', async () => {
@@ -88,17 +82,17 @@ describe('classify-inbox.mjs', () => {
       confidence: 0.9,
     });
     await classifyInbox.main();
-    expect(rename).toHaveBeenCalledWith(
+    expect(fs.rename).toHaveBeenCalledWith(
       expect.stringContaining('file1.txt'),
       expect.stringContaining('content/garden/file1.txt')
     );
-    expect(writeFile).toHaveBeenCalled();
+    expect(fs.writeFile).toHaveBeenCalled();
   });
 
   it('should move a file to untagged for low confidence', async () => {
     mockOpenAIResponse({ section: 'garden', tags: [], confidence: 0.7 });
     await classifyInbox.main();
-    expect(rename).toHaveBeenCalledWith(
+    expect(fs.rename).toHaveBeenCalledWith(
       expect.stringContaining('file1.txt'),
       expect.stringContaining('content/untagged/file1.txt')
     );
@@ -107,21 +101,16 @@ describe('classify-inbox.mjs', () => {
   it('should move a file to untagged for unknown section', async () => {
     mockOpenAIResponse({ section: 'unknown', tags: [], confidence: 0.9 });
     await classifyInbox.main();
-    expect(rename).toHaveBeenCalledWith(
+    expect(fs.rename).toHaveBeenCalledWith(
       expect.stringContaining('file1.txt'),
       expect.stringContaining('content/untagged/file1.txt')
     );
   });
 
   it('should move a file to failed on invalid JSON response', async () => {
-    global.fetch.mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        choices: [{ message: { content: 'invalid-json' } }],
-      }),
-    });
+    callOpenAI.mockResolvedValue('invalid-json');
     await classifyInbox.main();
-    expect(rename).toHaveBeenCalledWith(
+    expect(fs.rename).toHaveBeenCalledWith(
       expect.stringContaining('file1.txt'),
       expect.stringContaining('content/inbox/failed/file1.txt')
     );
@@ -130,16 +119,16 @@ describe('classify-inbox.mjs', () => {
   it('should move a file to failed on malformed (missing keys) response', async () => {
     mockOpenAIResponse({ section: 'garden' });
     await classifyInbox.main();
-    expect(rename).toHaveBeenCalledWith(
+    expect(fs.rename).toHaveBeenCalledWith(
       expect.stringContaining('file1.txt'),
       expect.stringContaining('content/inbox/failed/file1.txt')
     );
   });
 
   it('should move a file to failed on OpenAI API error', async () => {
-    mockOpenAIResponse({}, 500);
+    callOpenAI.mockRejectedValue(new Error('API error'));
     await classifyInbox.main();
-    expect(rename).toHaveBeenCalledWith(
+    expect(fs.rename).toHaveBeenCalledWith(
       expect.stringContaining('file1.txt'),
       expect.stringContaining('content/inbox/failed/file1.txt')
     );
@@ -148,6 +137,10 @@ describe('classify-inbox.mjs', () => {
   it('should skip classification if API key is not set', async () => {
     delete process.env.OPENAI_API_KEY;
     await classifyInbox.main();
-    expect(readdir).not.toHaveBeenCalled();
+    expect(fs.readdir).not.toHaveBeenCalled();
+    expect(console.error).toHaveBeenCalledWith(
+      '[ERROR]',
+      expect.stringContaining('OPENAI_API_KEY not set')
+    );
   });
 });
