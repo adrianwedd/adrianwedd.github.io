@@ -352,7 +352,7 @@ phases:
     component: 'CI/CD'
     dependencies: [3]
     priority: 4
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-SEC-1'
     area: Security
