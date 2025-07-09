@@ -160,7 +160,7 @@ jobs:
 | 1. Bootstrap | Repository + CI running | • Commit scaffold • Configure Pages to `gh-pages`. • Verify manual `npm run dev` / `npm run build`. |
 | 2. Automation Hooks | Data ingestion operational | • Add `GH_TOKEN` secret. • Finish & test `fetch-gh-repos.mjs`. • Push – confirm tools page autogenerates. |
 | 3. LLM Integration | Classification & insights | • Implement `classify-inbox.mjs` with chosen LLM. • Implement `build-insights.mjs`. • Store API keys in Secrets. • Dry-run on sample inbox files. |
-| 4. Agent Bus | Status visibility | • Design simple YAML manifest schema. • Implement `agent-bus.mjs` to update Issue. |
+| 4. Process Hardening & Agent Bus | Status visibility & quality gate | • Enforce branch protection on `main` requiring passing checks and one approving review. • Design simple YAML manifest schema. • Implement `agent-bus.mjs` to update Issue. |
 | 5. UI Expansion | Flesh out components & pages | • Build ToolCard, AgentDiagram, etc. • Style with Tailwind. • Populate content folders. |
 | 6. Iterative Growth | Continuous enhancement | • Add more scripts (dataset stats, changelog diffing). • Hook additional agents via commits. • Refine design/branding. |
 
