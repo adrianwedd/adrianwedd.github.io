@@ -262,5 +262,201 @@ phases:
     acceptance_criteria:
       - "CI pipeline includes a security audit step."
       - "The project has clear, detailed documentation for all its parts."
-      - "A monitoring plan is in place for CI/CD failures."
-    assigned_to: codex-agent    epic: "Phase 6: Iterative Growth"
+      - "A monitoring plan is in place for CI/CD failures."    assigned_to: codex-agent
+    epic: "Phase 6: Iterative Growth"
+
+  - id: 13
+    title: "Add Input Validation for LLM Response in classify-inbox.mjs"
+    description: "The classify-inbox script assumes the LLM always returns valid JSON. Invalid responses currently move files to 'untagged' without any validation, which can hide failures. This task introduces schema checks so malformed API replies are detected and handled explicitly."
+    component: "Automation Scripts"
+    dependencies: [6]
+    priority: 4
+    status: pending
+    command: null
+    task_id: "PIN-ROBUST-1"
+    area: Robustness
+    actionable_steps:
+      - "Wrap JSON.parse in a try-catch block and validate the parsed object contains 'section', 'tags', and 'confidence'."
+      - "Ensure 'section' matches one of the allowed SECTIONS and 'confidence' is between 0 and 1."
+      - "If validation fails, log the issue and move the source file to `content/inbox/failed/` for manual review."
+    acceptance_criteria:
+      - "Script no longer crashes when the LLM returns invalid JSON."
+      - "Files with malformed responses are quarantined and reported."
+    assigned_to: "codex-agent"
+    epic: "Phase 4: Process Hardening & Agent Bus"
+
+  - id: 14
+    title: "Unit Tests for classify-inbox.mjs"
+    description: "Increase test coverage for the classification logic, including the new validation behaviour."
+    component: "Testing"
+    dependencies: [13]
+    priority: 4
+    status: pending
+    command: "npm test"
+    task_id: "PIN-QA-4"
+    area: Testing
+    actionable_steps:
+      - "Create Vitest tests for buildPrompt and classifyFile with mocked OpenAI API responses."
+      - "Test handling of both valid and invalid JSON replies and verify files are moved to the correct directories."
+      - "Add coverage expectations for the new validation code."
+    acceptance_criteria:
+      - "Coverage for `classify-inbox.mjs` reaches 80% or higher."
+      - "All tests pass in CI."
+    assigned_to: "codex-agent"
+    epic: "Phase 4: Process Hardening & Agent Bus"
+
+  - id: 15
+    title: "Refactor GitHub API logic into utils/github.mjs"
+    description: "fetch-gh-repos.mjs and agent-bus.mjs duplicate token handling and fetch logic. Consolidating this code will reduce bugs and simplify future enhancements."
+    component: "Automation Scripts"
+    dependencies: [4, 9]
+    priority: 3
+    status: pending
+    command: null
+    task_id: "PIN-REF-1"
+    area: Maintainability
+    actionable_steps:
+      - "Create `scripts/utils/github.mjs` exporting a `githubFetch` helper that applies headers and throws informative errors."
+      - "Update `fetch-gh-repos.mjs` and `agent-bus.mjs` to use this helper."
+      - "Add minimal tests for the new utility to verify header injection and error handling."
+    acceptance_criteria:
+      - "Both scripts operate as before using the shared utility."
+      - "Repeated token/header code is removed from the individual scripts."
+    assigned_to: "codex-agent"
+    epic: "Phase 4: Process Hardening & Agent Bus"
+
+  - id: 16
+    title: "Unit Tests for agent-bus.mjs"
+    description: "Add tests to ensure agent-bus correctly loads manifests and interacts with the GitHub API after the refactor."
+    component: "Testing"
+    dependencies: [15]
+    priority: 3
+    status: pending
+    command: "npm test"
+    task_id: "PIN-QA-5"
+    area: Testing
+    actionable_steps:
+      - "Mock `fetch` and `fs` within Vitest to simulate manifest files and GitHub API responses."
+      - "Test getIssueNumber, createIssue, and updateIssue logic."
+      - "Verify manifestsToMarkdown produces the expected table format."
+    acceptance_criteria:
+      - "agent-bus.mjs reaches at least 80% test coverage."
+      - "CI passes with the new tests."
+    assigned_to: "codex-agent"
+    epic: "Phase 4: Process Hardening & Agent Bus"
+
+  - id: 17
+    title: "Restrict permissions in deploy workflow"
+    description: "The deploy.yml workflow currently runs with default token permissions. Tightening these permissions reduces blast radius if the token is compromised."
+    component: "CI/CD"
+    dependencies: [3]
+    priority: 4
+    status: pending
+    command: null
+    task_id: "PIN-SEC-1"
+    area: Security
+    actionable_steps:
+      - "Add a `permissions` section to `.github/workflows/deploy.yml` granting only the scopes needed (e.g., `contents: read`, `pages: write`, `issues: write`)."
+      - "Verify the job still succeeds with the restricted permissions."
+    acceptance_criteria:
+      - "Workflow defines explicit minimal permissions and completes successfully."
+    assigned_to: "codex-agent"
+    epic: "Phase 6: Iterative Growth"
+
+  - id: 18
+    title: "Implement build-insights.mjs"
+    description: "The placeholder build-insights script should summarise new or changed markdown files using an LLM and generate `.insight.md` outputs."
+    component: "Automation Scripts"
+    dependencies: [6]
+    priority: 3
+    status: pending
+    command: "node scripts/build-insights.mjs"
+    task_id: "PIN-DEV-4"
+    area: Development
+    actionable_steps:
+      - "Detect recently added or modified markdown across `content/garden`, `logs`, and `mirror`."
+      - "Use OpenAI (or configured LLM) to produce concise summaries with proper error handling."
+      - "Write the summaries to corresponding `.insight.md` files."
+    acceptance_criteria:
+      - "Running the script generates insight files without crashing when the API fails."
+    assigned_to: "codex-agent"
+    epic: "Phase 3: LLM Integration"
+
+  - id: 19
+    title: "Integration tests for automation pipeline"
+    description: "Validate that all automation scripts work together by running them sequentially on sample data with mocked external APIs."
+    component: "Testing"
+    dependencies: [14, 16, 18]
+    priority: 3
+    status: pending
+    command: null
+    task_id: "PIN-QA-6"
+    area: Testing
+    actionable_steps:
+      - "Create fixtures under `test/fixtures` for inbox files and agent manifests."
+      - "Mock GitHub and OpenAI APIs to avoid network calls."
+      - "Run fetch-gh-repos, classify-inbox, build-insights, and agent-bus in a single test suite."
+    acceptance_criteria:
+      - "Integration tests pass in CI and verify expected file movements and issue updates."
+    assigned_to: "codex-agent"
+    epic: "Phase 6: Iterative Growth"
+
+  - id: 20
+    title: "Add Caching to GitHub Actions Workflow"
+    description: "The CI workflow reinstalls all Node.js dependencies on every run. Implementing caching for `node_modules` will significantly speed up the build and test process, saving time and resources."
+    component: "CI/CD"
+    dependencies: [3]
+    priority: 2
+    status: pending
+    command: null
+    task_id: "PIN-OPT-1"
+    area: Optimization
+    actionable_steps:
+      - "Add a step using the `actions/setup-node@v4` action that includes caching for the package manager."
+      - "Configure the cache key to use the `package-lock.json` hash to ensure the cache is invalidated when dependencies change."
+      - "Verify that subsequent CI runs are faster due to the cache hit."
+    acceptance_criteria:
+      - "The `deploy.yml` workflow includes a caching mechanism for npm dependencies."
+      - "CI workflow execution time is demonstrably reduced on runs where dependencies have not changed."
+    assigned_to: "codex-agent"
+    epic: "Phase 6: Iterative Growth"
+
+  - id: 21
+    title: "Refactor Scripts to Only Process Changed Files"
+    description: "Scripts like `classify-inbox.mjs` and `build-insights.mjs` re-process all files in their target directories on every run. This is inefficient and will not scale. They should be refactored to only process files that have been added or changed in the latest push."
+    component: "Automation Scripts"
+    dependencies: [6, 18]
+    priority: 3
+    status: pending
+    command: null
+    task_id: "PIN-SCALE-1"
+    area: Scalability
+    actionable_steps:
+      - "In the `deploy.yml` workflow, use an action like `tj-actions/changed-files` to get a list of modified files."
+      - "Pass the list of changed files as arguments to the `classify-inbox.mjs` and `build-insights.mjs` scripts."
+      - "Update the scripts to accept a list of file paths as an argument and only process those files. If no arguments are provided, they should fall back to the current behavior."
+    acceptance_criteria:
+      - "Scripts only operate on the subset of files that were changed in a push."
+      - "The cron-scheduled run continues to process all files as a full sweep."
+    assigned_to: "codex-agent"
+    epic: "Phase 6: Iterative Growth"
+
+  - id: 22
+    title: "Add YAML Linting and Schema Validation to CI"
+    description: "To prevent future syntax errors or schema violations in `tasks.yml`, this task adds an automated validation step to the CI pipeline."
+    component: "CI/CD"
+    dependencies: [3]
+    priority: 5
+    status: pending
+    command: null
+    task_id: "PIN-QA-7"
+    area: QA
+    actionable_steps:
+      - "Add a new 'Lint & Validate YAML' step to the `deploy.yml` workflow."
+      - "This step will use `yamllint` to check for basic syntax and style issues."
+      - "It will then use a small Python script with `jsonschema` to validate that `tasks.yml` conforms to the schema defined in its `jsonschema` block."
+    acceptance_criteria:
+      - "The CI pipeline fails if `tasks.yml` has syntax errors or does not conform to its own schema."
+      - "This provides an automated safety net against malformed task definitions."
+    assigned_to: "codex-agent"
+    epic: "Phase 4: Process Hardening & Agent Bus"
