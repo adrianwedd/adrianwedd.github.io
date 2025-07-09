@@ -103,6 +103,7 @@ GitHub Issue with a summary table.
 | `fetch-gh-repos.mjs` | Scan GitHub user/org, create `content/tools/<repo>.md` for any repo tagged tool.                                                | Manual & nightly cron |
 | `classify-inbox.mjs` | For every file in `content/inbox/`, call LLM → `{section,tags}`; move file accordingly. Confidence < 0.8 ⇒ move to `untagged/`. | Before build step     |
 | `build-insights.mjs` | Parse new/changed markdown (logs, garden, mirror); generate `<slug>.insight.md` with summary + cross-links.                     | After classification  |
+| `build-search-index.mjs` | Generate `public/search-index.json` for client-side Lunr search. | Before build step |
 | `agent-bus.mjs`      | Read `content/agents/*.yml`, update or create GitHub Issue `#agent-bus` with latest agent statuses.                             | Last step in workflow |
 
 ---
@@ -137,6 +138,7 @@ jobs:
       - run: node scripts/fetch-gh-repos.mjs
       - run: node scripts/classify-inbox.mjs
       - run: node scripts/build-insights.mjs
+      - run: node scripts/build-search-index.mjs
       - run: node scripts/agent-bus.mjs
 
       # 2. build static site
@@ -172,6 +174,7 @@ jobs:
 | `AgentDiagram.astro`   | `src/components/` | Mermaid diagram for codex files with `diagram:` front-matter. |
 | `ResumeSwitcher.astro` | `src/components/` | Client-side toggle between multiple resume modes.             |
 | `VoiceLog.astro`       | `src/components/` | Audio player + transcript display for logs.                   |
+| `Search.astro`         | `src/components/` | Client-side search box using Lunr index.                      |
 
 ---
 
