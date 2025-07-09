@@ -41,7 +41,10 @@ export async function rename(oldPath, newPath) {
   try {
     await fs.rename(oldPath, newPath);
   } catch (err) {
-    log.error(`Error renaming file from ${oldPath} to ${newPath}:`, err.message);
+    log.error(
+      `Error renaming file from ${oldPath} to ${newPath}:`,
+      err.message
+    );
     throw err;
   }
 }

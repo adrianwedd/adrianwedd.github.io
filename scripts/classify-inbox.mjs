@@ -1,7 +1,6 @@
+import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
-import { log } from './utils/logger.mjs';
-import { readFile, writeFile, mkdir, readdir, rename } from './utils/file-utils.mjs';
 
 const MODEL = process.env.OPENAI_MODEL || 'gpt-3.5-turbo-1106';
 
@@ -9,14 +8,14 @@ const MODEL = process.env.OPENAI_MODEL || 'gpt-3.5-turbo-1106';
 async function getDynamicSections() {
   const contentDir = path.join('content');
   try {
-    const entries = await readdir(contentDir, { withFileTypes: true });
+    const entries = await fs.readdir(contentDir, { withFileTypes: true });
     const sections = entries
       .filter((dirent) => dirent.isDirectory())
       .map((dirent) => dirent.name)
       .filter((name) => !['inbox', 'untagged'].includes(name)); // Filter out special directories
     return sections;
   } catch (err) {
-    log.error(
+    console.error(
       `Error reading content directory ${contentDir}:`,
       err.message
     );
@@ -60,16 +59,16 @@ async function callOpenAI(prompt) {
 async function classifyFile(filePath) {
   let content;
   try {
-    content = await readFile(filePath, 'utf8');
+    content = await fs.readFile(filePath, 'utf8');
   } catch (err) {
-    log.error(
+    console.error(
       `Error reading file ${filePath} for classification:`,
       err.message
     );
     throw err; // Re-throw to be caught by main's try-catch
   }
 
-  const reply = await callOpenAI(buildPrompt(content));
+  const reply = await callOpenAI(await buildPrompt(content));
   let result;
   try {
     result = JSON.parse(reply);
@@ -95,9 +94,9 @@ async function classifyFile(filePath) {
 
 async function moveFile(src, destDir) {
   try {
-    await mkdir(destDir, { recursive: true });
+    await fs.mkdir(destDir, { recursive: true });
   } catch (err) {
-    log.error(
+    console.error(
       `Error creating destination directory ${destDir}:`,
       err.message
     );
@@ -105,9 +104,9 @@ async function moveFile(src, destDir) {
   }
   const dest = path.join(destDir, path.basename(src));
   try {
-    await rename(src, dest);
+    await fs.rename(src, dest);
   } catch (err) {
-    log.error(`Error moving file from ${src} to ${dest}:`, err.message);
+    console.error(`Error moving file from ${src} to ${dest}:`, err.message);
     throw err;
   }
   return dest;
@@ -115,7 +114,7 @@ async function moveFile(src, destDir) {
 
 async function main() {
   if (!process.env.OPENAI_API_KEY) {
-    log.error('OPENAI_API_KEY not set; skipping classification');
+    console.error('OPENAI_API_KEY not set; skipping classification');
     return;
   }
 
@@ -139,11 +138,11 @@ async function main() {
     // Filter for files that are actually in the inbox directory
     let allInboxFiles = [];
     try {
-      allInboxFiles = (await readdir(inboxDir)).filter(
+      allInboxFiles = (await fs.readdir(inboxDir)).filter(
         (f) => f !== '.gitkeep' && f !== 'failed'
       );
     } catch (err) {
-      log.error(`Error reading inbox directory ${inboxDir}:`, err.message);
+      console.error(`Error reading inbox directory ${inboxDir}:`, err.message);
       return; // Cannot proceed without reading inbox
     }
 
@@ -163,12 +162,12 @@ async function main() {
         (f) => f !== '.gitkeep' && f !== 'failed'
       );
     } catch (err) {
-      log.error(`Error reading inbox directory ${inboxDir}:`, err.message);
+      console.error(`Error reading inbox directory ${inboxDir}:`, err.message);
       return; // Cannot proceed without reading inbox
     }
 
     if (filesToProcess.length === 0) {
-      log.info('No inbox files to process.');
+      console.log('No inbox files to process.');
       return;
     }
   }
@@ -190,7 +189,7 @@ async function main() {
           try {
             data = await fs.readFile(filePath, 'utf8');
           } catch (err) {
-            log.error(
+            console.error(
               `Error reading file ${filePath} to add tags:`,
               err.message
             );
@@ -200,9 +199,9 @@ async function main() {
             // Only write if not already marked for failed
             const fm = `---\ntags: [${result.tags.join(', ')}]\n---\n`;
             try {
-              await writeFile(filePath, fm + data);
+              await fs.writeFile(filePath, fm + data);
             } catch (err) {
-              log.error(
+              console.error(
                 `Error writing tags to file ${filePath}:`,
                 err.message
               );
@@ -214,12 +213,12 @@ async function main() {
         targetDir = path.join('content', 'untagged');
       }
     } catch (err) {
-      log.error(`Failed to classify ${name}:`, err.message);
+      console.error(`Failed to classify ${name}:`, err.message);
       targetDir = failedDir;
     }
 
     const dest = await moveFile(filePath, targetDir);
-    log.info(`Moved ${name} to ${dest}`);
+    console.log(`Moved ${name} to ${dest}`);
   }
 }
 
@@ -234,7 +233,7 @@ export {
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {
-    log.error(err);
+    console.error(err);
     process.exit(1);
   });
 }

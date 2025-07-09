@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { readFile, writeFile, mkdir, readdir, rename } from '../scripts/utils/file-utils.mjs';
+import {
+  readFile,
+  writeFile,
+  mkdir,
+  readdir,
+  rename,
+} from '../scripts/utils/file-utils.mjs';
 
 // Mock fs before any imports
 vi.mock('fs/promises');

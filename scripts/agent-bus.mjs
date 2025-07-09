@@ -1,29 +1,34 @@
+import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { parse } from 'yaml';
 import { githubFetch } from './utils/github.mjs'; // Import the new utility
-import { log } from './utils/logger.mjs';
-import { readFile, readdir } from './utils/file-utils.mjs';
 
 const REPO = process.env.GH_REPO || process.env.GITHUB_REPOSITORY;
 
 async function loadManifests(dir = path.join('content', 'agents')) {
   let files = [];
   try {
-    files = await readdir(dir);
+    files = await fs.readdir(dir);
   } catch (err) {
-    log.error(`Error reading agent manifests directory ${dir}:`, err.message);
+    console.error(
+      `Error reading agent manifests directory ${dir}:`,
+      err.message
+    );
     return [];
   }
   const manifests = [];
   for (const file of files) {
     if (!file.endsWith('.yml') && !file.endsWith('.yaml')) continue;
     try {
-      const data = await readFile(path.join(dir, file), 'utf8');
+      const data = await fs.readFile(path.join(dir, file), 'utf8');
       const doc = parse(data);
       manifests.push({ file, ...doc });
     } catch (err) {
-      log.error(`Error reading or parsing agent manifest ${file}:`, err.message);
+      console.error(
+        `Error reading or parsing agent manifest ${file}:`,
+        err.message
+      );
     }
   }
   return manifests;
@@ -79,10 +84,10 @@ async function main() {
   const num = await getIssueNumber(title, owner, repo);
   if (num) {
     await updateIssue(num, body, owner, repo);
-    log.info(`Updated issue #${num}`);
+    console.log(`Updated issue #${num}`);
   } else {
     const newNum = await createIssue(title, body, owner, repo);
-    log.info(`Created issue #${newNum}`);
+    console.log(`Created issue #${newNum}`);
   }
 }
 
@@ -97,7 +102,7 @@ export {
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {
-    log.error(err);
+    console.error(err);
     process.exit(1);
   });
 }

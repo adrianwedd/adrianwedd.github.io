@@ -17,8 +17,26 @@ vi.mock('../scripts/classify-inbox.mjs', async (importOriginal) => {
 });
 
 // Import the module to be tested
+import { log } from '../scripts/utils/logger.mjs';
+
+// Mock file-utils before any imports
+vi.mock('../scripts/utils/file-utils.mjs', () => ({
+  readFile: vi.fn(),
+  writeFile: vi.fn(),
+  readdir: vi.fn(),
+  mkdir: vi.fn(),
+  rename: vi.fn(),
+}));
+
+// Mock the callOpenAI function from classify-inbox.mjs
+vi.mock('../scripts/classify-inbox.mjs', () => ({
+  callOpenAI: vi.fn(),
+}));
+
+// Import the module to be tested
 import * as buildInsights from '../scripts/build-insights.mjs';
 import { callOpenAI } from '../scripts/classify-inbox.mjs'; // Import the mocked function
+import { readFile, writeFile, readdir } from '../scripts/utils/file-utils.mjs'; // Import mocked file-utils functions
 
 describe('build-insights.mjs', () => {
   const mockMarkdownContent = '# Test Content\nThis is some test content.';
@@ -26,14 +44,20 @@ describe('build-insights.mjs', () => {
 
   beforeEach(() => {
     vi.restoreAllMocks();
-    vi.spyOn(fs, 'readdir').mockResolvedValue([
-      'file1.md',
-      'file2.md',
-      'file3.insight.md',
-    ]);
-    vi.spyOn(fs, 'readFile').mockResolvedValue(mockMarkdownContent);
-    vi.spyOn(fs, 'writeFile').mockResolvedValue(undefined);
-    vi.spyOn(fs, 'mkdir').mockResolvedValue(undefined);
+    readFile.mockResolvedValue(mockMarkdownContent);
+    writeFile.mockResolvedValue(undefined);
+    readdir.mockImplementation((dir) => {
+      if (dir === path.join('content', 'garden')) {
+        return Promise.resolve(['file1.md', 'file2.md', 'file3.insight.md']);
+      }
+      if (dir === path.join('content', 'logs')) {
+        return Promise.resolve(['log1.md', 'log2.md']);
+      }
+      if (dir === path.join('content', 'mirror')) {
+        return Promise.resolve(['mirror1.md', 'mirror2.md']);
+      }
+      return Promise.resolve([]);
+    });
     callOpenAI.mockResolvedValue(mockSummary);
     process.env.OPENAI_API_KEY = 'test-key';
   });
@@ -54,7 +78,7 @@ describe('build-insights.mjs', () => {
     expect(callOpenAI).toHaveBeenCalledWith(
       buildInsights.buildSummaryPrompt(mockMarkdownContent)
     );
-    expect(fs.writeFile).toHaveBeenCalledWith(
+    expect(writeFile).toHaveBeenCalledWith(
       path.join('content', 'garden', 'file1.insight.md'),
       mockSummary
     );
@@ -71,14 +95,14 @@ describe('build-insights.mjs', () => {
       expect.stringContaining('Failed to generate insight'),
       'LLM API error'
     );
-    expect(fs.writeFile).not.toHaveBeenCalled();
+    expect(writeFile).not.toHaveBeenCalled();
   });
 
   it('main should process markdown files in target directories', async () => {
     await buildInsights.main();
-    expect(fs.readdir).toHaveBeenCalledWith(path.join('content', 'garden'));
-    expect(fs.readdir).toHaveBeenCalledWith(path.join('content', 'logs'));
-    expect(fs.readdir).toHaveBeenCalledWith(path.join('content', 'mirror'));
+    expect(readdir).toHaveBeenCalledWith(path.join('content', 'garden'));
+    expect(readdir).toHaveBeenCalledWith(path.join('content', 'logs'));
+    expect(readdir).toHaveBeenCalledWith(path.join('content', 'mirror'));
     expect(fs.writeFile).toHaveBeenCalledWith(
       path.join('content', 'garden', 'file1.insight.md'),
       mockSummary
@@ -117,6 +141,6 @@ describe('build-insights.mjs', () => {
   it('main should skip insight generation if API key is not set', async () => {
     delete process.env.OPENAI_API_KEY;
     await buildInsights.main();
-    expect(fs.readdir).not.toHaveBeenCalled();
+    expect(readdir).not.toHaveBeenCalled();
   });
 });

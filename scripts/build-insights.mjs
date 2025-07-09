@@ -1,8 +1,8 @@
 import path from 'path';
 import { pathToFileURL } from 'url';
-import { callOpenAI } from './classify-inbox.mjs'; // Reusing callOpenAI
 import { log } from './utils/logger.mjs';
 import { readFile, writeFile, readdir } from './utils/file-utils.mjs';
+import { callOpenAI } from './utils/llm-api.mjs';
 
 const TARGET_DIRS = [
   path.join('content', 'garden'),
