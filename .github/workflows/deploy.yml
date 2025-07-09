@@ -18,6 +18,9 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - uses: actions/checkout@v4
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35
       - name: Node
         uses: actions/setup-node@v4
         with:
@@ -34,8 +37,8 @@ jobs:
           yamllint tasks.yml
           python scripts/validate-tasks.py
       - run: node scripts/fetch-gh-repos.mjs
-      - run: node scripts/classify-inbox.mjs
-      - run: node scripts/build-insights.mjs
+      - run: node scripts/classify-inbox.mjs ${{ steps.changed-files.outputs.changed_files }}
+      - run: node scripts/build-insights.mjs ${{ steps.changed-files.outputs.changed_files }}
       - run: node scripts/agent-bus.mjs
       - run: npm run build
       - uses: JamesIves/github-pages-deploy-action@v4
