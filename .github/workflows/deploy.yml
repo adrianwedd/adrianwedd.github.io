@@ -23,6 +23,11 @@ jobs:
         run: npm audit --audit-level=high
       - run: npm run lint
       - run: npm test
+      - name: Lint & Validate tasks.yml
+        run: |
+          pip install yamllint pyyaml jsonschema
+          yamllint tasks.yml
+          python scripts/validate-tasks.py
       - run: node scripts/fetch-gh-repos.mjs
       - run: node scripts/classify-inbox.mjs
       - run: node scripts/build-insights.mjs

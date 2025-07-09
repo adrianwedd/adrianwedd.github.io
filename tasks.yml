@@ -448,7 +448,7 @@ phases:
     component: 'CI/CD'
     dependencies: [3]
     priority: 5
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-QA-7'
     area: QA
