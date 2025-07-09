@@ -1,0 +1,7 @@
+id: codex-agent
+name: Codex Agent
+owner: "@adrian"
+role: Repository automation
+status: active
+last_updated: 2024-01-01T00:00:00Z
+description: Handles GitHub automation tasks.
