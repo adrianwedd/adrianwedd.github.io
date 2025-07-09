@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { githubFetch } from './utils/github.mjs'; // Import the new utility
+import { log } from './utils/logger.mjs';
 
 async function getLogin() {
   if (process.env.GH_USER) return process.env.GH_USER;
@@ -39,7 +40,7 @@ async function main() {
   try {
     await fs.mkdir(dir, { recursive: true });
   } catch (err) {
-    console.error(`Error creating directory ${dir}:`, err.message);
+    log.error(`Error creating directory ${dir}:`, err.message);
     // Depending on severity, might want to exit or throw here
     return;
   }
@@ -49,9 +50,9 @@ async function main() {
     const filePath = path.join(dir, `${repo.name}.md`);
     try {
       await fs.writeFile(filePath, md);
-      console.log(`Wrote ${filePath}`);
+      log.info(`Wrote ${filePath}`);
     } catch (err) {
-      console.error(`Error writing file ${filePath}:`, err.message);
+      log.error(`Error writing file ${filePath}:`, err.message);
     }
   }
 }
@@ -60,7 +61,7 @@ export { getLogin, fetchRepos, repoToMarkdown, main };
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {
-    console.error(err);
+    log.error(err);
     process.exit(1);
   });
 }

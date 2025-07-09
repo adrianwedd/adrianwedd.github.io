@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { callOpenAI } from './classify-inbox.mjs'; // Reusing callOpenAI
+import { log } from './utils/logger.mjs';
 
 const TARGET_DIRS = [
   path.join('content', 'garden'),
@@ -23,15 +24,15 @@ async function processMarkdownFile(filePath) {
     const insightFileName = fileName.replace(/\.md$/, '.insight.md');
     const insightFilePath = path.join(dirName, insightFileName);
     await fs.writeFile(insightFilePath, summary);
-    console.log(`Generated insight for ${fileName} -> ${insightFileName}`);
+    log.info(`Generated insight for ${fileName} -> ${insightFileName}`);
   } catch (err) {
-    console.error(`Failed to generate insight for ${fileName}:`, err.message);
+    log.error(`Failed to generate insight for ${fileName}:`, err.message);
   }
 }
 
 async function main() {
   if (!process.env.OPENAI_API_KEY) {
-    console.error('OPENAI_API_KEY not set; skipping insight generation');
+    log.error('OPENAI_API_KEY not set; skipping insight generation');
     return;
   }
 
@@ -62,7 +63,7 @@ async function main() {
     }
 
     if (filesToProcess.length === 0) {
-      console.log('No relevant changed markdown files to process.');
+      log.info('No relevant changed markdown files to process.');
       return;
     }
   } else {
@@ -78,14 +79,14 @@ async function main() {
         }
       } catch (err) {
         if (err.code === 'ENOENT') {
-          console.warn(`Directory not found: ${dir}. Skipping.`);
+          log.warn(`Directory not found: ${dir}. Skipping.`);
         } else {
-          console.error(`Error processing directory ${dir}:`, err.message);
+          log.error(`Error processing directory ${dir}:`, err.message);
         }
       }
     }
     if (filesToProcess.length === 0) {
-      console.log('No markdown files to process.');
+      log.info('No markdown files to process.');
       return;
     }
   }
@@ -93,14 +94,14 @@ async function main() {
   for (const filePath of filesToProcess) {
     await processMarkdownFile(filePath);
   }
-  console.log('Insight generation complete.');
+  log.info('Insight generation complete.');
 }
 
 export { main, buildSummaryPrompt, processMarkdownFile };
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {
-    console.error(err);
+    log.error(err);
     process.exit(1);
   });
 }
