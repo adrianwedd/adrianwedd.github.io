@@ -36,14 +36,24 @@ async function main() {
   );
 
   const dir = path.join('content', 'tools');
-  await fs.mkdir(dir, { recursive: true });
+  try {
+    await fs.mkdir(dir, { recursive: true });
+  } catch (err) {
+    console.error(`Error creating directory ${dir}:`, err.message);
+    // Depending on severity, might want to exit or throw here
+    return;
+  }
 
   await Promise.all(
     tools.map(async (repo) => {
       const md = repoToMarkdown(repo);
       const filePath = path.join(dir, `${repo.name}.md`);
-      await fs.writeFile(filePath, md);
-      console.log(`Wrote ${filePath}`);
+      try {
+        await fs.writeFile(filePath, md);
+        console.log(`Wrote ${filePath}`);
+      } catch (err) {
+        console.error(`Error writing file ${filePath}:`, err.message);
+      }
     })
   );
 }
