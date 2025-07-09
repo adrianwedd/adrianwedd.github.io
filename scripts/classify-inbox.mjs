@@ -2,7 +2,6 @@ import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const MODEL = process.env.OPENAI_MODEL || 'gpt-3.5-turbo-1106';
 const SECTIONS = ['tools', 'logs', 'garden', 'mirror', 'resume', 'agents'];
 
@@ -14,12 +13,13 @@ function buildPrompt(content) {
 }
 
 async function callOpenAI(prompt) {
-  if (!OPENAI_API_KEY) throw new Error('OPENAI_API_KEY not set');
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error('OPENAI_API_KEY not set');
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
       model: MODEL,
@@ -67,7 +67,7 @@ async function moveFile(src, destDir) {
 }
 
 async function main() {
-  if (!OPENAI_API_KEY) {
+  if (!process.env.OPENAI_API_KEY) {
     console.error('OPENAI_API_KEY not set; skipping classification');
     return;
   }
