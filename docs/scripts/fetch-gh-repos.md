@@ -10,5 +10,11 @@ Fetches repositories from GitHub for a given user and generates markdown files i
 Run manually with:
 
 ```bash
-node scripts/fetch-gh-repos.mjs
+GH_TOKEN=ghp_yourtoken GH_USER=octocat node scripts/fetch-gh-repos.mjs
+```
+
+Example output:
+
+```text
+[INFO] Wrote content/tools/example-repo.md
 ```
