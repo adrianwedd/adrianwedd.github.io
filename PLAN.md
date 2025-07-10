@@ -188,8 +188,8 @@ jobs:
 | 3. LLM Integration               | Classification & insights        | • Implement `classify-inbox.mjs` with chosen LLM. • Implement `build-insights.mjs`. • Store API keys in Secrets. • Dry-run on sample inbox files.                                       |
 | 4. Process Hardening & Agent Bus | Status visibility & quality gate | • Enforce branch protection on `main` requiring passing checks and one approving review. • Require Conventional Commits via a Husky `commit-msg` hook. • Design simple YAML manifest schema. • Implement `agent-bus.mjs` to update Issue.             |
 | 5. UI Expansion                  | Flesh out components & pages     | • Build ToolCard, AgentDiagram, etc. • Style with Tailwind. • Populate content folders.                                                                                                 |
-| 6. Iterative Growth              | Continuous enhancement           | • Add more scripts (dataset stats, changelog diffing). • Hook additional agents via commits. • Refine design/branding. • Introduce `npm audit` checks and Slack alerts for CI failures. |
-| 7. Debugging & Stability         | Harden automation reliability    | • Document troubleshooting workflow. • Add file locking and dead-letter queues. • Perform dependency audits and performance tests. |
+| 6. Iterative Growth              | Continuous enhancement           | • Add more scripts (dataset stats, changelog diffing). • Hook additional agents via commits. • Refine design/branding. • Introduce `npm audit` and Snyk checks with Slack alerts for CI failures. |
+| 7. Debugging & Stability         | Harden automation reliability    | • Document troubleshooting workflow. • Add file locking and dead-letter queues. • Perform dependency audits with Snyk and performance tests. |
 
 ---
 
