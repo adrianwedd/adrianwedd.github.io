@@ -88,11 +88,15 @@ describe('Integration Test: Full Automation Pipeline', () => {
       return Promise.resolve(fileContents[filePath] || '');
     });
 
-    const movedFiles = {};
     vi.spyOn(fs, 'rename').mockImplementation((src, dest) => {
       const content = fileContents[src];
-      movedFiles[dest] = content;
+      fileContents[dest] = content;
       delete fileContents[src];
+      return Promise.resolve();
+    });
+
+    vi.spyOn(fs, 'unlink').mockImplementation((filePath) => {
+      delete fileContents[filePath];
       return Promise.resolve();
     });
 
@@ -184,17 +188,26 @@ describe('Integration Test: Full Automation Pipeline', () => {
 
     // 2. Run classify-inbox
     await classifyInboxMain();
-    expect(fs.rename).toHaveBeenCalledWith(
-      path.join('content', 'inbox', 'test-doc-garden.md'),
-      path.join('content', 'garden', 'test-doc-garden.md')
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      path.join('content', 'garden', 'test-doc-garden.md'),
+      expect.stringContaining('---')
     );
-    expect(fs.rename).toHaveBeenCalledWith(
-      path.join('content', 'inbox', 'test-doc-log.md'),
-      path.join('content', 'logs', 'test-doc-log.md')
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      path.join('content', 'logs', 'test-doc-log.md'),
+      expect.any(String)
     );
-    expect(fs.rename).toHaveBeenCalledWith(
-      path.join('content', 'inbox', 'test-doc-untagged.txt'),
-      path.join('content', 'untagged', 'test-doc-untagged.txt')
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      path.join('content', 'untagged', 'test-doc-untagged.txt'),
+      expect.any(String)
+    );
+    expect(fs.unlink).toHaveBeenCalledWith(
+      path.join('content', 'inbox', 'test-doc-garden.md')
+    );
+    expect(fs.unlink).toHaveBeenCalledWith(
+      path.join('content', 'inbox', 'test-doc-log.md')
+    );
+    expect(fs.unlink).toHaveBeenCalledWith(
+      path.join('content', 'inbox', 'test-doc-untagged.txt')
     );
 
     // 3. Run build-insights

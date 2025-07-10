@@ -64,6 +64,7 @@ describe('classify-inbox.mjs', () => {
     fs.mkdir.mockResolvedValue(undefined);
     fs.rename.mockResolvedValue(undefined);
     fs.writeFile.mockResolvedValue(undefined);
+    fs.unlink.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -82,55 +83,73 @@ describe('classify-inbox.mjs', () => {
       confidence: 0.9,
     });
     await classifyInbox.main();
-    expect(fs.rename).toHaveBeenCalledWith(
-      expect.stringContaining('file1.txt'),
-      expect.stringContaining('content/garden/file1.txt')
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      expect.stringContaining('content/garden/file1.txt'),
+      expect.stringContaining('---')
     );
-    expect(fs.writeFile).toHaveBeenCalled();
+    expect(fs.unlink).toHaveBeenCalledWith(
+      expect.stringContaining('content/inbox/file1.txt')
+    );
+    expect(fs.rename).not.toHaveBeenCalled();
   });
 
   it('should move a file to untagged for low confidence', async () => {
     mockOpenAIResponse({ section: 'garden', tags: [], confidence: 0.7 });
     await classifyInbox.main();
-    expect(fs.rename).toHaveBeenCalledWith(
-      expect.stringContaining('file1.txt'),
-      expect.stringContaining('content/untagged/file1.txt')
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      expect.stringContaining('content/untagged/file1.txt'),
+      'Test content'
+    );
+    expect(fs.unlink).toHaveBeenCalledWith(
+      expect.stringContaining('content/inbox/file1.txt')
     );
   });
 
   it('should move a file to untagged for unknown section', async () => {
     mockOpenAIResponse({ section: 'unknown', tags: [], confidence: 0.9 });
     await classifyInbox.main();
-    expect(fs.rename).toHaveBeenCalledWith(
-      expect.stringContaining('file1.txt'),
-      expect.stringContaining('content/untagged/file1.txt')
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      expect.stringContaining('content/untagged/file1.txt'),
+      'Test content'
+    );
+    expect(fs.unlink).toHaveBeenCalledWith(
+      expect.stringContaining('content/inbox/file1.txt')
     );
   });
 
   it('should move a file to failed on invalid JSON response', async () => {
     callOpenAI.mockResolvedValue('invalid-json');
     await classifyInbox.main();
-    expect(fs.rename).toHaveBeenCalledWith(
-      expect.stringContaining('file1.txt'),
-      expect.stringContaining('content/inbox/failed/file1.txt')
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      expect.stringContaining('content/inbox/failed/file1.txt'),
+      'Test content'
+    );
+    expect(fs.unlink).toHaveBeenCalledWith(
+      expect.stringContaining('content/inbox/file1.txt')
     );
   });
 
   it('should move a file to failed on malformed (missing keys) response', async () => {
     mockOpenAIResponse({ section: 'garden' });
     await classifyInbox.main();
-    expect(fs.rename).toHaveBeenCalledWith(
-      expect.stringContaining('file1.txt'),
-      expect.stringContaining('content/inbox/failed/file1.txt')
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      expect.stringContaining('content/inbox/failed/file1.txt'),
+      'Test content'
+    );
+    expect(fs.unlink).toHaveBeenCalledWith(
+      expect.stringContaining('content/inbox/file1.txt')
     );
   });
 
   it('should move a file to failed on OpenAI API error', async () => {
     callOpenAI.mockRejectedValue(new Error('API error'));
     await classifyInbox.main();
-    expect(fs.rename).toHaveBeenCalledWith(
-      expect.stringContaining('file1.txt'),
-      expect.stringContaining('content/inbox/failed/file1.txt')
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      expect.stringContaining('content/inbox/failed/file1.txt'),
+      'Test content'
+    );
+    expect(fs.unlink).toHaveBeenCalledWith(
+      expect.stringContaining('content/inbox/file1.txt')
     );
   });
 

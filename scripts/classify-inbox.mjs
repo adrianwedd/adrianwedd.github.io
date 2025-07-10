@@ -68,20 +68,45 @@ async function classifyFile(filePath) {
   return result;
 }
 
-async function moveFile(src, destDir) {
+async function moveFile(src, destDir, tags = []) {
   try {
     await fs.mkdir(destDir, { recursive: true });
   } catch (err) {
     log.error(`Error creating destination directory ${destDir}:`, err.message);
     throw err;
   }
+
   const dest = path.join(destDir, path.basename(src));
+  let data;
   try {
-    await fs.rename(src, dest);
+    data = await fs.readFile(src, 'utf8');
   } catch (err) {
-    log.error(`Error moving file from ${src} to ${dest}:`, err.message);
+    log.error(`Error reading file ${src}:`, err.message);
     throw err;
   }
+
+  const fm = tags.length ? `---\ntags: [${tags.join(', ')}]\n---\n` : '';
+
+  try {
+    await fs.writeFile(dest, fm + data);
+  } catch (err) {
+    log.error(`Error writing file to ${dest}:`, err.message);
+    try {
+      await fs.unlink(dest);
+    } catch {}
+    throw err;
+  }
+
+  try {
+    await fs.unlink(src);
+  } catch (err) {
+    log.error(`Error removing original file ${src}:`, err.message);
+    try {
+      await fs.unlink(dest);
+    } catch {}
+    throw err;
+  }
+
   return dest;
 }
 
@@ -150,6 +175,7 @@ async function main() {
     const filePath = path.join(inboxDir, name);
     log.info(`Processing ${name}`);
     let targetDir;
+    let tags = [];
 
     try {
       const result = await classifyFile(filePath);
@@ -160,26 +186,7 @@ async function main() {
       ) {
         targetDir = path.join('content', result.section);
         if (result.tags && result.tags.length) {
-          let data;
-          try {
-            data = await fs.readFile(filePath, 'utf8');
-          } catch (err) {
-            log.error(
-              `Error reading file ${filePath} to add tags:`,
-              err.message
-            );
-            targetDir = failedDir; // Move to failed if cannot read to add tags
-          }
-          if (targetDir !== failedDir) {
-            // Only write if not already marked for failed
-            const fm = `---\ntags: [${result.tags.join(', ')}]\n---\n`;
-            try {
-              await fs.writeFile(filePath, fm + data);
-            } catch (err) {
-              log.error(`Error writing tags to file ${filePath}:`, err.message);
-              targetDir = failedDir; // Move to failed if cannot write tags
-            }
-          }
+          tags = result.tags;
         }
       } else {
         targetDir = path.join('content', 'untagged');
@@ -189,7 +196,7 @@ async function main() {
       targetDir = failedDir;
     }
 
-    const dest = await moveFile(filePath, targetDir);
+    const dest = await moveFile(filePath, targetDir, tags);
     log.info(`Moved ${name} to ${dest}`);
   }
 }
