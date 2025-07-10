@@ -175,6 +175,19 @@ async function main() {
 
   for (const name of filesToProcess) {
     const filePath = path.join(inboxDir, name);
+    const lockPath = `${filePath}.lock`;
+
+    try {
+      await fs.writeFile(lockPath, '', { flag: 'wx' });
+    } catch (err) {
+      if (err.code === 'EEXIST') {
+        log.info(`Skipping ${name}; lock file exists`);
+      } else {
+        log.error(`Unable to create lock for ${name}:`, err.message);
+      }
+      continue;
+    }
+
     log.info(`Processing ${name}`);
     let targetDir;
     let tags = [];
@@ -193,13 +206,20 @@ async function main() {
       } else {
         targetDir = path.join('content', 'untagged');
       }
+
+      const dest = await moveFile(filePath, targetDir, tags);
+      log.info(`Moved ${name} to ${dest}`);
     } catch (err) {
       log.error(`Failed to classify ${name}:`, err.message);
-      targetDir = failedDir;
+      const dest = await moveFile(filePath, failedDir, tags);
+      log.info(`Moved ${name} to ${dest}`);
+    } finally {
+      try {
+        await fs.unlink(lockPath);
+      } catch (err) {
+        log.error(`Error removing lock file ${lockPath}:`, err.message);
+      }
     }
-
-    const dest = await moveFile(filePath, targetDir, tags);
-    log.info(`Moved ${name} to ${dest}`);
   }
 }
 

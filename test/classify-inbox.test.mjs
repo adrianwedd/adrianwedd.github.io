@@ -90,6 +90,9 @@ describe('classify-inbox.mjs', () => {
     expect(fs.unlink).toHaveBeenCalledWith(
       expect.stringContaining('content/inbox/file1.txt')
     );
+    expect(fs.unlink).toHaveBeenCalledWith(
+      expect.stringContaining('content/inbox/file1.txt.lock')
+    );
     expect(fs.rename).not.toHaveBeenCalled();
   });
 
@@ -170,6 +173,24 @@ describe('classify-inbox.mjs', () => {
     expect(logSpy).toHaveBeenCalledWith(
       '[INFO]',
       expect.stringContaining('Processing file1.txt')
+    );
+  });
+
+  it('skips a file when a lock exists', async () => {
+    fs.writeFile.mockImplementationOnce((filePath) => {
+      if (filePath.endsWith('.lock')) {
+        const err = new Error('exists');
+        err.code = 'EEXIST';
+        return Promise.reject(err);
+      }
+      return Promise.resolve();
+    });
+
+    await classifyInbox.main();
+
+    expect(callOpenAI).toHaveBeenCalledTimes(1);
+    expect(fs.unlink).not.toHaveBeenCalledWith(
+      expect.stringContaining('content/inbox/file1.txt')
     );
   });
 });
