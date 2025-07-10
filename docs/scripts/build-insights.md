@@ -1,6 +1,6 @@
 # build-insights.mjs
 
-Generates short summaries for markdown files in `content/garden`, `content/logs`, and `content/mirror`. Each original file is paired with a new `<name>.insight.md` file containing the summary.
+Generates short summaries for markdown files in the content directories. The script automatically discovers subfolders under `content/` (excluding `inbox` and `untagged`) and processes any markdown files it finds. Each original file is paired with a new `<name>.insight.md` file containing the summary.
 
 The script accepts a comma-separated list of changed files as its first argument. If none are provided it scans the target directories. For every markdown file found (excluding existing `.insight.md` files) the contents are sent to OpenAI via `callOpenAI`. The resulting text is written next to the source file.
 
