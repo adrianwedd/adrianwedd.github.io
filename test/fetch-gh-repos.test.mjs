@@ -104,4 +104,35 @@ describe('fetch-gh-repos', () => {
     );
     error.mockRestore();
   });
+  it('main throws when mkdir fails', async () => {
+    mockFetch([{ login: 'user' }, []]);
+    const mkdir = vi.spyOn(fs, 'mkdir').mockRejectedValue(new Error('mkerr'));
+    await expect(main()).rejects.toThrow('mkerr');
+    mkdir.mockRestore();
+  });
+
+  it('main logs error when writeFile fails', async () => {
+    mockFetch([
+      { login: 'user' },
+      [
+        {
+          name: 'tool1',
+          html_url: 'u',
+          description: 'd',
+          updated_at: 't',
+          topics: ['tool'],
+        },
+      ],
+    ]);
+    vi.spyOn(fs, 'mkdir').mockResolvedValue();
+    const write = vi.spyOn(fs, 'writeFile').mockRejectedValue(new Error('wr'));
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await main();
+    expect(err).toHaveBeenCalledWith(
+      '[ERROR]',
+      expect.stringContaining('Error writing file'),
+      'wr'
+    );
+    write.mockRestore();
+  });
 });
