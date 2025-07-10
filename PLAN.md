@@ -189,6 +189,7 @@ jobs:
 | 4. Process Hardening & Agent Bus | Status visibility & quality gate | • Enforce branch protection on `main` requiring passing checks and one approving review. • Design simple YAML manifest schema. • Implement `agent-bus.mjs` to update Issue.             |
 | 5. UI Expansion                  | Flesh out components & pages     | • Build ToolCard, AgentDiagram, etc. • Style with Tailwind. • Populate content folders.                                                                                                 |
 | 6. Iterative Growth              | Continuous enhancement           | • Add more scripts (dataset stats, changelog diffing). • Hook additional agents via commits. • Refine design/branding. • Introduce `npm audit` checks and Slack alerts for CI failures. |
+| 7. Debugging & Stability         | Harden automation reliability    | • Document troubleshooting workflow. • Add file locking and dead-letter queues. • Perform dependency audits and performance tests. |
 
 ---
 
