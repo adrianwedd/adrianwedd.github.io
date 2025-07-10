@@ -29,6 +29,8 @@ import * as buildInsights from '../scripts/build-insights.mjs';
 import { callOpenAI } from '../scripts/utils/llm-api.mjs';
 import { readFile, writeFile, readdir } from '../scripts/utils/file-utils.mjs'; // Import mocked file-utils functions
 
+const originalArgv = process.argv.slice();
+
 describe('build-insights.mjs', () => {
   const mockMarkdownContent = '# Test Content\nThis is some test content.';
   const mockSummary = 'Concise summary of test content.';
@@ -55,6 +57,7 @@ describe('build-insights.mjs', () => {
 
   afterEach(() => {
     delete process.env.OPENAI_API_KEY;
+    process.argv = originalArgv.slice();
   });
 
   it('buildSummaryPrompt should generate a correct prompt', () => {
@@ -134,6 +137,17 @@ describe('build-insights.mjs', () => {
   it('main should skip insight generation if API key is not set', async () => {
     delete process.env.OPENAI_API_KEY;
     await buildInsights.main();
+    expect(readdir).not.toHaveBeenCalled();
+  });
+
+  it('main should handle relative changed file arguments', async () => {
+    const changedArg = path.join('content', 'garden', 'file1.md');
+    process.argv = ['node', 'build-insights.mjs', changedArg];
+    await buildInsights.main();
+    expect(writeFile).toHaveBeenCalledWith(
+      path.resolve('content', 'garden', 'file1.insight.md'),
+      mockSummary
+    );
     expect(readdir).not.toHaveBeenCalled();
   });
 });
