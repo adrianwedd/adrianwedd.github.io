@@ -1,8 +1,9 @@
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { log } from './utils/logger.mjs';
-import { readFile, writeFile, readdir } from './utils/file-utils.mjs';
+import { readFile, writeFile, readdir, mkdir, rename } from './utils/file-utils.mjs';
 import { callOpenAI } from './utils/llm-api.mjs';
+import { lint } from 'markdownlint/promise';
 
 
 // Dynamically discover content directories to process
@@ -25,6 +26,28 @@ function buildSummaryPrompt(content) {
   return `Summarize the following text concisely, highlighting key insights and cross-references. Format the output as markdown.\nText:\n${content}`;
 }
 
+async function validateMarkdown(text) {
+  try {
+    const results = await lint({ strings: { text } });
+    return results.toString() === '';
+  } catch (err) {
+    log.error('Markdownlint error:', err.message);
+    return false;
+  }
+}
+
+async function moveToFailed(srcPath) {
+  const failedDir = path.join('content', 'insights-failed');
+  try {
+    await mkdir(failedDir, { recursive: true });
+    const dest = path.join(failedDir, path.basename(srcPath));
+    await rename(srcPath, dest);
+    log.info(`Moved ${path.basename(srcPath)} to ${dest}`);
+  } catch (err) {
+    log.error(`Error moving file to ${failedDir}:`, err.message);
+  }
+}
+
 async function processMarkdownFile(filePath) {
   const content = await readFile(filePath, 'utf8');
   const fileName = path.basename(filePath);
@@ -32,12 +55,19 @@ async function processMarkdownFile(filePath) {
 
   try {
     const summary = await callOpenAI(buildSummaryPrompt(content));
+    const isValid = await validateMarkdown(summary);
+    if (!isValid) {
+      log.error(`Invalid markdown summary for ${fileName}`);
+      await moveToFailed(filePath);
+      return;
+    }
     const insightFileName = fileName.replace(/\.md$/, '.insight.md');
     const insightFilePath = path.join(dirName, insightFileName);
     await writeFile(insightFilePath, summary);
     log.info(`Generated insight for ${fileName} -> ${insightFileName}`);
   } catch (err) {
     log.error(`Failed to generate insight for ${fileName}:`, err.message);
+    await moveToFailed(filePath);
   }
 }
 
@@ -111,7 +141,14 @@ async function main() {
   log.info('Insight generation complete.');
 }
 
-export { main, buildSummaryPrompt, processMarkdownFile, getTargetDirs };
+export {
+  main,
+  buildSummaryPrompt,
+  processMarkdownFile,
+  getTargetDirs,
+  validateMarkdown,
+  moveToFailed,
+};
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {

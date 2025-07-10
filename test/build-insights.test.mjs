@@ -27,13 +27,13 @@ vi.mock('../scripts/utils/file-utils.mjs', () => ({
 // Import the module to be tested
 import * as buildInsights from '../scripts/build-insights.mjs';
 import { callOpenAI } from '../scripts/utils/llm-api.mjs';
-import { readFile, writeFile, readdir } from '../scripts/utils/file-utils.mjs'; // Import mocked file-utils functions
+import { readFile, writeFile, readdir, mkdir, rename } from '../scripts/utils/file-utils.mjs'; // Import mocked file-utils functions
 
 const originalArgv = process.argv.slice();
 
 describe('build-insights.mjs', () => {
   const mockMarkdownContent = '# Test Content\nThis is some test content.';
-  const mockSummary = 'Concise summary of test content.';
+  const mockSummary = '# Summary\n\nConcise summary of test content.\n';
   const createDirent = (name, isDirectory = false) => ({
     name,
     isDirectory: () => isDirectory,
@@ -102,6 +102,21 @@ describe('build-insights.mjs', () => {
       '[ERROR]',
       expect.stringContaining('Failed to generate insight'),
       'LLM API error'
+    );
+    expect(writeFile).not.toHaveBeenCalled();
+    expect(rename).toHaveBeenCalledWith(
+      filePath,
+      path.join('content', 'insights-failed', 'file1.md')
+    );
+  });
+
+  it('processMarkdownFile should move file when summary is invalid', async () => {
+    callOpenAI.mockResolvedValue('Bad\tsummary');
+    const filePath = path.join('content', 'garden', 'file1.md');
+    await buildInsights.processMarkdownFile(filePath);
+    expect(rename).toHaveBeenCalledWith(
+      filePath,
+      path.join('content', 'insights-failed', 'file1.md')
     );
     expect(writeFile).not.toHaveBeenCalled();
   });

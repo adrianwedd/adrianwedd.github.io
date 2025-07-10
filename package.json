@@ -15,13 +15,14 @@
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.5.1",
+    "markdownlint": "^0.38.0",
     "prettier": "^3.6.2",
     "vitest": "^3.2.4"
   },
   "dependencies": {
-    "yaml": "^2.8.0",
+    "gray-matter": "^4.0.3",
     "lunr": "^2.3.9",
-    "gray-matter": "^4.0.3"
+    "yaml": "^2.8.0"
   },
   "license": "MIT"
 }
