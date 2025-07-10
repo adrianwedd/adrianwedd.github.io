@@ -45,8 +45,7 @@ async function main() {
     await mkdir(dir, { recursive: true });
   } catch (err) {
     log.error(`Error creating directory ${dir}:`, err.message);
-    // Depending on severity, might want to exit or throw here
-    return;
+    throw err;
   }
 
   for (const repo of tools) {
@@ -65,7 +64,7 @@ export { getLogin, fetchRepos, repoToMarkdown, main };
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {
-    log.error(err);
+    log.error('fetch-gh-repos main error:', err);
     process.exit(1);
   });
 }

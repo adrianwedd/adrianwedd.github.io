@@ -27,12 +27,13 @@ function buildSummaryPrompt(content) {
   return `Summarize the following text concisely, highlighting key insights and cross-references. Format the output as markdown.\nText:\n${content}`;
 }
 
-async function validateMarkdown(text) {
+async function validateMarkdown(text, filePath = '') {
   try {
     const results = await lint({ strings: { text } });
     return results.toString() === '';
   } catch (err) {
-    log.error('Markdownlint error:', err.message);
+    const ctx = filePath ? ` for ${filePath}` : '';
+    log.error(`Markdownlint error${ctx}:`, err.message);
     return false;
   }
 }
@@ -56,7 +57,7 @@ async function processMarkdownFile(filePath) {
 
   try {
     const summary = await callOpenAI(buildSummaryPrompt(content));
-    const isValid = await validateMarkdown(summary);
+    const isValid = await validateMarkdown(summary, filePath);
     if (!isValid) {
       log.error(`Invalid markdown summary for ${fileName}`);
       await moveToFailed(filePath);
@@ -68,7 +69,7 @@ async function processMarkdownFile(filePath) {
     await writeFile(insightFilePath, safeSummary);
     log.info(`Generated insight for ${fileName} -> ${insightFileName}`);
   } catch (err) {
-    log.error(`Failed to generate insight for ${fileName}:`, err.message);
+    log.error(`Failed to generate insight for ${filePath}:`, err.message);
     await moveToFailed(filePath);
   }
 }
@@ -154,7 +155,7 @@ export {
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {
-    log.error(err);
+    log.error('build-insights main error:', err);
     process.exit(1);
   });
 }
