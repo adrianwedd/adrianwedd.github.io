@@ -4,14 +4,22 @@ import { log } from './utils/logger.mjs';
 import { readFile, writeFile, readdir } from './utils/file-utils.mjs';
 import { callOpenAI } from './utils/llm-api.mjs';
 
-const TARGET_DIRS = [
-  path.join('content', 'garden'),
-  path.join('content', 'logs'),
-  path.join('content', 'mirror'),
-];
 
-// Precompute absolute paths for target directories
-const RESOLVED_TARGET_DIRS = TARGET_DIRS.map((dir) => path.resolve(dir));
+// Dynamically discover content directories to process
+async function getTargetDirs() {
+  const contentDir = 'content';
+  try {
+    const entries = await readdir(contentDir, { withFileTypes: true });
+    return entries
+      .filter((dirent) => dirent.isDirectory())
+      .map((dirent) => dirent.name)
+      .filter((name) => !['inbox', 'untagged'].includes(name))
+      .map((name) => path.join(contentDir, name));
+  } catch (err) {
+    log.error(`Error reading content directory ${contentDir}:`, err.message);
+    return [];
+  }
+}
 
 function buildSummaryPrompt(content) {
   return `Summarize the following text concisely, highlighting key insights and cross-references. Format the output as markdown.\nText:\n${content}`;
@@ -38,6 +46,9 @@ async function main() {
     log.error('OPENAI_API_KEY not set; skipping insight generation');
     return;
   }
+
+  const TARGET_DIRS = await getTargetDirs();
+  const RESOLVED_TARGET_DIRS = TARGET_DIRS.map((dir) => path.resolve(dir));
 
   // Get files to process from arguments or read from target directories
   let filesToProcess = [];
@@ -100,7 +111,7 @@ async function main() {
   log.info('Insight generation complete.');
 }
 
-export { main, buildSummaryPrompt, processMarkdownFile };
+export { main, buildSummaryPrompt, processMarkdownFile, getTargetDirs };
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {

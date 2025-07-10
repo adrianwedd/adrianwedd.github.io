@@ -34,19 +34,32 @@ const originalArgv = process.argv.slice();
 describe('build-insights.mjs', () => {
   const mockMarkdownContent = '# Test Content\nThis is some test content.';
   const mockSummary = 'Concise summary of test content.';
+  const createDirent = (name, isDirectory = false) => ({
+    name,
+    isDirectory: () => isDirectory,
+  });
 
   beforeEach(() => {
     vi.restoreAllMocks();
     readFile.mockResolvedValue(mockMarkdownContent);
     writeFile.mockResolvedValue(undefined);
-    readdir.mockImplementation((dir) => {
-      if (dir === path.join('content', 'garden')) {
+    readdir.mockImplementation((dirPath, options) => {
+      if (dirPath === 'content' && options && options.withFileTypes) {
+        return Promise.resolve([
+          createDirent('garden', true),
+          createDirent('logs', true),
+          createDirent('mirror', true),
+          createDirent('inbox', true),
+          createDirent('untagged', true),
+        ]);
+      }
+      if (dirPath === path.join('content', 'garden')) {
         return Promise.resolve(['file1.md', 'file2.md', 'file3.insight.md']);
       }
-      if (dir === path.join('content', 'logs')) {
+      if (dirPath === path.join('content', 'logs')) {
         return Promise.resolve(['log1.md', 'log2.md']);
       }
-      if (dir === path.join('content', 'mirror')) {
+      if (dirPath === path.join('content', 'mirror')) {
         return Promise.resolve(['mirror1.md', 'mirror2.md']);
       }
       return Promise.resolve([]);
@@ -95,6 +108,7 @@ describe('build-insights.mjs', () => {
 
   it('main should process markdown files in target directories', async () => {
     await buildInsights.main();
+    expect(readdir).toHaveBeenCalledWith('content', { withFileTypes: true });
     expect(readdir).toHaveBeenCalledWith(path.join('content', 'garden'));
     expect(readdir).toHaveBeenCalledWith(path.join('content', 'logs'));
     expect(readdir).toHaveBeenCalledWith(path.join('content', 'mirror'));
@@ -120,7 +134,14 @@ describe('build-insights.mjs', () => {
   });
 
   it('main should handle missing directories gracefully', async () => {
-    readdir.mockImplementation((dirPath) => {
+    readdir.mockImplementation((dirPath, options) => {
+      if (dirPath === 'content' && options && options.withFileTypes) {
+        return Promise.resolve([
+          createDirent('garden', true),
+          createDirent('logs', true),
+          createDirent('mirror', true),
+        ]);
+      }
       if (dirPath.includes('garden')) return Promise.reject({ code: 'ENOENT' });
       return Promise.resolve([]);
     });
@@ -148,6 +169,6 @@ describe('build-insights.mjs', () => {
       path.resolve('content', 'garden', 'file1.insight.md'),
       mockSummary
     );
-    expect(readdir).not.toHaveBeenCalled();
+    expect(readdir).toHaveBeenCalledWith('content', { withFileTypes: true });
   });
 });
