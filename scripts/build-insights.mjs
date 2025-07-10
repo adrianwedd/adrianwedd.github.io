@@ -15,7 +15,14 @@ function buildSummaryPrompt(content) {
 }
 
 async function processMarkdownFile(filePath) {
-  const content = await readFile(filePath, 'utf8');
+  let content;
+  try {
+    content = await readFile(filePath, 'utf8');
+  } catch (err) {
+    log.error(`Error reading file ${filePath}:`, err.message);
+    return; // Skip processing this file if it cannot be read
+  }
+
   const fileName = path.basename(filePath);
   const dirName = path.dirname(filePath);
 
@@ -23,8 +30,12 @@ async function processMarkdownFile(filePath) {
     const summary = await callOpenAI(buildSummaryPrompt(content));
     const insightFileName = fileName.replace(/\.md$/, '.insight.md');
     const insightFilePath = path.join(dirName, insightFileName);
-    await writeFile(insightFilePath, summary);
-    log.info(`Generated insight for ${fileName} -> ${insightFileName}`);
+    try {
+      await writeFile(insightFilePath, summary);
+      log.info(`Generated insight for ${fileName} -> ${insightFileName}`);
+    } catch (err) {
+      log.error(`Error writing insight file ${insightFilePath}:`, err.message);
+    }
   } catch (err) {
     log.error(`Failed to generate insight for ${fileName}:`, err.message);
   }

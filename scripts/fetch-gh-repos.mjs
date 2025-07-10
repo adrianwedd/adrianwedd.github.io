@@ -30,8 +30,22 @@ function repoToMarkdown(repo) {
 }
 
 async function main() {
-  const login = await getLogin();
-  const repos = await fetchRepos(login);
+  let login;
+  try {
+    login = await getLogin();
+  } catch (err) {
+    log.error(`Failed to get GitHub login: ${err.message}`);
+    process.exit(1);
+  }
+
+  let repos;
+  try {
+    repos = await fetchRepos(login);
+  } catch (err) {
+    log.error(`Failed to fetch GitHub repositories for ${login}: ${err.message}`);
+    process.exit(1);
+  }
+
   const tools = repos.filter(
     (r) => Array.isArray(r.topics) && r.topics.includes('tool')
   );
@@ -41,8 +55,7 @@ async function main() {
     await mkdir(dir, { recursive: true });
   } catch (err) {
     log.error(`Error creating directory ${dir}:`, err.message);
-    // Depending on severity, might want to exit or throw here
-    return;
+    process.exit(1);
   }
 
   for (const repo of tools) {
