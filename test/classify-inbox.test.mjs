@@ -193,4 +193,43 @@ describe('classify-inbox.mjs', () => {
       expect.stringContaining('content/inbox/file1.txt')
     );
   });
+
+  it('logs message when inbox empty', async () => {
+    fs.readdir.mockImplementation((dirPath, options) => {
+      if (options && options.withFileTypes && dirPath === 'content') {
+        return Promise.resolve(mockFiles);
+      }
+      if (dirPath.includes('content/inbox')) return Promise.resolve([]);
+      return Promise.resolve([]);
+    });
+    await classifyInbox.main();
+    expect(console.log).toHaveBeenCalledWith(
+      '[INFO]',
+      'No inbox files to process.'
+    );
+  });
+
+  it('logs message when changed args have no files', async () => {
+    process.argv = ['node', 'script', 'content/inbox/nothing.txt'];
+    await classifyInbox.main();
+    expect(console.log).toHaveBeenCalledWith(
+      '[INFO]',
+      'No relevant changed inbox files to process.'
+    );
+  });
+
+  it('handles inbox read error', async () => {
+    fs.readdir.mockImplementation((dirPath, options) => {
+      if (options && options.withFileTypes && dirPath === 'content') {
+        return Promise.resolve(mockFiles);
+      }
+      throw new Error('oops');
+    });
+    await classifyInbox.main();
+    expect(console.error).toHaveBeenCalledWith(
+      '[ERROR]',
+      expect.stringContaining('Error reading inbox directory'),
+      'oops'
+    );
+  });
 });
