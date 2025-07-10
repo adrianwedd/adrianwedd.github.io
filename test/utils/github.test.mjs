@@ -53,7 +53,7 @@ describe('github.mjs', () => {
 
     it('should throw an error on non-ok response', async () => {
       process.env.GH_TOKEN = 'test_token';
-      global.fetch.mockResolvedValueOnce({
+      global.fetch.mockResolvedValue({
         ok: false,
         status: 404,
         statusText: 'Not Found',
@@ -61,7 +61,7 @@ describe('github.mjs', () => {
       });
 
       await expect(githubFetch('https://api.github.com/test')).rejects.toThrow(
-        'GitHub API error for https://api.github.com/test: 404 Not Found\nError: Not Found'
+        'Fetch failed 404 Not Found - Error: Not Found'
       );
     });
 

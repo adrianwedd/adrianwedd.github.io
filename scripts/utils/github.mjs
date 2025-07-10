@@ -1,3 +1,5 @@
+import { retryFetch } from './retryFetch.mjs';
+
 export function getGitHubHeaders() {
   const GH_TOKEN = process.env.GH_TOKEN;
   if (!GH_TOKEN) {
@@ -13,20 +15,13 @@ export function getGitHubHeaders() {
 
 export async function githubFetch(url, options = {}) {
   const headers = getGitHubHeaders();
-  const res = await fetch(url, {
+  const res = await retryFetch(url, {
     ...options,
     headers: {
       ...headers,
       ...options.headers,
     },
   });
-
-  if (!res.ok) {
-    const errorBody = await res.text();
-    throw new Error(
-      `GitHub API error for ${url}: ${res.status} ${res.statusText}\n${errorBody}`
-    );
-  }
 
   return res.json();
 }
