@@ -42,7 +42,9 @@ async function classifyFile(filePath) {
     throw err; // Re-throw to be caught by main's try-catch
   }
 
+  log.debug(`Classifying file ${filePath}`);
   const reply = await callOpenAI(await buildPrompt(content));
+  log.debug(`Raw response for ${filePath}: ${reply}`);
   let result;
   try {
     result = JSON.parse(reply);
@@ -93,6 +95,7 @@ async function main() {
   const failedDir = path.join(inboxDir, 'failed');
 
   const dynamicSections = await getDynamicSections(); // Get dynamic sections for validation
+  log.debug(`Available sections: ${dynamicSections.join(', ')}`);
 
   // Get files to process from arguments or read from inboxDir
   let filesToProcess = [];
@@ -145,6 +148,7 @@ async function main() {
 
   for (const name of filesToProcess) {
     const filePath = path.join(inboxDir, name);
+    log.info(`Processing ${name}`);
     let targetDir;
 
     try {

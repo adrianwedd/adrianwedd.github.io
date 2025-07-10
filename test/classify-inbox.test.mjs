@@ -143,4 +143,14 @@ describe('classify-inbox.mjs', () => {
       expect.stringContaining('OPENAI_API_KEY not set')
     );
   });
+
+  it('logs processing steps', async () => {
+    const logSpy = vi.spyOn(console, 'log');
+    mockOpenAIResponse({ section: 'garden', tags: [], confidence: 0.9 });
+    await classifyInbox.main();
+    expect(logSpy).toHaveBeenCalledWith(
+      '[INFO]',
+      expect.stringContaining('Processing file1.txt')
+    );
+  });
 });
