@@ -1,4 +1,5 @@
 import { log } from './logger.mjs';
+import { retryFetch } from './retryFetch.mjs';
 
 const MODEL = process.env.OPENAI_MODEL || 'gpt-3.5-turbo-1106';
 
@@ -8,7 +9,7 @@ export async function callOpenAI(prompt) {
   log.debug(
     `Calling OpenAI model ${MODEL} with prompt length ${prompt.length}`
   );
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+  const res = await retryFetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -20,11 +21,6 @@ export async function callOpenAI(prompt) {
       temperature: 0,
     }),
   });
-  if (!res.ok) {
-    const errorBody = await res.text();
-    log.error(`OpenAI API error ${res.status}: ${errorBody}`);
-    throw new Error(`OpenAI API error ${res.status}: ${errorBody}`);
-  }
   const data = await res.json();
   log.debug('OpenAI response received');
   return data.choices[0].message.content.trim();
