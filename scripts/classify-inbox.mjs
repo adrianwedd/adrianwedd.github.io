@@ -3,6 +3,7 @@ import path from 'path';
 import { pathToFileURL } from 'url';
 import { callOpenAI } from './utils/llm-api.mjs';
 import { log } from './utils/logger.mjs';
+import { sanitizeMarkdown } from './utils/sanitize-markdown.mjs';
 
 // Function to dynamically discover content sections
 async function getDynamicSections() {
@@ -86,9 +87,10 @@ async function moveFile(src, destDir, tags = []) {
   }
 
   const fm = tags.length ? `---\ntags: [${tags.join(', ')}]\n---\n` : '';
+  const output = sanitizeMarkdown(fm + data);
 
   try {
-    await fs.writeFile(dest, fm + data);
+    await fs.writeFile(dest, output);
   } catch (err) {
     log.error(`Error writing file to ${dest}:`, err.message);
     try {

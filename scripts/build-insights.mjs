@@ -4,6 +4,7 @@ import { log } from './utils/logger.mjs';
 import { readFile, writeFile, readdir, mkdir, rename } from './utils/file-utils.mjs';
 import { callOpenAI } from './utils/llm-api.mjs';
 import { lint } from 'markdownlint/promise';
+import { sanitizeMarkdown } from './utils/sanitize-markdown.mjs';
 
 
 // Dynamically discover content directories to process
@@ -63,7 +64,8 @@ async function processMarkdownFile(filePath) {
     }
     const insightFileName = fileName.replace(/\.md$/, '.insight.md');
     const insightFilePath = path.join(dirName, insightFileName);
-    await writeFile(insightFilePath, summary);
+    const safeSummary = sanitizeMarkdown(summary);
+    await writeFile(insightFilePath, safeSummary);
     log.info(`Generated insight for ${fileName} -> ${insightFileName}`);
   } catch (err) {
     log.error(`Failed to generate insight for ${fileName}:`, err.message);

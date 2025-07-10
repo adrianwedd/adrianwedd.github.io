@@ -24,7 +24,9 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
+    "dompurify": "^3.0.3",
     "gray-matter": "^4.0.3",
+    "jsdom": "^24.0.0",
     "lunr": "^2.3.9",
     "yaml": "^2.8.0"
   },
