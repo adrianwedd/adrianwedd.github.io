@@ -1070,7 +1070,7 @@ phases:
     component: 'Automation Scripts'
     dependencies: [18]
     priority: 3
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-ROBUST-8'
     area: 'Robustness'
