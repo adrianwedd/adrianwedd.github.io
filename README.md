@@ -48,7 +48,7 @@ Format the codebase using Prettier:
 npm run format
 ```
 
-See [docs/scripts/README.md](docs/scripts/README.md) for examples and environment variables for each automation script. For troubleshooting CI failures, consult [docs/DEBUGGING.md](docs/DEBUGGING.md).
+See [docs/scripts/README.md](docs/scripts/README.md) for script usage and environment variables. Troubleshooting tips live in [docs/DEBUGGING.md](docs/DEBUGGING.md).
 
 ## License
 
