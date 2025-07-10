@@ -1120,3 +1120,101 @@ phases:
       - 'The performance of the automation scripts has been measured and any bottlenecks have been identified.'
     assigned_to: 'codex-agent'
     epic: 'Phase 6: Iterative Growth'
+
+  - id: 59
+    title: 'Fix `classify-inbox.mjs` Race Condition'
+    description: 'Refactor the file processing logic in `classify-inbox.mjs` to make it atomic. Instead of modifying the file in the inbox, the script should write the new content (with tags) directly to the destination directory and then delete the original file from the inbox.'
+    component: 'Automation Scripts'
+    dependencies: [6]
+    priority: 5
+    status: pending
+    command: null
+    task_id: 'PIN-BUG-1'
+    area: 'Bugs'
+    actionable_steps:
+      - 'In `classify-inbox.mjs`, when a file is successfully classified and needs tags, read the content from the source file in the inbox.'
+      - 'Construct the new content with the tags.'
+      - 'Write the new content to the destination path in the target directory (e.g., `content/garden/file.md`).'
+      - 'If the write is successful, delete the original file from the inbox.'
+    acceptance_criteria:
+      - 'Files are no longer modified in the inbox directory.'
+      - 'The file processing logic is atomic and resilient to failures.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 7: Debugging and Stability'
+
+  - id: 60
+    title: 'Add Rate Limiting and Retry Logic to API Calls'
+    description: 'Implement a retry mechanism with exponential backoff for all external API calls (GitHub, OpenAI) to handle rate limiting and transient network errors gracefully.'
+    component: 'Core Infrastructure'
+    dependencies: [15, 36]
+    priority: 4
+    status: pending
+    command: null
+    task_id: 'PIN-ROBUST-9'
+    area: 'Robustness'
+    actionable_steps:
+      - 'Create a new utility function `retryFetch` that wraps the `fetch` call.'
+      - 'The `retryFetch` function should accept the number of retries and a backoff strategy.'
+      - 'Update `github.mjs` and `llm-api.mjs` to use this new utility for all API calls.'
+      - 'Log a warning on each retry attempt.'
+    acceptance_criteria:
+      - 'The scripts can withstand intermittent network failures and API rate limiting.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 7: Debugging and Stability'
+
+  - id: 61
+    title: 'Use Streaming for Large File Processing'
+    description: 'Refactor the file reading logic in `classify-inbox.mjs` and `build-insights.mjs` to use streams instead of reading the entire file into memory. This will improve performance and prevent memory issues when dealing with large files.'
+    component: 'Automation Scripts'
+    dependencies: [6, 18]
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-SCALE-2'
+    area: 'Scalability'
+    actionable_steps:
+      - 'Replace `fs.readFile` with `fs.createReadStream` in the scripts.'
+      - 'Pipe the stream to the appropriate processing function.'
+      - 'Ensure that the LLM API calls are still handled correctly with the streamed content.'
+    acceptance_criteria:
+      - 'The scripts can process large files without consuming excessive memory.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 62
+    title: 'Isolate Integration Test Data'
+    description: 'Refactor the integration test suite to ensure that each test has its own isolated set of mock data. This will prevent tests from interfering with each other and make them more reliable.'
+    component: 'Testing'
+    dependencies: [19]
+    priority: 4
+    status: pending
+    command: null
+    task_id: 'PIN-QA-17'
+    area: 'Testing'
+    actionable_steps:
+      - 'In `test/integration.test.mjs`, create a separate mock data object for each test case.'
+      - 'Ensure that the `beforeEach` hook resets all mocks to a clean state before each test.'
+    acceptance_criteria:
+      - 'The integration tests are fully isolated and can be run in any order.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 63
+    title: 'Update and Complete Script Documentation'
+    description: 'Update the `docs/scripts/README.md` file to include documentation for `build-search-index.mjs` and `build-rss.mjs`. Also, add details on default values for optional environment variables to all script documentation.'
+    component: 'Documentation'
+    dependencies: [12]
+    priority: 2
+    status: pending
+    command: null
+    task_id: 'PIN-DOC-5'
+    area: 'Documentation'
+    actionable_steps:
+      - 'Add entries for `build-search-index.mjs` and `build-rss.mjs` to the table in `docs/scripts/README.md`.'
+      - 'Create `docs/scripts/build-search-index.md` and `docs/scripts/build-rss.md`.'
+      - 'In each script\'s documentation, add a section for environment variables that lists the default values for optional variables.'
+    acceptance_criteria:
+      - 'All automation scripts are fully documented.'
+      - 'The documentation is consistent and up-to-date.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 6: Iterative Growth'
