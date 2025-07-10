@@ -5,6 +5,9 @@ const MODEL = process.env.OPENAI_MODEL || 'gpt-3.5-turbo-1106';
 export async function callOpenAI(prompt) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error('OPENAI_API_KEY not set');
+  log.debug(
+    `Calling OpenAI model ${MODEL} with prompt length ${prompt.length}`
+  );
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -23,5 +26,6 @@ export async function callOpenAI(prompt) {
     throw new Error(`OpenAI API error ${res.status}: ${errorBody}`);
   }
   const data = await res.json();
+  log.debug('OpenAI response received');
   return data.choices[0].message.content.trim();
 }
