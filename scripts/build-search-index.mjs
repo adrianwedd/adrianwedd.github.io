@@ -3,6 +3,7 @@ import path from 'path';
 import { pathToFileURL } from 'url';
 import lunr from 'lunr';
 import matter from 'gray-matter';
+import { log } from './utils/logger.mjs';
 
 async function collectMarkdown(dir) {
   const entries = await fs.readdir(dir, { withFileTypes: true });
@@ -46,14 +47,14 @@ async function main() {
   const output = { index: idx.toJSON(), docs };
   await fs.mkdir('public', { recursive: true });
   await fs.writeFile('public/search-index.json', JSON.stringify(output));
-  console.log('Wrote public/search-index.json');
+  log.info('Wrote public/search-index.json');
 }
 
 export { collectMarkdown, slugify, main };
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {
-    console.error(err);
+    log.error('build-search-index main error:', err);
     process.exit(1);
   });
 }

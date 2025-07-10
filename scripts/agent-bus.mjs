@@ -108,7 +108,7 @@ export {
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {
-    log.error(err);
+    log.error('agent-bus main error:', err);
     process.exit(1);
   });
 }

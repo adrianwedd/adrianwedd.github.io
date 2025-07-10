@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
 import matter from 'gray-matter';
+import { log } from './utils/logger.mjs';
 
 const BASE_URL = process.env.BASE_URL || 'https://adrianwedd.github.io';
 
@@ -67,14 +68,14 @@ async function main() {
   const xml = buildXml(items);
   await fs.mkdir('public', { recursive: true });
   await fs.writeFile('public/rss.xml', xml);
-  console.log('Wrote public/rss.xml');
+  log.info('Wrote public/rss.xml');
 }
 
 export { collectMarkdown, slugify, buildXml, main };
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {
-    console.error(err);
+    log.error('build-rss main error:', err);
     process.exit(1);
   });
 }

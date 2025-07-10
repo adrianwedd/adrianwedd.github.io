@@ -181,9 +181,9 @@ async function main() {
       await fs.writeFile(lockPath, '', { flag: 'wx' });
     } catch (err) {
       if (err.code === 'EEXIST') {
-        log.info(`Skipping ${name}; lock file exists`);
+        log.info(`Skipping ${filePath}; lock file exists`);
       } else {
-        log.error(`Unable to create lock for ${name}:`, err.message);
+        log.error(`Unable to create lock file ${lockPath}:`, err.message);
       }
       continue;
     }
@@ -210,7 +210,7 @@ async function main() {
       const dest = await moveFile(filePath, targetDir, tags);
       log.info(`Moved ${name} to ${dest}`);
     } catch (err) {
-      log.error(`Failed to classify ${name}:`, err.message);
+      log.error(`Failed to classify ${filePath}:`, err.message);
       const dest = await moveFile(filePath, failedDir, tags);
       log.info(`Moved ${name} to ${dest}`);
     } finally {
@@ -234,7 +234,7 @@ export {
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {
-    log.error(err);
+    log.error('classify-inbox main error:', err);
     process.exit(1);
   });
 }
