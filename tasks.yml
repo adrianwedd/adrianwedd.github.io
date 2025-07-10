@@ -747,7 +747,7 @@ phases:
     component: 'Automation Scripts'
     dependencies: []
     priority: 2
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-MAINT-2'
     area: Maintainability
@@ -1030,7 +1030,7 @@ phases:
     component: 'Security'
     dependencies: [25]
     priority: 5
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-SEC-4'
     area: 'Security'
