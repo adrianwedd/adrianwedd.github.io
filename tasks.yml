@@ -747,7 +747,7 @@ phases:
     component: 'Automation Scripts'
     dependencies: []
     priority: 2
-    status: pending
+    status: in_progress
     command: null
     task_id: 'PIN-MAINT-2'
     area: Maintainability
@@ -764,7 +764,7 @@ phases:
     component: 'Testing'
     dependencies: [27]
     priority: 4
-    status: pending
+    status: in_progress
     command: null
     task_id: 'PIN-QA-10'
     area: Testing
@@ -784,7 +784,7 @@ phases:
     component: 'Testing'
     dependencies: [24]
     priority: 4
-    status: pending
+    status: in_progress
     command: null
     task_id: 'PIN-QA-11'
     area: Testing
@@ -864,7 +864,7 @@ phases:
     component: 'Security'
     dependencies: []
     priority: 5
-    status: pending
+    status: in_progress
     command: null
     task_id: 'PIN-SEC-3'
     area: Security

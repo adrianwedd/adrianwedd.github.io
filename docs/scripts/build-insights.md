@@ -1,5 +1,5 @@
 # build-insights.mjs
 
-Placeholder script that will generate periodic insights from the classified content. The implementation is currently minimal but reserved for future data analysis tasks.
+Generates `.insight.md` files summarising markdown content with an LLM. The summary text is sanitised with `sanitize-html` before writing to disk to prevent malicious HTML from ending up on the site.
 
-This script does not require any environment variables at present.
+Requires `OPENAI_API_KEY` and optionally `OPENAI_MODEL`.

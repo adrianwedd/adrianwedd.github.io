@@ -3,6 +3,7 @@ import { pathToFileURL } from 'url';
 import { log } from './utils/logger.mjs';
 import { readFile, writeFile, readdir } from './utils/file-utils.mjs';
 import { callOpenAI } from './utils/llm-api.mjs';
+import { sanitizeMarkdown } from './utils/sanitize.mjs';
 
 const TARGET_DIRS = [
   path.join('content', 'garden'),
@@ -21,9 +22,10 @@ async function processMarkdownFile(filePath) {
 
   try {
     const summary = await callOpenAI(buildSummaryPrompt(content));
+    const sanitized = sanitizeMarkdown(summary);
     const insightFileName = fileName.replace(/\.md$/, '.insight.md');
     const insightFilePath = path.join(dirName, insightFileName);
-    await writeFile(insightFilePath, summary);
+    await writeFile(insightFilePath, sanitized);
     log.info(`Generated insight for ${fileName} -> ${insightFileName}`);
   } catch (err) {
     log.error(`Failed to generate insight for ${fileName}:`, err.message);
