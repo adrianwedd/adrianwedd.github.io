@@ -16,5 +16,11 @@ Output is logged with `[INFO]`, `[WARN]`, and `[ERROR]` prefixes via `logger.mjs
 Run manually with:
 
 ```bash
-node scripts/build-insights.mjs
+OPENAI_API_KEY=sk-test node scripts/build-insights.mjs "content/garden/note.md"
+```
+
+Example output:
+
+```text
+[INFO] Generated insight for note.md -> note.insight.md
 ```

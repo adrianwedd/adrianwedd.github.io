@@ -10,5 +10,13 @@ Reads files from `content/inbox`, asks OpenAI to determine which section they be
 Run manually with:
 
 ```bash
-node scripts/classify-inbox.mjs
+OPENAI_API_KEY=sk-test node scripts/classify-inbox.mjs
+```
+
+Place a markdown file in `content/inbox/` before running.
+
+Example output:
+
+```text
+[INFO] Moved note.md to content/garden/note.md
 ```

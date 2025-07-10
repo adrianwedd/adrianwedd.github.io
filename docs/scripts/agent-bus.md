@@ -10,5 +10,11 @@ Reads all YAML agent manifests in `content/agents`, aggregates their status, and
 Run manually with:
 
 ```bash
-node scripts/agent-bus.mjs
+GH_TOKEN=ghp_yourtoken GH_REPO=owner/repo node scripts/agent-bus.mjs
+```
+
+Example output:
+
+```text
+[INFO] Created issue #12
 ```

@@ -1,13 +1,15 @@
 # Automation Scripts
 
+
 This directory contains documentation for the Node.js scripts that run during the CI workflow. Each script is written in ESM and executed with Node 20.
+All pages include example commands and sample output so you can reproduce the results locally.
 
 | Script               | Description                                                              | Environment Variables                     |
 | -------------------- | ------------------------------------------------------------------------ | ----------------------------------------- |
 | `fetch-gh-repos.mjs` | Fetches public repositories from GitHub and creates tool markdown files. | `GH_TOKEN`, optional `GH_USER`            |
 | `classify-inbox.mjs` | Uses OpenAI to categorise files dropped into `content/inbox`.            | `OPENAI_API_KEY`, optional `OPENAI_MODEL` |
 | `build-insights.mjs` | Summarises changed markdown files, validates the summary with `markdownlint`, and writes `.insight.md` outputs (failed files move to `content/insights-failed/`). | `OPENAI_API_KEY`, optional `OPENAI_MODEL` |
-| `build-rss.mjs`      | Generates `public/rss.xml` from markdown metadata.                       | none                                      |
+| `build-rss.mjs` | Generates `public/rss.xml` from markdown metadata. | optional `BASE_URL` |
 | `agent-bus.mjs`      | Aggregates agent manifests and posts a summary issue on GitHub.          | `GH_TOKEN`, optional `GH_REPO`            |
 
 See the individual files below for further details.
