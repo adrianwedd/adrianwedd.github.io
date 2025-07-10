@@ -19,9 +19,10 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
-    "yaml": "^2.8.0",
+    "gray-matter": "^4.0.3",
     "lunr": "^2.3.9",
-    "gray-matter": "^4.0.3"
+    "sanitize-html": "^2.17.0",
+    "yaml": "^2.8.0"
   },
   "license": "MIT"
 }

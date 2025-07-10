@@ -1,5 +1,18 @@
 # build-insights.mjs
 
-Placeholder script that will generate periodic insights from the classified content. The implementation is currently minimal but reserved for future data analysis tasks.
+Generates short summaries for markdown files in `content/garden`, `content/logs`, and `content/mirror`. Each original file is paired with a new `<name>.insight.md` file containing the sanitized summary.
 
-This script does not require any environment variables at present.
+The script accepts a comma-separated list of changed files as its first argument. If none are provided it scans the target directories. For every markdown file found (excluding existing `.insight.md` files) the contents are sent to OpenAI via `callOpenAI`. The resulting text is sanitized with `sanitize-html` to strip HTML and then written next to the source file.
+
+Output is logged with `[INFO]`, `[WARN]`, and `[ERROR]` prefixes via `logger.mjs`.
+
+## Environment Variables
+
+- `OPENAI_API_KEY` – **required** for contacting the OpenAI API.
+- `OPENAI_MODEL` – optional model name (defaults to `gpt-3.5-turbo-1106`).
+
+Run manually with:
+
+```bash
+node scripts/build-insights.mjs
+```

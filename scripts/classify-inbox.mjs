@@ -3,6 +3,7 @@ import path from 'path';
 import { pathToFileURL } from 'url';
 import { callOpenAI } from './utils/llm-api.mjs';
 import { log } from './utils/logger.mjs';
+import { sanitizeMarkdown } from './utils/sanitize.mjs';
 
 // Function to dynamically discover content sections
 async function getDynamicSections() {
@@ -159,6 +160,7 @@ async function main() {
           let data;
           try {
             data = await fs.readFile(filePath, 'utf8');
+            data = sanitizeMarkdown(data);
           } catch (err) {
             log.error(
               `Error reading file ${filePath} to add tags:`,
@@ -168,7 +170,10 @@ async function main() {
           }
           if (targetDir !== failedDir) {
             // Only write if not already marked for failed
-            const fm = `---\ntags: [${result.tags.join(', ')}]\n---\n`;
+            const sanitizedTags = result.tags.map((t) =>
+              sanitizeMarkdown(t).replace(/\n/g, '').trim()
+            );
+            const fm = `---\ntags: [${sanitizedTags.join(', ')}]\n---\n`;
             try {
               await fs.writeFile(filePath, fm + data);
             } catch (err) {
