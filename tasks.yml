@@ -1089,7 +1089,7 @@ phases:
     component: 'Documentation'
     dependencies: [45]
     priority: 2
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-DOC-4'
     area: 'Documentation'
@@ -1216,5 +1216,24 @@ phases:
     acceptance_criteria:
       - 'All automation scripts are fully documented.'
       - 'The documentation is consistent and up-to-date.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 6: Iterative Growth'
+
+  - id: 64
+    title: 'Enforce Conventional Commits with Husky'
+    description: 'Add a commit-msg hook using Husky and commitlint to ensure all commit messages follow the Conventional Commits specification.'
+    component: 'CI/CD'
+    dependencies: [57]
+    priority: 2
+    status: done
+    command: null
+    task_id: 'PIN-TOOL-1'
+    area: 'Tooling'
+    actionable_steps:
+      - 'Install husky and commitlint as dev dependencies.'
+      - 'Create a commitlint config extending @commitlint/config-conventional.'
+      - 'Add a commit-msg hook that runs commitlint.'
+    acceptance_criteria:
+      - 'Commit messages not following the convention are rejected.'
     assigned_to: 'codex-agent'
     epic: 'Phase 6: Iterative Growth'
