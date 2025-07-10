@@ -18,6 +18,12 @@ npm run dev
 npm test
 ```
 
+The repository uses [Husky](https://typicode.github.io/husky) to manage Git hooks. Running `npm ci` or `npm install` will trigger the `prepare` script and install the hooks locally. If they are missing, run:
+
+```bash
+npm run prepare
+```
+
 4. Lint and format all files:
 
 ```bash
@@ -33,6 +39,7 @@ Secrets like `GH_TOKEN` or `OPENAI_API_KEY` must be stored as repository secrets
 - Follow the existing ESLint and Prettier configuration.
 - Place unit tests in the `test/` directory and run them with [Vitest](https://vitest.dev/).
 - Ensure scripts run under Node 20 with `node --experimental-specifier-resolution=node` if needed.
+- Commit messages must follow the [Conventional Commits](https://www.conventionalcommits.org/) format. A `commit-msg` hook will reject non‑conforming messages.
 
 ## Pull Requests
 
