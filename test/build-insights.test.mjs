@@ -17,7 +17,7 @@ import { log } from '../scripts/utils/logger.mjs';
 
 // Mock file-utils before any imports
 vi.mock('../scripts/utils/file-utils.mjs', () => ({
-  readFile: vi.fn(),
+  readFileStream: vi.fn(),
   writeFile: vi.fn(),
   readdir: vi.fn(),
   mkdir: vi.fn(),
@@ -27,7 +27,13 @@ vi.mock('../scripts/utils/file-utils.mjs', () => ({
 // Import the module to be tested
 import * as buildInsights from '../scripts/build-insights.mjs';
 import { callOpenAI } from '../scripts/utils/llm-api.mjs';
-import { readFile, writeFile, readdir, mkdir, rename } from '../scripts/utils/file-utils.mjs'; // Import mocked file-utils functions
+import {
+  readFileStream,
+  writeFile,
+  readdir,
+  mkdir,
+  rename,
+} from '../scripts/utils/file-utils.mjs'; // Import mocked file-utils functions
 
 const originalArgv = process.argv.slice();
 
@@ -41,7 +47,7 @@ describe('build-insights.mjs', () => {
 
   beforeEach(() => {
     vi.restoreAllMocks();
-    readFile.mockResolvedValue(mockMarkdownContent);
+    readFileStream.mockResolvedValue(mockMarkdownContent);
     writeFile.mockResolvedValue(undefined);
     readdir.mockImplementation((dirPath, options) => {
       if (dirPath === 'content' && options && options.withFileTypes) {

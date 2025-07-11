@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import { readFileStream } from './utils/file-utils.mjs';
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { callOpenAI } from './utils/llm-api.mjs';
@@ -34,7 +35,7 @@ async function buildPrompt(content) {
 async function classifyFile(filePath) {
   let content;
   try {
-    content = await fs.readFile(filePath, 'utf8');
+    content = await readFileStream(filePath);
   } catch (err) {
     log.error(
       `Error reading file ${filePath} for classification:`,
@@ -80,7 +81,7 @@ async function moveFile(src, destDir, tags = []) {
   const dest = path.join(destDir, path.basename(src));
   let data;
   try {
-    data = await fs.readFile(src, 'utf8');
+    data = await readFileStream(src);
   } catch (err) {
     log.error(`Error reading file ${src}:`, err.message);
     throw err;
