@@ -1,7 +1,7 @@
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { log } from './utils/logger.mjs';
-import { readFile, writeFile, readdir, mkdir, rename } from './utils/file-utils.mjs';
+import { readFileStream, writeFile, readdir, mkdir, rename } from './utils/file-utils.mjs';
 import { callOpenAI } from './utils/llm-api.mjs';
 import { lint } from 'markdownlint/promise';
 import { sanitizeMarkdown } from './utils/sanitize-markdown.mjs';
@@ -51,7 +51,7 @@ async function moveToFailed(srcPath) {
 }
 
 async function processMarkdownFile(filePath) {
-  const content = await readFile(filePath, 'utf8');
+  const content = await readFileStream(filePath);
   const fileName = path.basename(filePath);
   const dirName = path.dirname(filePath);
 

@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 
 vi.mock('fs/promises');
 vi.mock('../scripts/utils/llm-api.mjs', () => ({ callOpenAI: vi.fn() }));
+vi.mock('../scripts/utils/file-utils.mjs', () => ({ readFileStream: vi.fn() }));
 vi.mock('../scripts/utils/sanitize-markdown.mjs', () => ({
   sanitizeMarkdown: (s) => s,
 }));
@@ -13,10 +14,11 @@ import {
   getDynamicSections,
 } from '../scripts/classify-inbox.mjs';
 import { callOpenAI } from '../scripts/utils/llm-api.mjs';
+import { readFileStream } from '../scripts/utils/file-utils.mjs';
 
 beforeEach(() => {
   vi.restoreAllMocks();
-  fs.readFile.mockResolvedValue('content');
+  readFileStream.mockResolvedValue('content');
   fs.writeFile.mockResolvedValue();
   fs.unlink.mockResolvedValue();
   fs.mkdir.mockResolvedValue();
@@ -32,7 +34,7 @@ afterEach(() => {
 
 describe('classify-inbox error paths', () => {
   it('classifyFile throws on read error', async () => {
-    fs.readFile.mockRejectedValueOnce(new Error('fail'));
+    readFileStream.mockRejectedValueOnce(new Error('fail'));
     await expect(classifyFile('x')).rejects.toThrow('fail');
   });
 

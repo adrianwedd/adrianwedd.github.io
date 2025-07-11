@@ -7,10 +7,13 @@ vi.mock('fs/promises');
 vi.mock('../scripts/utils/llm-api.mjs', () => ({
   callOpenAI: vi.fn(),
 }));
+// Mock file-utils for readFileStream
+vi.mock('../scripts/utils/file-utils.mjs', () => ({ readFileStream: vi.fn() }));
 
 // Import the module to be tested
 import * as classifyInbox from '../scripts/classify-inbox.mjs';
 import { callOpenAI } from '../scripts/utils/llm-api.mjs';
+import { readFileStream } from '../scripts/utils/file-utils.mjs';
 
 describe('classify-inbox.mjs', () => {
   // Helper to create Dirent-like objects for mocking fs.readdir
@@ -60,7 +63,7 @@ describe('classify-inbox.mjs', () => {
         mockFiles.filter((d) => !d.isDirectory()).map((d) => d.name)
       );
     });
-    fs.readFile.mockResolvedValue('Test content');
+    readFileStream.mockResolvedValue('Test content');
     fs.mkdir.mockResolvedValue(undefined);
     fs.rename.mockResolvedValue(undefined);
     fs.writeFile.mockResolvedValue(undefined);

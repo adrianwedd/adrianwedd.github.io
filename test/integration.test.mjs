@@ -2,10 +2,13 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import fs from 'fs/promises';
+import fsSync from 'fs';
+import { Readable } from 'stream';
 import path from 'path';
 
 // Mock fs before any imports
 vi.mock('fs/promises');
+vi.mock('fs');
 
 // Mock external API calls
 vi.mock('../scripts/utils/github.mjs', () => ({
@@ -92,6 +95,10 @@ describe('Integration Test: Full Automation Pipeline', () => {
       'content/agents/test-agent.yml':
         'id: test-agent\nname: Test Agent\nowner: @testuser\nrole: Testing automation\nstatus: active\nlast_updated: 2025-01-01T00:00:00Z\ndescription: An agent for testing purposes.',
     };
+
+    vi.spyOn(fsSync, 'createReadStream').mockImplementation((filePath) => {
+      return Readable.from([fileContents[filePath] || '']);
+    });
 
     vi.spyOn(fs, 'readFile').mockImplementation((filePath) => {
       return Promise.resolve(fileContents[filePath] || '');
