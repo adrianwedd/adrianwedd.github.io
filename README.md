@@ -35,6 +35,7 @@ Run the automated tests with:
 ```bash
 npm test
 ```
+These tests also run automatically in the GitHub Actions workflow to prevent deployments when the automation pipeline fails.
 
 Lint all files and automatically fix issues with:
 

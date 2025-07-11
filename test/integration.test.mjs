@@ -8,10 +8,10 @@ import path from 'path';
 vi.mock('fs/promises');
 
 // Mock external API calls
-vi.mock('../../scripts/utils/github.mjs', () => ({
+vi.mock('../scripts/utils/github.mjs', () => ({
   githubFetch: vi.fn(),
 }));
-vi.mock('../../scripts/classify-inbox.mjs', async (importOriginal) => {
+vi.mock('../scripts/classify-inbox.mjs', async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
@@ -19,24 +19,33 @@ vi.mock('../../scripts/classify-inbox.mjs', async (importOriginal) => {
   };
 });
 
-// Import main scripts
-import { main as fetchGhReposMain } from '../../scripts/fetch-gh-repos.mjs';
-import { main as classifyInboxMain } from '../../scripts/classify-inbox.mjs';
-import { main as buildInsightsMain } from '../../scripts/build-insights.mjs';
-import { main as agentBusMain } from '../../scripts/agent-bus.mjs';
-import { githubFetch } from '../../scripts/utils/github.mjs';
-import { callOpenAI } from '../../scripts/classify-inbox.mjs';
+// Placeholders for dynamically imported modules
+let fetchGhReposMain;
+let classifyInboxMain;
+let buildInsightsMain;
+let agentBusMain;
+let githubFetch;
+let callOpenAI;
 
 describe('Integration Test: Full Automation Pipeline', () => {
   const originalConsoleLog = console.log;
   const originalConsoleError = console.error;
   const originalConsoleWarn = console.warn;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.restoreAllMocks();
     vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const utils = await import('../scripts/utils/github.mjs');
+    githubFetch = vi.fn();
+    vi.spyOn(utils, 'githubFetch').mockImplementation((...args) => githubFetch(...args));
+
+    ({ main: fetchGhReposMain } = await import('../scripts/fetch-gh-repos.mjs'));
+    ({ main: classifyInboxMain, callOpenAI } = await import('../scripts/classify-inbox.mjs'));
+    ({ main: buildInsightsMain } = await import('../scripts/build-insights.mjs'));
+    ({ main: agentBusMain } = await import('../scripts/agent-bus.mjs'));
 
     // Mock fs operations for the entire pipeline
     vi.spyOn(fs, 'readdir').mockImplementation((dirPath, options) => {
@@ -236,5 +245,45 @@ describe('Integration Test: Full Automation Pipeline', () => {
         body: expect.stringContaining('| id | status |'),
       })
     );
+  });
+
+  it('logs error and continues when GH_TOKEN is missing', async () => {
+    delete process.env.GH_TOKEN;
+
+    await fetchGhReposMain();
+
+    expect(console.error).toHaveBeenCalledWith(
+      '[ERROR]',
+      expect.stringContaining('GH_TOKEN not set')
+    );
+
+    await classifyInboxMain();
+    await buildInsightsMain();
+    await agentBusMain();
+
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      path.join('content', 'garden', 'test-doc-garden.md'),
+      expect.stringContaining('---')
+    );
+  });
+
+  it('logs OpenAI errors and moves files to failed', async () => {
+    callOpenAI.mockImplementationOnce(() =>
+      Promise.reject(new Error('OpenAI fail'))
+    );
+
+    await classifyInboxMain();
+
+    expect(console.error).toHaveBeenCalledWith(
+      '[ERROR]',
+      expect.stringContaining('Failed to classify')
+    );
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      path.join('content', 'inbox', 'failed', 'test-doc-garden.md'),
+      expect.any(String)
+    );
+
+    await buildInsightsMain();
+    await agentBusMain();
   });
 });

@@ -33,3 +33,7 @@ This guide collects tips for diagnosing failures in the GitHub Actions pipeline 
 4. Check the terminal output for errors and iterate until the command succeeds.
 
 Running scripts locally mirrors the CI environment and helps isolate issues before pushing commits.
+
+## Continuous Integration
+
+The `Build & Deploy Site` workflow executes `npm test` on every push. The integration tests mock failures from GitHub and OpenAI to verify that the automation scripts log errors and keep running. Any failing test will stop the workflow and block deployment.
