@@ -29,6 +29,15 @@ let buildInsightsMain;
 let agentBusMain;
 let githubFetch;
 let callOpenAI;
+let fileContents;
+
+const createMockFiles = () => ({
+  'content/inbox/test-doc-garden.md': 'This is a garden note about plants.',
+  'content/inbox/test-doc-log.md': "Log entry for today's activities.",
+  'content/inbox/test-doc-untagged.txt': 'This file should not be classified.',
+  'content/agents/test-agent.yml':
+    'id: test-agent\nname: Test Agent\nowner: @testuser\nrole: Testing automation\nstatus: active\nlast_updated: 2025-01-01T00:00:00Z\ndescription: An agent for testing purposes.',
+});
 
 describe('Integration Test: Full Automation Pipeline', () => {
   const originalConsoleLog = console.log;
@@ -37,6 +46,7 @@ describe('Integration Test: Full Automation Pipeline', () => {
 
   beforeEach(async () => {
     vi.restoreAllMocks();
+    vi.resetModules();
     vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -87,14 +97,7 @@ describe('Integration Test: Full Automation Pipeline', () => {
       return Promise.resolve([]);
     });
 
-    const fileContents = {
-      'content/inbox/test-doc-garden.md': 'This is a garden note about plants.',
-      'content/inbox/test-doc-log.md': "Log entry for today's activities.",
-      'content/inbox/test-doc-untagged.txt':
-        'This file should not be classified.',
-      'content/agents/test-agent.yml':
-        'id: test-agent\nname: Test Agent\nowner: @testuser\nrole: Testing automation\nstatus: active\nlast_updated: 2025-01-01T00:00:00Z\ndescription: An agent for testing purposes.',
-    };
+    fileContents = createMockFiles();
 
     vi.spyOn(fsSync, 'createReadStream').mockImplementation((filePath) => {
       return Readable.from([fileContents[filePath] || '']);
@@ -192,6 +195,7 @@ describe('Integration Test: Full Automation Pipeline', () => {
     delete process.env.GH_TOKEN;
     delete process.env.OPENAI_API_KEY;
     delete process.env.GH_REPO;
+    fileContents = {};
   });
 
   it('should run the full automation pipeline successfully', async () => {
