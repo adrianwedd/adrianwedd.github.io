@@ -9,7 +9,8 @@ All pages include example commands and sample output so you can reproduce the re
 | `fetch-gh-repos.mjs` | Fetches public repositories from GitHub and creates tool markdown files. | `GH_TOKEN`, optional `GH_USER`            |
 | `classify-inbox.mjs` | Uses OpenAI to categorise files dropped into `content/inbox`.            | `OPENAI_API_KEY`, optional `OPENAI_MODEL` |
 | `build-insights.mjs` | Summarises changed markdown files, validates the summary with `markdownlint`, and writes `.insight.md` outputs (failed files move to `content/insights-failed/`). | `OPENAI_API_KEY`, optional `OPENAI_MODEL` |
-| `build-rss.mjs` | Generates `public/rss.xml` from markdown metadata. | optional `BASE_URL` |
+| `build-search-index.mjs` | Builds `public/search-index.json` for site search. | none |
+| `build-rss.mjs` | Generates `public/rss.xml` from markdown metadata. | optional `BASE_URL` (defaults to `https://adrianwedd.github.io`) |
 | `agent-bus.mjs`      | Aggregates agent manifests and posts a summary issue on GitHub.          | `GH_TOKEN`, optional `GH_REPO`            |
 
 See the individual files below for further details.
