@@ -34,11 +34,11 @@ async function loadManifests(dir = path.join('content', 'agents')) {
 
 function manifestsToMarkdown(manifests) {
   if (manifests.length === 0) return 'No agents found.';
-  const header = '| id | status | last updated | owner | role |';
-  const separator = '|---|---|---|---|---|';
-  let md = `${header}
-${separator}
-`;
+  const headerRows = [
+    '| id | status | last updated | owner | role |',
+    '|---|---|---|---|---|',
+  ];
+  let md = headerRows.join('\n') + '\n';
   for (const m of manifests) {
     md += `| ${m.id} | ${m.status} | ${m.last_updated} | ${m.owner || ''} | ${m.role || ''} |
 `;
