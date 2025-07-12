@@ -971,6 +971,7 @@ phases:
       - 'Analyze workflow logs from failed runs to identify specific error messages and failing steps.'
       - 'Replicate failures locally where possible by running the scripts with the same inputs and environment variables.'
       - 'Add more detailed logging to scripts to trace execution flow and variable states.'
+      - 'Improve check-dns.mjs to log when the CNAME file is missing.'
       - 'Create isolated test cases that specifically target the failing conditions.'
       - 'Incrementally apply fixes and re-run the workflow to verify the solution.'
     acceptance_criteria:
