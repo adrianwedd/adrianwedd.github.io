@@ -379,7 +379,8 @@ phases:
     task_id: 'PIN-SEC-1'
     area: Security
     actionable_steps:
-      - 'Add a `permissions` section to `.github/workflows/deploy.yml` granting only the scopes needed (e.g., `contents: read`, `pages: write`, `issues: write`).'
+      - 'Add a `permissions` section to `.github/workflows/deploy.yml` granting only the scopes needed.'
+      - 'Use `contents: read` with `actions/deploy-pages` or `contents: write` when the workflow pushes with `JamesIves/github-pages-deploy-action`, plus `pages: write` and `issues: write`.'
       - 'Verify the job still succeeds with the restricted permissions.'
     acceptance_criteria:
       - 'Workflow defines explicit minimal permissions and completes successfully.'
