@@ -1245,7 +1245,7 @@ phases:
     component: 'Documentation'
     dependencies: []
     priority: 3
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-NEW-65'
     area: 'Architecture'
@@ -1262,7 +1262,7 @@ phases:
     component: 'Automation Scripts'
     dependencies: []
     priority: 3
-    status: pending
+    status: done
     command: null
     task_id: 'PIN-NEW-66'
     area: 'Optimization'
