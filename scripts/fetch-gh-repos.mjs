@@ -4,12 +4,14 @@ import { githubFetch } from './utils/github.mjs'; // Import the new utility
 import { log } from './utils/logger.mjs';
 import { mkdir, writeFile } from './utils/file-utils.mjs';
 
+// Determine the GitHub username for the current token
 async function getLogin() {
   if (process.env.GH_USER) return process.env.GH_USER;
   const data = await githubFetch('https://api.github.com/user'); // Use githubFetch
   return data.login;
 }
 
+// Fetch all repositories owned by the given login, paging as needed
 async function fetchRepos(login) {
   const repos = [];
   let page = 1;
@@ -24,11 +26,13 @@ async function fetchRepos(login) {
   return repos;
 }
 
+// Convert GitHub repo metadata to a markdown front matter block
 function repoToMarkdown(repo) {
   const frontmatter = `---\ntitle: ${repo.name}\nrepo: ${repo.html_url}\ndescription: ${repo.description ? repo.description.replace(/\n/g, ' ') : ''}\nupdated: ${repo.updated_at}\n---\n`;
   return frontmatter;
 }
 
+// Fetch repos tagged "tool" and write one markdown file per repo
 async function main() {
   if (!process.env.GH_TOKEN) {
     log.error('GH_TOKEN not set; skipping fetch-gh-repos');

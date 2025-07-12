@@ -1,5 +1,6 @@
 import { retryFetch } from './retryFetch.mjs';
 
+// Build the authorization headers for GitHub API requests
 export function getGitHubHeaders() {
   const GH_TOKEN = process.env.GH_TOKEN;
   if (!GH_TOKEN) {
@@ -13,6 +14,7 @@ export function getGitHubHeaders() {
   };
 }
 
+// Fetch from the GitHub API with retries and JSON response
 export async function githubFetch(url, options = {}) {
   const headers = getGitHubHeaders();
   const res = await retryFetch(url, {

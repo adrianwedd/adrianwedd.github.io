@@ -7,7 +7,7 @@ import { lint } from 'markdownlint/promise';
 import { sanitizeMarkdown } from './utils/sanitize-markdown.mjs';
 
 
-// Dynamically discover content directories to process
+// Discover which content subdirectories contain notes to summarise
 async function getTargetDirs() {
   const contentDir = 'content';
   try {
@@ -23,10 +23,12 @@ async function getTargetDirs() {
   }
 }
 
+// Prompt template used when requesting a summary from the LLM
 function buildSummaryPrompt(content) {
   return `Summarize the following text concisely, highlighting key insights and cross-references. Format the output as markdown.\nText:\n${content}`;
 }
 
+// Run markdownlint on the generated summary
 async function validateMarkdown(text, filePath = '') {
   try {
     const results = await lint({ strings: { text } });
@@ -38,6 +40,7 @@ async function validateMarkdown(text, filePath = '') {
   }
 }
 
+// Move an input file to the failure directory if processing fails
 async function moveToFailed(srcPath) {
   const failedDir = path.join('content', 'insights-failed');
   try {
@@ -50,6 +53,7 @@ async function moveToFailed(srcPath) {
   }
 }
 
+// Generate an insight markdown file next to the source markdown
 async function processMarkdownFile(filePath) {
   const content = await readFileStream(filePath);
   const fileName = path.basename(filePath);
@@ -74,6 +78,7 @@ async function processMarkdownFile(filePath) {
   }
 }
 
+// Entry point for the insights generator
 async function main() {
   if (!process.env.OPENAI_API_KEY) {
     log.error('OPENAI_API_KEY not set; skipping insight generation');

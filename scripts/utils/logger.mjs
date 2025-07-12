@@ -1,3 +1,4 @@
+// Lightweight logging wrapper to allow DEBUG control
 export const log = {
   info: (...args) => console.log('[INFO]', ...args),
   warn: (...args) => console.warn('[WARN]', ...args),

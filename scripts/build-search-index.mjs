@@ -5,6 +5,7 @@ import lunr from 'lunr';
 import matter from 'gray-matter';
 import { log } from './utils/logger.mjs';
 
+// Recursively collect all markdown files for indexing
 async function collectMarkdown(dir) {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const files = [];
@@ -19,11 +20,13 @@ async function collectMarkdown(dir) {
   return files;
 }
 
+// Convert a markdown path into a site-relative URL
 function slugify(filePath) {
   const relative = filePath.replace(/^content\//, '');
   return '/' + relative.replace(/\.md$/, '') + '/';
 }
 
+// Build lunr.js index and write to public/search-index.json
 async function main() {
   const files = await collectMarkdown('content');
   const docs = [];
