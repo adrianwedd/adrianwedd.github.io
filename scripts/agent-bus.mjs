@@ -5,7 +5,6 @@ import { parse } from 'yaml';
 import { githubFetch } from './utils/github.mjs'; // Import the new utility
 import { log } from './utils/logger.mjs';
 
-
 // Read YAML manifest files from the given directory
 // Returns an array of parsed manifest objects
 async function loadManifests(dir = path.join('content', 'agents')) {
