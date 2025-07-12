@@ -46,4 +46,11 @@ describe('check-dns', () => {
     await main();
     expect(errSpy).toHaveBeenCalledWith('[ERROR]', 'DNS FAIL for example.com');
   });
+
+  it('main logs error when CNAME file missing', async () => {
+    fs.readFile.mockRejectedValue(Object.assign(new Error('no file'), { code: 'ENOENT' }));
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await main();
+    expect(errSpy).toHaveBeenCalledWith('[ERROR]', 'CNAME file missing; DNS check skipped');
+  });
 });
