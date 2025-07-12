@@ -6,6 +6,7 @@ import { log } from './utils/logger.mjs';
 
 const BASE_URL = process.env.BASE_URL || 'https://adrianwedd.github.io';
 
+// Recursively gather markdown files under a directory
 async function collectMarkdown(dir) {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const files = [];
@@ -20,15 +21,18 @@ async function collectMarkdown(dir) {
   return files;
 }
 
+// Convert a markdown file path in content/ to a URL slug
 function slugify(filePath) {
   const relative = filePath.replace(/^content\//, '');
   return '/' + relative.replace(/\.md$/, '') + '/';
 }
 
+// Escape XML special characters for RSS output
 function escape(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+// Build a minimal RSS 2.0 feed from a list of items
 function buildXml(items) {
   const lines = [];
   lines.push('<?xml version="1.0" encoding="UTF-8"?>');
@@ -52,6 +56,7 @@ function buildXml(items) {
   return lines.join('');
 }
 
+// Generate rss.xml in the public directory
 async function main() {
   const files = await collectMarkdown('content');
   const items = [];

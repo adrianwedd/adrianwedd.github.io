@@ -1,5 +1,6 @@
 import { log } from './logger.mjs';
 
+// Fetch with exponential backoff retry behaviour
 export async function retryFetch(
   url,
   options = {},

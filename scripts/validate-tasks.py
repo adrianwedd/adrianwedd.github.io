@@ -3,9 +3,8 @@ import jsonschema
 import sys
 
 def validate_tasks(file_path="tasks.yml"):
-    """
-    Validates the 'phases' in a YAML file against a 'jsonschema' block within the same file.
-    """
+    """Validate task phases against the schema embedded in the YAML file."""
+    # ``file_path`` allows running validation on a custom tasks file
     try:
         with open(file_path, 'r') as f:
             data = yaml.safe_load(f)

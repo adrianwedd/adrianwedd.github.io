@@ -6,7 +6,7 @@ import { callOpenAI } from './utils/llm-api.mjs';
 import { log } from './utils/logger.mjs';
 import { sanitizeMarkdown } from './utils/sanitize-markdown.mjs';
 
-// Function to dynamically discover content sections
+// Discover valid content sections for classification
 async function getDynamicSections() {
   const contentDir = path.join('content');
   try {
@@ -22,6 +22,7 @@ async function getDynamicSections() {
   }
 }
 
+// Build the OpenAI prompt including the list of available sections
 async function buildPrompt(content) {
   const dynamicSections = await getDynamicSections(); // Get dynamic sections
   return (
@@ -32,6 +33,7 @@ async function buildPrompt(content) {
   );
 }
 
+// Classify a single inbox file using the LLM
 async function classifyFile(filePath) {
   let content;
   try {
@@ -70,6 +72,7 @@ async function classifyFile(filePath) {
   return result;
 }
 
+// Move the processed file to the destination directory and write tags front matter
 async function moveFile(src, destDir, tags = []) {
   try {
     await fs.mkdir(destDir, { recursive: true });
@@ -113,6 +116,7 @@ async function moveFile(src, destDir, tags = []) {
   return dest;
 }
 
+// Entry point for inbox classification logic
 async function main() {
   if (!process.env.OPENAI_API_KEY) {
     log.error('OPENAI_API_KEY not set; skipping classification');

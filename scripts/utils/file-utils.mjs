@@ -2,6 +2,7 @@ import fsPromises from 'fs/promises';
 import fs from 'fs';
 import { log } from './logger.mjs';
 
+// Wrapper around fs.readFile with logging
 export async function readFile(filePath, encoding = 'utf8') {
   try {
     return await fsPromises.readFile(filePath, encoding);
@@ -11,6 +12,7 @@ export async function readFile(filePath, encoding = 'utf8') {
   }
 }
 
+// Read a file as a stream and resolve with its contents
 export async function readFileStream(filePath, encoding = 'utf8') {
   return new Promise((resolve, reject) => {
     let data = '';
@@ -26,6 +28,7 @@ export async function readFileStream(filePath, encoding = 'utf8') {
   });
 }
 
+// Write a file and log any errors
 export async function writeFile(filePath, data, encoding = 'utf8') {
   try {
     await fsPromises.writeFile(filePath, data, encoding);
@@ -35,6 +38,7 @@ export async function writeFile(filePath, data, encoding = 'utf8') {
   }
 }
 
+// Create a directory recursively by default
 export async function mkdir(dirPath, options = { recursive: true }) {
   try {
     await fsPromises.mkdir(dirPath, options);
@@ -44,6 +48,7 @@ export async function mkdir(dirPath, options = { recursive: true }) {
   }
 }
 
+// Read directory contents with optional fs options
 export async function readdir(dirPath, options) {
   try {
     return await fsPromises.readdir(dirPath, options);
@@ -53,6 +58,7 @@ export async function readdir(dirPath, options) {
   }
 }
 
+// Rename a file and log failures
 export async function rename(oldPath, newPath) {
   try {
     await fsPromises.rename(oldPath, newPath);

@@ -7,6 +7,8 @@ import { log } from './utils/logger.mjs';
 
 const REPO = process.env.GH_REPO || process.env.GITHUB_REPOSITORY;
 
+// Read YAML manifest files from the given directory
+// Returns an array of parsed manifest objects
 async function loadManifests(dir = path.join('content', 'agents')) {
   let files = [];
   try {
@@ -32,6 +34,7 @@ async function loadManifests(dir = path.join('content', 'agents')) {
   return manifests;
 }
 
+// Convert manifest objects to a simple markdown table for the GitHub issue body
 function manifestsToMarkdown(manifests) {
   if (manifests.length === 0) return 'No agents found.';
   const headerRows = [
@@ -46,6 +49,7 @@ function manifestsToMarkdown(manifests) {
   return md;
 }
 
+// Look up an open issue by title and return its number if found
 async function getIssueNumber(title, owner, repo) {
   const issues = await githubFetch(
     `https://api.github.com/repos/${owner}/${repo}/issues?per_page=100&state=open`
@@ -56,6 +60,7 @@ async function getIssueNumber(title, owner, repo) {
   return found ? found.number : null;
 }
 
+// Create a new issue with the specified title and body
 async function createIssue(title, body, owner, repo) {
   const issue = await githubFetch(
     `https://api.github.com/repos/${owner}/${repo}/issues`,
@@ -67,6 +72,7 @@ async function createIssue(title, body, owner, repo) {
   return issue.number;
 }
 
+// Update an existing issue body in place
 async function updateIssue(number, body, owner, repo) {
   await githubFetch(
     `https://api.github.com/repos/${owner}/${repo}/issues/${number}`,
@@ -77,6 +83,7 @@ async function updateIssue(number, body, owner, repo) {
   );
 }
 
+// Entry point when run as a script: update or create the agent bus issue
 async function main() {
   if (!process.env.GH_TOKEN) {
     log.error('GH_TOKEN not set; skipping agent-bus update');
