@@ -40,6 +40,7 @@ describe('classify-inbox.mjs', () => {
   beforeEach(() => {
     // Set env var for most tests
     process.env.OPENAI_API_KEY = 'test-key';
+    process.argv = ['node', 'script'];
     vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -233,6 +234,32 @@ describe('classify-inbox.mjs', () => {
       '[ERROR]',
       expect.stringContaining('Error reading inbox directory'),
       'oops'
+    );
+  });
+
+  it('processes files with unusual names', async () => {
+    const weird = 'weird name @#$%.md';
+    fs.readdir.mockImplementation((dirPath, options) => {
+      if (options && options.withFileTypes && dirPath === 'content') {
+        return Promise.resolve(mockFiles);
+      }
+      if (dirPath.includes('content/inbox')) return Promise.resolve([weird]);
+      return Promise.resolve([]);
+    });
+
+    mockOpenAIResponse({
+      section: 'garden',
+      tags: ['odd'],
+      confidence: 0.95,
+    });
+
+    await classifyInbox.main();
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      expect.stringContaining(`content/garden/${weird}`),
+      expect.stringContaining('---')
+    );
+    expect(fs.unlink).toHaveBeenCalledWith(
+      expect.stringContaining(`content/inbox/${weird}`)
     );
   });
 });
