@@ -5,7 +5,6 @@ import { parse } from 'yaml';
 import { githubFetch } from './utils/github.mjs'; // Import the new utility
 import { log } from './utils/logger.mjs';
 
-const REPO = process.env.GH_REPO || process.env.GITHUB_REPOSITORY;
 
 // Read YAML manifest files from the given directory
 // Returns an array of parsed manifest objects
@@ -89,8 +88,11 @@ async function main() {
     log.error('GH_TOKEN not set; skipping agent-bus update');
     return;
   }
-  if (!REPO) throw new Error('GH_REPO or GITHUB_REPOSITORY not set'); // Moved check here
-  const [owner, repo] = REPO.split('/');
+  const repoEnv = process.env.GH_REPO || process.env.GITHUB_REPOSITORY;
+  if (!repoEnv) {
+    throw new Error('GH_REPO or GITHUB_REPOSITORY not set');
+  }
+  const [owner, repo] = repoEnv.split('/');
   const manifests = await loadManifests();
   const body = manifestsToMarkdown(manifests);
   const title = 'agent-bus';
