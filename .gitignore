@@ -6,3 +6,7 @@ coverage/
 
 # don't remove
 .env 
+
+# Astro build artifacts
+.astro/content*.mjs
+.astro/content.d.ts
