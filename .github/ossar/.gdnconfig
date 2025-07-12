@@ -1,0 +1,7 @@
+{
+  "tools": {
+    "eslint": {
+      "arguments": "--ext .js,.mjs,.cjs"
+    }
+  }
+}

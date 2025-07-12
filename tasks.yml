@@ -1452,7 +1452,7 @@ phases:
     component: 'CI/CD'
     dependencies: []
     priority: 2
-    status: pending
+    status: done
     type: task
     command: null
     task_id: 'PIN-NEW-73'
