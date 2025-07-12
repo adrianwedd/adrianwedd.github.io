@@ -3,8 +3,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     environment: 'node',
-    include: ['test/**/*.test.{ts,js,mjs,cjs}'], // Only include tests in the 'test' directory
-    exclude: ['test/integration.test.mjs'], // Integration test still excluded due to heavy mocks
+    include: ['test/**/*.test.{ts,js,mjs,cjs}'], // Include all test files
     coverage: {
       include: [
         'scripts/fetch-gh-repos.mjs',
