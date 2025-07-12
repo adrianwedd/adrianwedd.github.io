@@ -42,6 +42,24 @@ describe('agent-bus.mjs', () => {
     expect(logSpy).toHaveBeenCalled();
   });
 
+  it('loadManifests skips malformed YAML files', async () => {
+    fs.readdir.mockResolvedValueOnce(['good.yml', 'bad.yml']);
+    fs.readFile.mockImplementation((file) => {
+      if (file.endsWith('good.yml'))
+        return Promise.resolve(
+          'id: good\nstatus: active\nlast_updated: 2025-01-01\nowner: me\nrole: r'
+        );
+      if (file.endsWith('bad.yml')) return Promise.resolve(': : : :');
+      return Promise.resolve('');
+    });
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const agentBus = await loadAgentBus();
+    const res = await agentBus.loadManifests('agents');
+    expect(res.length).toBe(1);
+    expect(res[0].id).toBe('good');
+    expect(errSpy).toHaveBeenCalled();
+  });
+
   it('manifestsToMarkdown formats table', async () => {
     const agentBus = await loadAgentBus();
     const md = agentBus.manifestsToMarkdown([
