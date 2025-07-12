@@ -1237,3 +1237,855 @@ phases:
       - 'Commit messages not following the convention are rejected.'
     assigned_to: 'codex-agent'
     epic: 'Phase 6: Iterative Growth'
+# tasks 65-114 from detailed code reviews
+  - id: 65
+    title: 'Formalize Agent Interaction Model'
+    description: 'Expand AGENTS.md with a detailed specification for agent contributions, including expected metadata and file naming.'
+    component: 'Documentation'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-65'
+    area: 'Architecture'
+    actionable_steps:
+      - 'Document required frontmatter fields and naming conventions.'
+    acceptance_criteria:
+      - 'AGENTS.md includes a formal interaction model.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 66
+    title: 'Evaluate readFileStream vs readFile'
+    description: 'Standardize file reading utilities by assessing whether readFileStream is needed for large files.'
+    component: 'Automation Scripts'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-66'
+    area: 'Optimization'
+    actionable_steps:
+      - 'Review current usage of readFileStream and replace with readFile if appropriate.'
+    acceptance_criteria:
+      - 'Utilities use the simplest viable file reading method.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 67
+    title: 'Refine tasks.yml structure'
+    description: 'Add a type field to tasks.yml entries for better categorization.'
+    component: 'Project Management'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-67'
+    area: 'Process'
+    actionable_steps:
+      - 'Update JSON schema and existing tasks with a type property.'
+    acceptance_criteria:
+      - 'tasks.yml validates with the new schema including type.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 68
+    title: 'Enable and Fix Integration Tests'
+    description: 'Activate the integration test suite and resolve failing cases.'
+    component: 'Testing'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-68'
+    area: 'Testing'
+    actionable_steps:
+      - 'Uncomment integration tests in vitest config.'
+      - 'Ensure all scripts work together in tests.'
+    acceptance_criteria:
+      - 'Integration tests run and pass.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 69
+    title: 'Enhance Test Coverage for Edge Cases'
+    description: 'Add tests for unusual filenames and malformed YAML to improve robustness.'
+    component: 'Testing'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-69'
+    area: 'Testing'
+    actionable_steps:
+      - 'Create additional unit tests for classify-inbox and agent-bus.'
+    acceptance_criteria:
+      - 'Edge cases are covered by unit tests.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 70
+    title: 'Test the retryFetch Utility'
+    description: 'Create tests verifying retry logic and success conditions.'
+    component: 'Testing'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-70'
+    area: 'Testing'
+    actionable_steps:
+      - 'Add a new test file for retryFetch.mjs.'
+    acceptance_criteria:
+      - 'retryFetch utility is fully tested.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 71
+    title: 'Update Husky Configuration'
+    description: 'Remove deprecated lines from husky.sh to prepare for Husky v10.'
+    component: 'Tooling'
+    dependencies: []
+    priority: 2
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-71'
+    area: 'CI/CD'
+    actionable_steps:
+      - 'Edit husky.sh as recommended.'
+    acceptance_criteria:
+      - 'No deprecation warning when running husky.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 72
+    title: 'Refine deploy workflow efficiency'
+    description: 'Only rebuild RSS and search index when content changes.'
+    component: 'CI/CD'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-72'
+    area: 'Optimization'
+    actionable_steps:
+      - 'Detect content changes in deploy.yml before running build scripts.'
+    acceptance_criteria:
+      - 'CI only rebuilds when necessary.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 73
+    title: 'Remove OSSAR file duplication'
+    description: 'Configure ESLint to lint .mjs files directly and drop JS copies.'
+    component: 'CI/CD'
+    dependencies: []
+    priority: 2
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-73'
+    area: 'Tooling'
+    actionable_steps:
+      - 'Update ossar-analysis.yml to lint mjs without duplication.'
+    acceptance_criteria:
+      - 'Workflow no longer duplicates files.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 74
+    title: 'Centralize Constants'
+    description: 'Create scripts/utils/constants.mjs for shared string literals.'
+    component: 'Code Quality'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-74'
+    area: 'Maintainability'
+    actionable_steps:
+      - 'Refactor scripts to import common constants.'
+    acceptance_criteria:
+      - 'No repeated directory strings across scripts.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 75
+    title: 'Improve Markdown Generation Readability'
+    description: 'Refactor agent-bus.mjs to build markdown tables using array join for clarity.'
+    component: 'Code Quality'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-75'
+    area: 'Maintainability'
+    actionable_steps:
+      - 'Rewrite string concatenation using array of lines and join.'
+    acceptance_criteria:
+      - 'Markdown generation code is easier to read.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 76
+    title: 'Add JSDoc Comments to Utilities'
+    description: 'Document functions in scripts/utils with JSDoc for better maintenance.'
+    component: 'Documentation'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-76'
+    area: 'Maintainability'
+    actionable_steps:
+      - 'Add JSDoc comments to exported functions.'
+    acceptance_criteria:
+      - 'Utilities have clear JSDoc documentation.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 77
+    title: 'Update docs/scripts README'
+    description: 'Add entries for build-search-index.mjs and build-rss.mjs to documentation.'
+    component: 'Documentation'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-77'
+    area: 'Documentation'
+    actionable_steps:
+      - 'Edit docs/scripts/README.md to include missing scripts.'
+    acceptance_criteria:
+      - 'README lists all automation scripts.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 78
+    title: 'Create CONTRIBUTING guide'
+    description: 'Provide setup and PR instructions in a CONTRIBUTING.md file.'
+    component: 'Documentation'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-78'
+    area: 'Community'
+    actionable_steps:
+      - 'Write CONTRIBUTING.md with setup, testing and PR steps.'
+    acceptance_criteria:
+      - 'Repository includes CONTRIBUTING.md at root.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 79
+    title: 'Add Known Issues Document'
+    description: 'Track ongoing challenges in docs/KNOWN_ISSUES.md.'
+    component: 'Documentation'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-79'
+    area: 'Documentation'
+    actionable_steps:
+      - 'Create docs/KNOWN_ISSUES.md summarizing technical hurdles.'
+    acceptance_criteria:
+      - 'Known issues file exists and is referenced in README.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 80
+    title: 'Use Safe YAML Parsing'
+    description: 'Replace yaml.load with yaml.safeLoad in agent-bus.mjs.'
+    component: 'Security'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-80'
+    area: 'Security'
+    actionable_steps:
+      - 'Update agent-bus.mjs to use safe YAML parsing.'
+    acceptance_criteria:
+      - 'YAML parsing cannot execute arbitrary code.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 81
+    title: 'Harden External Links'
+    description: 'Add rel attributes to external link configuration in astro.config.mjs.'
+    component: 'Security'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-81'
+    area: 'Security'
+    actionable_steps:
+      - 'Configure rehype-external-links with rel noopener noreferrer nofollow.'
+    acceptance_criteria:
+      - 'Generated HTML uses secure external link attributes.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 82
+    title: 'Audit Workflow Permissions'
+    description: 'Review GitHub Actions for least privilege and adjust where possible.'
+    component: 'CI/CD'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-82'
+    area: 'Security'
+    actionable_steps:
+      - 'Check each workflow file for required permissions only.'
+    acceptance_criteria:
+      - 'Workflows specify minimal necessary permissions.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 83
+    title: 'Parallelize File Processing'
+    description: 'Process files concurrently in build-insights and classify-inbox.'
+    component: 'Performance'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-83'
+    area: 'Optimization'
+    actionable_steps:
+      - 'Use Promise.all to handle per-file operations.'
+    acceptance_criteria:
+      - 'Scripts handle multiple files in parallel.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 84
+    title: 'Implement Image Optimization Pipeline'
+    description: 'Optimize images using Astro image tools or similar.'
+    component: 'Performance'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-84'
+    area: 'Optimization'
+    actionable_steps:
+      - 'Integrate image optimization library into build.'
+    acceptance_criteria:
+      - 'Images served are optimized formats.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 85
+    title: 'Create Frontmatter Type Definition'
+    description: 'Define a typed schema for frontmatter using Astro content collections or TypeScript.'
+    component: 'Architecture'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-85'
+    area: 'Type Safety'
+    actionable_steps:
+      - 'Implement a frontmatter schema in src/content/config.ts.'
+    acceptance_criteria:
+      - 'Build validates frontmatter against the schema.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 86
+    title: 'Refine Error Handling with Context'
+    description: 'Log file paths when errors occur in build scripts.'
+    component: 'Robustness'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-86'
+    area: 'Debugging'
+    actionable_steps:
+      - 'Update build-insights.mjs to log the file that fails.'
+    acceptance_criteria:
+      - 'Error logs include contextual information.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 87
+    title: 'Prune Unused Dependencies'
+    description: 'Remove @astrojs/rss from package.json as it is not used.'
+    component: 'Dependency Management'
+    dependencies: []
+    priority: 2
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-87'
+    area: 'Tooling'
+    actionable_steps:
+      - 'Run npm uninstall @astrojs/rss and update lockfile.'
+    acceptance_criteria:
+      - 'package.json no longer lists unused packages.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 88
+    title: 'Enforce pnpm via preinstall script'
+    description: 'Use only-allow to ensure contributors install dependencies with pnpm.'
+    component: 'Tooling'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-88'
+    area: 'Consistency'
+    actionable_steps:
+      - 'Add preinstall script to package.json.'
+    acceptance_criteria:
+      - 'Running npm install with another package manager fails.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 89
+    title: 'Pin Critical Dependency Versions'
+    description: 'Lock versions for astro, vitest and eslint to avoid unexpected upgrades.'
+    component: 'Dependency Management'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-89'
+    area: 'Stability'
+    actionable_steps:
+      - 'Remove caret ranges from critical dependencies.'
+    acceptance_criteria:
+      - 'Version bumps are explicit and manual.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 90
+    title: 'Stricter TypeScript Configuration'
+    description: 'Enable noUnusedLocals, noUnusedParameters and exactOptionalPropertyTypes.'
+    component: 'Type Safety'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-90'
+    area: 'Code Quality'
+    actionable_steps:
+      - 'Update tsconfig.json with additional strict flags.'
+    acceptance_criteria:
+      - 'tsc reports unused variables and stricter checks.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 91
+    title: 'Centralize Path Aliases'
+    description: 'Create a shared paths.js for Astro, Vitest and TypeScript configs.'
+    component: 'Developer Experience'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-91'
+    area: 'Maintainability'
+    actionable_steps:
+      - 'Export alias object and import it into all config files.'
+    acceptance_criteria:
+      - 'Path aliases are consistent across tools.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 92
+    title: 'Add Skip to Content Link'
+    description: 'Improve accessibility in Layout.astro with a skip link.'
+    component: 'Accessibility'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-92'
+    area: 'A11y'
+    actionable_steps:
+      - 'Add focusable skip to content link styled as sr-only.'
+    acceptance_criteria:
+      - 'Keyboard users can skip navigation.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 93
+    title: 'Use Semantic Article Tags'
+    description: 'Wrap post content in <article> elements in posts pages.'
+    component: 'Accessibility'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-93'
+    area: 'A11y'
+    actionable_steps:
+      - 'Update src/pages/posts/[...slug].astro to use article tag.'
+    acceptance_criteria:
+      - 'Posts are semantically marked as articles.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 94
+    title: 'Create Issue and PR Templates'
+    description: 'Add GitHub templates to standardize contributions.'
+    component: 'Community'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-94'
+    area: 'Community'
+    actionable_steps:
+      - 'Add .github/PULL_REQUEST_TEMPLATE.md and ISSUE_TEMPLATE.'
+    acceptance_criteria:
+      - 'Repository provides templates for contributors.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 95
+    title: 'Formalize Agent Manifest Schema'
+    description: 'Convert agent-manifest-schema.yml into a JSON Schema and validate manifests.'
+    component: 'Architecture'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-95'
+    area: 'Scalability'
+    actionable_steps:
+      - 'Create JSON Schema file and integrate validation in agent-bus.'
+    acceptance_criteria:
+      - 'Agent manifests are validated automatically.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 96
+    title: 'Define Agent Interaction Protocol'
+    description: 'Specify status reporting, content requirements and idempotency in AGENTS.md.'
+    component: 'Documentation'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-96'
+    area: 'Architecture'
+    actionable_steps:
+      - 'Document protocol including status.json and required fields.'
+    acceptance_criteria:
+      - 'Agents can follow the protocol unambiguously.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 97
+    title: 'Cache LLM API Calls'
+    description: 'Store results keyed by file hash to avoid redundant API calls.'
+    component: 'Performance'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-97'
+    area: 'Optimization'
+    actionable_steps:
+      - 'Implement simple file hash cache for LLM results.'
+    acceptance_criteria:
+      - 'Repeated runs skip unchanged files without new API calls.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 98
+    title: 'Streamlined Search Indexing'
+    description: 'Refactor build-search-index.mjs to use streams for large collections.'
+    component: 'Performance'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-98'
+    area: 'Scalability'
+    actionable_steps:
+      - 'Process content files one by one and stream output.'
+    acceptance_criteria:
+      - 'Search index build memory usage stays low.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 99
+    title: 'Implement Granular Log Levels'
+    description: 'Expand logger.mjs to support DEBUG, INFO, WARN and ERROR levels.'
+    component: 'Robustness'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-99'
+    area: 'Debugging'
+    actionable_steps:
+      - 'Add LOG_LEVEL env variable control.'
+    acceptance_criteria:
+      - 'Scripts output adjustable verbosity.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 100
+    title: 'Add Dry Run Mode'
+    description: 'Allow destructive scripts to log actions without executing when --dry-run flag is used.'
+    component: 'Robustness'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-100'
+    area: 'Debugging'
+    actionable_steps:
+      - 'Implement command line option parsing for dry runs.'
+    acceptance_criteria:
+      - 'Scripts can simulate changes safely.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 101
+    title: 'Parallelize Workflow Jobs'
+    description: 'Run independent build steps concurrently in deploy.yml.'
+    component: 'CI/CD'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-101'
+    area: 'Optimization'
+    actionable_steps:
+      - 'Refactor deploy workflow using job matrix or parallel steps.'
+    acceptance_criteria:
+      - 'Workflow duration decreases due to parallel execution.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 102
+    title: 'Content Correction Workflow'
+    description: 'Create a manual GitHub workflow to fix miscategorized content.'
+    component: 'CI/CD'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-102'
+    area: 'Maintenance'
+    actionable_steps:
+      - 'Provide workflow_dispatch to move a file and re-run selective scripts.'
+    acceptance_criteria:
+      - 'Content corrections can be triggered without full deploy.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 103
+    title: 'Triaging Classification Results'
+    description: 'Update classify-inbox to return confidence scores and reasoning.'
+    component: 'AI Logic'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-103'
+    area: 'AI'
+    actionable_steps:
+      - 'Modify prompt and handle review-needed cases based on confidence.'
+    acceptance_criteria:
+      - 'Ambiguous files are moved to review-needed with reasoning.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 104
+    title: 'Context-Aware Insight Generation'
+    description: 'Tailor LLM prompts based on document category.'
+    component: 'AI Logic'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-104'
+    area: 'AI'
+    actionable_steps:
+      - 'Select specialized prompt templates per content type.'
+    acceptance_criteria:
+      - 'Insights reflect context of the source document.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 105
+    title: 'Define and Enforce Content Schema'
+    description: 'Use Astro Content Collections to ensure all content types have explicit frontmatter.'
+    component: 'Architecture'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-105'
+    area: 'Data'
+    actionable_steps:
+      - 'Create collection schemas for each content directory.'
+    acceptance_criteria:
+      - 'Build fails when content does not match schema.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 106
+    title: 'Introduce Content Lifecycle'
+    description: 'Add status fields to frontmatter and update scripts to respect draft, published and archived states.'
+    component: 'Architecture'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-106'
+    area: 'Data'
+    actionable_steps:
+      - 'Implement status field and update RSS and search index logic.'
+    acceptance_criteria:
+      - 'Only published content appears on the site.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 107
+    title: 'Test Prompt Construction'
+    description: 'Assert that mocked LLM calls receive the correct prompt strings.'
+    component: 'Testing'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-107'
+    area: 'Testing'
+    actionable_steps:
+      - 'Capture arguments to callLlm mock and verify contents.'
+    acceptance_criteria:
+      - 'Tests fail if prompt templates change unexpectedly.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 108
+    title: 'Implement End-to-End Testing'
+    description: 'Run the full build in a temp directory and verify generated output.'
+    component: 'Testing'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-108'
+    area: 'Testing'
+    actionable_steps:
+      - 'Use execa to run pnpm build during tests.'
+    acceptance_criteria:
+      - 'E2E test validates site generation.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 109
+    title: 'Property-Based Tests for Sanitization'
+    description: 'Use fast-check to test sanitize-markdown against many inputs.'
+    component: 'Testing'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-109'
+    area: 'Security'
+    actionable_steps:
+      - 'Create fast-check properties ensuring scripts remove scripts tags.'
+    acceptance_criteria:
+      - 'Property-based tests pass for sanitize-markdown.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 110
+    title: 'Establish Tailwind Design System'
+    description: 'Define custom theme tokens in tailwind.config.cjs.'
+    component: 'Frontend'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-110'
+    area: 'UI'
+    actionable_steps:
+      - 'Add color palette and typography scale to Tailwind config.'
+    acceptance_criteria:
+      - 'Styles use the defined design tokens.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 111
+    title: 'Separate DNS Check Workflow'
+    description: 'Move check-dns.mjs to a scheduled GitHub Action instead of build step.'
+    component: 'CI/CD'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-111'
+    area: 'Operations'
+    actionable_steps:
+      - 'Create a cron workflow that runs check-dns.mjs hourly.'
+    acceptance_criteria:
+      - 'Main deploy workflow no longer fails due to DNS issues.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 112
+    title: 'Document Current Architecture'
+    description: 'Create docs/ARCHITECTURE.md describing the implemented system.'
+    component: 'Documentation'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-112'
+    area: 'Documentation'
+    actionable_steps:
+      - 'Write architecture document separate from PLAN.md.'
+    acceptance_criteria:
+      - 'ARCHITECTURE.md reflects current implementation.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 113
+    title: 'Improve README Quick Start'
+    description: 'Add concise setup steps for running the project locally.'
+    component: 'Documentation'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-113'
+    area: 'Documentation'
+    actionable_steps:
+      - 'Add getting-started section with install and dev commands.'
+    acceptance_criteria:
+      - 'New contributors can start within five minutes.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
+  - id: 114
+    title: 'Address Miscellaneous Nitpicks'
+    description: 'Standardize variable names and consider rewriting Python script in Node.'
+    component: 'Refactoring'
+    dependencies: []
+    priority: 3
+    status: pending
+    command: null
+    task_id: 'PIN-NEW-114'
+    area: 'Cleanup'
+    actionable_steps:
+      - 'Normalize naming conventions and port validate-tasks.py to JS.'
+    acceptance_criteria:
+      - 'Codebase is consistent and Python dependency removed.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'
+
