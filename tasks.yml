@@ -1085,7 +1085,7 @@ phases:
 
   - id: 57
     title: 'Enhance the `CONTRIBUTING.md` Guide'
-    description: 'Enhance the `CONTRIBUTING.md` guide with more detailed information on the project\'s branching strategy, commit message format, and code style guidelines.'
+    description: "Enhance the `CONTRIBUTING.md` guide with more detailed information on the project's branching strategy, commit message format, and code style guidelines."
     component: 'Documentation'
     dependencies: [45]
     priority: 2
@@ -1212,7 +1212,7 @@ phases:
     actionable_steps:
       - 'Add entries for `build-search-index.mjs` and `build-rss.mjs` to the table in `docs/scripts/README.md`.'
       - 'Create `docs/scripts/build-search-index.md` and `docs/scripts/build-rss.md`.'
-      - 'In each script\'s documentation, add a section for environment variables that lists the default values for optional variables.'
+      - "In each script's documentation, add a section for environment variables that lists the default values for optional variables."
     acceptance_criteria:
       - 'All automation scripts are fully documented.'
       - 'The documentation is consistent and up-to-date.'

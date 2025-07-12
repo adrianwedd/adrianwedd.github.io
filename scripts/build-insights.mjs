@@ -1,11 +1,16 @@
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { log } from './utils/logger.mjs';
-import { readFileStream, writeFile, readdir, mkdir, rename } from './utils/file-utils.mjs';
+import {
+  readFileStream,
+  writeFile,
+  readdir,
+  mkdir,
+  rename,
+} from './utils/file-utils.mjs';
 import { callOpenAI } from './utils/llm-api.mjs';
 import { lint } from 'markdownlint/promise';
 import { sanitizeMarkdown } from './utils/sanitize-markdown.mjs';
-
 
 // Discover which content subdirectories contain notes to summarise
 async function getTargetDirs() {
@@ -86,7 +91,6 @@ async function main() {
   }
 
   const TARGET_DIRS = await getTargetDirs();
-  const RESOLVED_TARGET_DIRS = TARGET_DIRS.map((dir) => path.resolve(dir));
 
   // Get files to process from arguments or read from target directories
   let filesToProcess = [];

@@ -53,11 +53,19 @@ describe('Integration Test: Full Automation Pipeline', () => {
 
     const utils = await import('../scripts/utils/github.mjs');
     githubFetch = vi.fn();
-    vi.spyOn(utils, 'githubFetch').mockImplementation((...args) => githubFetch(...args));
+    vi.spyOn(utils, 'githubFetch').mockImplementation((...args) =>
+      githubFetch(...args)
+    );
 
-    ({ main: fetchGhReposMain } = await import('../scripts/fetch-gh-repos.mjs'));
-    ({ main: classifyInboxMain, callOpenAI } = await import('../scripts/classify-inbox.mjs'));
-    ({ main: buildInsightsMain } = await import('../scripts/build-insights.mjs'));
+    ({ main: fetchGhReposMain } = await import(
+      '../scripts/fetch-gh-repos.mjs'
+    ));
+    ({ main: classifyInboxMain, callOpenAI } = await import(
+      '../scripts/classify-inbox.mjs'
+    ));
+    ({ main: buildInsightsMain } = await import(
+      '../scripts/build-insights.mjs'
+    ));
     ({ main: agentBusMain } = await import('../scripts/agent-bus.mjs'));
 
     // Mock fs operations for the entire pipeline
