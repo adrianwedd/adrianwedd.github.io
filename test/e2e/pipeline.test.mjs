@@ -57,7 +57,11 @@ describe('E2E: classify inbox then build insights', () => {
     callOpenAI.mockImplementation((prompt) => {
       if (prompt.includes('garden note')) {
         return Promise.resolve(
-          JSON.stringify({ section: 'garden', tags: ['plants'], confidence: 0.9 })
+          JSON.stringify({
+            section: 'garden',
+            tags: ['plants'],
+            confidence: 0.9,
+          })
         );
       }
       if (prompt.includes('Log entry')) {

@@ -9,4 +9,3 @@ const DOMPurify = createDOMPurify(window);
 export function sanitizeMarkdown(text) {
   return DOMPurify.sanitize(text);
 }
-

@@ -51,18 +51,12 @@ async function main() {
   } else {
     log.error(`DNS FAIL for ${domain}`);
     if (aRecords.length) log.error('A records:', aRecords.join(', '));
-    if (cnameRecords.length) log.error('CNAME records:', cnameRecords.join(', '));
+    if (cnameRecords.length)
+      log.error('CNAME records:', cnameRecords.join(', '));
   }
 }
 
-export {
-  getDomain,
-  lookupA,
-  lookupCNAME,
-  isGitHubA,
-  isGitHubCNAME,
-  main,
-};
+export { getDomain, lookupA, lookupCNAME, isGitHubA, isGitHubCNAME, main };
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {

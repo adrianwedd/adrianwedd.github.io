@@ -99,7 +99,9 @@ async function moveFile(src, destDir, tags = []) {
     log.error(`Error writing file to ${dest}:`, err.message);
     try {
       await fs.unlink(dest);
-    } catch {}
+    } catch (cleanupErr) {
+      log.warn(`Cleanup failed for ${dest}:`, cleanupErr.message);
+    }
     throw err;
   }
 
@@ -109,7 +111,9 @@ async function moveFile(src, destDir, tags = []) {
     log.error(`Error removing original file ${src}:`, err.message);
     try {
       await fs.unlink(dest);
-    } catch {}
+    } catch (cleanupErr) {
+      log.warn(`Cleanup failed for ${dest}:`, cleanupErr.message);
+    }
     throw err;
   }
 
