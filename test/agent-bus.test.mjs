@@ -15,6 +15,9 @@ beforeEach(() => {
     'id: test\nstatus: active\nlast_updated: 2025-01-01\nowner: me\nrole: tester'
   );
   githubFetch.mockReset();
+  delete process.env.GH_REPO;
+  delete process.env.GITHUB_REPOSITORY;
+  delete process.env.GH_TOKEN;
 });
 
 afterEach(() => {
