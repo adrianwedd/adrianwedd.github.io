@@ -2,7 +2,7 @@ import path from 'path';
 import { pathToFileURL } from 'url';
 import { log } from './utils/logger.mjs';
 import {
-  readFileStream,
+  readFile,
   writeFile,
   readdir,
   mkdir,
@@ -60,7 +60,7 @@ async function moveToFailed(srcPath) {
 
 // Generate an insight markdown file next to the source markdown
 async function processMarkdownFile(filePath) {
-  const content = await readFileStream(filePath);
+  const content = await readFile(filePath);
   const fileName = path.basename(filePath);
   const dirName = path.dirname(filePath);
 
