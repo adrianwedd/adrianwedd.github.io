@@ -19,6 +19,10 @@ async function fetchRepos(login) {
   for (;;) {
     const url = `https://api.github.com/users/${login}/repos?per_page=${perPage}&page=${page}`;
     const data = await githubFetch(url); // Use githubFetch
+    if (!Array.isArray(data)) {
+      log.error(`Invalid response fetching repos: ${JSON.stringify(data)}`);
+      break;
+    }
     repos.push(...data);
     if (data.length < perPage) break;
     page += 1;
