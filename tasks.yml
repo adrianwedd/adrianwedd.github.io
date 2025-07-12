@@ -5,7 +5,7 @@ jsonschema: |
     "type": "array",
     "items": {
       "type": "object",
-      "required": ["id", "description", "dependencies", "priority", "status"],
+      "required": ["id", "description", "dependencies", "priority", "status", "type"],
       "properties": {
         "id": { "type": "integer" },
         "description": { "type": "string" },
@@ -13,6 +13,7 @@ jsonschema: |
         "dependencies": { "type": "array", "items": { "type": "integer" } },
         "priority": { "type": "integer", "minimum": 1, "maximum": 5 },
         "status": { "type": "string", "enum": ["pending", "in_progress", "done"] },
+        "type": { "type": "string" },
         "command": { "type": ["string", "null"] },
         "task_id": { "type": "string" },
         "title": { "type": "string" },
@@ -34,6 +35,7 @@ phases:
     dependencies: []
     priority: 5
     status: done
+    type: task
     command: null
     task_id: 'PIN-ID-1'
     area: Planning
@@ -55,6 +57,7 @@ phases:
     dependencies: [1]
     priority: 5
     status: done
+    type: task
     command: "git init && git add . && git commit -m 'Initial commit: project scaffold'"
     task_id: 'PIN-BS-1'
     area: Setup
@@ -74,6 +77,7 @@ phases:
     dependencies: [2]
     priority: 5
     status: done
+    type: task
     command: null
     task_id: 'PIN-CI-1'
     area: Deployment
@@ -93,6 +97,7 @@ phases:
     dependencies: [3]
     priority: 4
     status: done
+    type: task
     command: 'node scripts/fetch-gh-repos.mjs'
     task_id: 'PIN-DEV-1'
     area: Development
@@ -112,6 +117,7 @@ phases:
     dependencies: [4]
     priority: 4
     status: done
+    type: task
     command: 'npm test'
     task_id: 'PIN-QA-1'
     area: QA
@@ -132,6 +138,7 @@ phases:
     dependencies: [5]
     priority: 3
     status: done
+    type: task
     command: 'node scripts/classify-inbox.mjs'
     task_id: 'PIN-DEV-2'
     area: Development
@@ -151,6 +158,7 @@ phases:
     dependencies: [6]
     priority: 3
     status: done
+    type: task
     command: null
     task_id: 'PIN-QA-2'
     area: QA
@@ -172,6 +180,7 @@ phases:
     dependencies: [3]
     priority: 4
     status: done
+    type: task
     command: null
     task_id: 'PIN-CR-1'
     area: 'Code Review'
@@ -191,6 +200,7 @@ phases:
     dependencies: [8]
     priority: 2
     status: done
+    type: task
     command: 'node scripts/agent-bus.mjs'
     task_id: 'PIN-DEV-3'
     area: Development
@@ -210,6 +220,7 @@ phases:
     dependencies: [3]
     priority: 3
     status: done
+    type: task
     command: 'npm run dev'
     task_id: 'PIN-UI-1'
     area: Frontend
@@ -229,6 +240,7 @@ phases:
     dependencies: [10, 7, 9]
     priority: 2
     status: done
+    type: task
     command: null
     task_id: 'PIN-QA-3'
     area: QA
@@ -251,6 +263,7 @@ phases:
     dependencies: [11]
     priority: 1
     status: done
+    type: task
     command: null
     task_id: 'PIN-PROD-1'
     area: Production
@@ -273,6 +286,7 @@ phases:
     dependencies: [6]
     priority: 4
     status: done
+    type: task
     command: null
     task_id: 'PIN-ROBUST-1'
     area: Robustness
@@ -293,6 +307,7 @@ phases:
     dependencies: [13]
     priority: 4
     status: done
+    type: task
     command: 'npm test'
     task_id: 'PIN-QA-4'
     area: Testing
@@ -313,6 +328,7 @@ phases:
     dependencies: [4, 9]
     priority: 3
     status: done
+    type: task
     command: null
     task_id: 'PIN-REF-1'
     area: Maintainability
@@ -333,6 +349,7 @@ phases:
     dependencies: [15]
     priority: 3
     status: done
+    type: task
     command: 'npm test'
     task_id: 'PIN-QA-5'
     area: Testing
@@ -352,6 +369,7 @@ phases:
     dependencies: [16] # Depends on the tests being written (even if excluded)
     priority: 4
     status: done
+    type: task
     command: 'npm test'
     task_id: 'PIN-QA-9'
     area: 'QA'
@@ -375,6 +393,7 @@ phases:
     dependencies: [3]
     priority: 4
     status: done
+    type: task
     command: null
     task_id: 'PIN-SEC-1'
     area: Security
@@ -393,6 +412,7 @@ phases:
     dependencies: [6]
     priority: 3
     status: done
+    type: task
     command: 'node scripts/build-insights.mjs'
     task_id: 'PIN-DEV-4'
     area: Development
@@ -412,6 +432,7 @@ phases:
     dependencies: [14, 16, 18]
     priority: 3
     status: done
+    type: task
     command: null
     task_id: 'PIN-QA-6'
     area: Testing
@@ -431,6 +452,7 @@ phases:
     dependencies: [3]
     priority: 2
     status: done
+    type: task
     command: null
     task_id: 'PIN-OPT-1'
     area: Optimization
@@ -451,6 +473,7 @@ phases:
     dependencies: [6, 18]
     priority: 3
     status: done
+    type: task
     command: null
     task_id: 'PIN-SCALE-1'
     area: Scalability
@@ -471,6 +494,7 @@ phases:
     dependencies: [3]
     priority: 5
     status: done
+    type: task
     command: null
     task_id: 'PIN-QA-7'
     area: QA
@@ -491,6 +515,7 @@ phases:
     dependencies: [6]
     priority: 3
     status: done
+    type: task
     command: null
     task_id: PIN-REF-2
     area: Maintainability
@@ -510,6 +535,7 @@ phases:
     dependencies: [18]
     priority: 4
     status: done
+    type: task
     command: npm test
     task_id: PIN-QA-8
     area: Testing
@@ -530,6 +556,7 @@ phases:
     dependencies: [3]
     priority: 3
     status: done
+    type: task
     command: null
     task_id: PIN-SEC-2
     area: Security
@@ -549,6 +576,7 @@ phases:
     dependencies: [2]
     priority: 4
     status: done
+    type: task
     command: npm run build
     task_id: PIN-CFG-1
     area: Configuration
@@ -568,6 +596,7 @@ phases:
     dependencies: [5]
     priority: 3
     status: done
+    type: task
     command: null
     task_id: 'PIN-UI-3'
     area: UI
@@ -588,6 +617,7 @@ phases:
     dependencies: [5]
     priority: 3
     status: done
+    type: task
     command: null
     task_id: 'PIN-AUTO-4'
     area: Deployment
@@ -608,6 +638,7 @@ phases:
     dependencies: []
     priority: 4
     status: done
+    type: task
     command: null
     task_id: 'PIN-ROBUST-2'
     area: Robustness
@@ -628,6 +659,7 @@ phases:
     dependencies: []
     priority: 4
     status: done
+    type: task
     command: null
     task_id: 'PIN-ROBUST-3'
     area: Robustness
@@ -648,6 +680,7 @@ phases:
     dependencies: []
     priority: 4
     status: done
+    type: task
     command: null
     task_id: 'PIN-ROBUST-4'
     area: Robustness
@@ -668,6 +701,7 @@ phases:
     dependencies: []
     priority: 4
     status: done
+    type: task
     command: null
     task_id: 'PIN-ROBUST-5'
     area: Robustness
@@ -688,6 +722,7 @@ phases:
     dependencies: []
     priority: 3
     status: done
+    type: task
     command: null
     task_id: 'PIN-MAINT-1'
     area: Maintainability
@@ -708,6 +743,7 @@ phases:
     dependencies: [30, 31, 32, 33, 34]
     priority: 3
     status: done
+    type: task
     command: null
     task_id: 'PIN-REF-3'
     area: Refactoring
@@ -728,6 +764,7 @@ phases:
     dependencies: []
     priority: 3
     status: done
+    type: task
     command: null
     task_id: 'PIN-REF-4'
     area: Refactoring
@@ -748,6 +785,7 @@ phases:
     dependencies: []
     priority: 2
     status: done
+    type: task
     command: null
     task_id: 'PIN-MAINT-2'
     area: Maintainability
@@ -765,6 +803,7 @@ phases:
     dependencies: [27]
     priority: 4
     status: done
+    type: task
     command: null
     task_id: 'PIN-QA-10'
     area: Testing
@@ -785,6 +824,7 @@ phases:
     dependencies: [24]
     priority: 4
     status: done
+    type: task
     command: null
     task_id: 'PIN-QA-11'
     area: Testing
@@ -805,6 +845,7 @@ phases:
     dependencies: []
     priority: 3
     status: done
+    type: task
     command: null
     task_id: 'PIN-QA-12'
     area: Testing
@@ -825,6 +866,7 @@ phases:
     dependencies: []
     priority: 3
     status: done
+    type: task
     command: null
     task_id: 'PIN-QA-13'
     area: Testing
@@ -845,6 +887,7 @@ phases:
     dependencies: [19]
     priority: 4
     status: done
+    type: task
     command: null
     task_id: 'PIN-QA-14'
     area: Testing
@@ -865,6 +908,7 @@ phases:
     dependencies: []
     priority: 5
     status: done
+    type: task
     command: null
     task_id: 'PIN-SEC-3'
     area: Security
@@ -885,6 +929,7 @@ phases:
     dependencies: []
     priority: 2
     status: done
+    type: task
     command: null
     task_id: 'PIN-DOC-1'
     area: Documentation
@@ -904,6 +949,7 @@ phases:
     dependencies: []
     priority: 3
     status: done
+    type: task
     command: 'add CONTRIBUTING.md'
     task_id: 'PIN-DOC-2'
     area: Documentation
@@ -924,6 +970,7 @@ phases:
     dependencies: [32]
     priority: 5
     status: done
+    type: task
     command: 'npm test'
     task_id: 'PIN-QA-15'
     area: QA
@@ -944,6 +991,7 @@ phases:
     dependencies: [15]
     priority: 3
     status: done
+    type: task
     command: 'node scripts/verify-dns.mjs'
     task_id: 'PIN-VERIFY-1'
     area: 'Verification'
@@ -964,6 +1012,7 @@ phases:
     dependencies: [3]
     priority: 5
     status: in_progress
+    type: task
     command: null
     task_id: 'PIN-DEBUG-1'
     area: 'Debugging'
@@ -988,6 +1037,7 @@ phases:
     dependencies: [30, 31, 32, 33]
     priority: 4
     status: done
+    type: task
     command: null
     task_id: 'PIN-ROBUST-6'
     area: 'Robustness'
@@ -1010,6 +1060,7 @@ phases:
     dependencies: [48]
     priority: 3
     status: done
+    type: task
     command: null
     task_id: 'PIN-DOC-3'
     area: 'Documentation'
@@ -1032,6 +1083,7 @@ phases:
     dependencies: [25]
     priority: 5
     status: done
+    type: task
     command: null
     task_id: 'PIN-SEC-4'
     area: 'Security'
@@ -1052,6 +1104,7 @@ phases:
     dependencies: [6]
     priority: 4
     status: done
+    type: task
     command: null
     task_id: 'PIN-ROBUST-7'
     area: 'Robustness'
@@ -1072,6 +1125,7 @@ phases:
     dependencies: [18]
     priority: 3
     status: done
+    type: task
     command: null
     task_id: 'PIN-ROBUST-8'
     area: 'Robustness'
@@ -1091,6 +1145,7 @@ phases:
     dependencies: [45]
     priority: 2
     status: done
+    type: task
     command: null
     task_id: 'PIN-DOC-4'
     area: 'Documentation'
@@ -1110,6 +1165,7 @@ phases:
     dependencies: [19]
     priority: 2
     status: done
+    type: task
     command: null
     task_id: 'PIN-QA-16'
     area: 'Testing'
@@ -1129,6 +1185,7 @@ phases:
     dependencies: [6]
     priority: 5
     status: done
+    type: task
     command: null
     task_id: 'PIN-BUG-1'
     area: 'Bugs'
@@ -1150,6 +1207,7 @@ phases:
     dependencies: [15, 36]
     priority: 4
     status: done
+    type: task
     command: null
     task_id: 'PIN-ROBUST-9'
     area: 'Robustness'
@@ -1170,6 +1228,7 @@ phases:
     dependencies: [6, 18]
     priority: 3
     status: done
+    type: task
     command: null
     task_id: 'PIN-SCALE-2'
     area: 'Scalability'
@@ -1189,6 +1248,7 @@ phases:
     dependencies: [19]
     priority: 4
     status: done
+    type: task
     command: null
     task_id: 'PIN-QA-17'
     area: 'Testing'
@@ -1207,6 +1267,7 @@ phases:
     dependencies: [12]
     priority: 2
     status: done
+    type: task
     command: null
     task_id: 'PIN-DOC-5'
     area: 'Documentation'
@@ -1227,6 +1288,7 @@ phases:
     dependencies: [57]
     priority: 2
     status: done
+    type: task
     command: null
     task_id: 'PIN-TOOL-1'
     area: 'Tooling'
@@ -1246,6 +1308,7 @@ phases:
     dependencies: []
     priority: 3
     status: done
+    type: task
     command: null
     task_id: 'PIN-NEW-65'
     area: 'Architecture'
@@ -1263,6 +1326,7 @@ phases:
     dependencies: []
     priority: 3
     status: done
+    type: task
     command: null
     task_id: 'PIN-NEW-66'
     area: 'Optimization'
@@ -1279,7 +1343,8 @@ phases:
     component: 'Project Management'
     dependencies: []
     priority: 3
-    status: pending
+    status: done
+    type: task
     command: null
     task_id: 'PIN-NEW-67'
     area: 'Process'
@@ -1297,6 +1362,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-68'
     area: 'Testing'
@@ -1315,6 +1381,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-69'
     area: 'Testing'
@@ -1332,6 +1399,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-70'
     area: 'Testing'
@@ -1349,6 +1417,7 @@ phases:
     dependencies: []
     priority: 2
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-71'
     area: 'CI/CD'
@@ -1366,6 +1435,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-72'
     area: 'Optimization'
@@ -1383,6 +1453,7 @@ phases:
     dependencies: []
     priority: 2
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-73'
     area: 'Tooling'
@@ -1400,6 +1471,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-74'
     area: 'Maintainability'
@@ -1417,6 +1489,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-75'
     area: 'Maintainability'
@@ -1434,6 +1507,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-76'
     area: 'Maintainability'
@@ -1451,6 +1525,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-77'
     area: 'Documentation'
@@ -1468,6 +1543,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-78'
     area: 'Community'
@@ -1485,6 +1561,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-79'
     area: 'Documentation'
@@ -1502,6 +1579,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-80'
     area: 'Security'
@@ -1519,6 +1597,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-81'
     area: 'Security'
@@ -1536,6 +1615,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-82'
     area: 'Security'
@@ -1553,6 +1633,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-83'
     area: 'Optimization'
@@ -1570,6 +1651,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-84'
     area: 'Optimization'
@@ -1587,6 +1669,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-85'
     area: 'Type Safety'
@@ -1604,6 +1687,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-86'
     area: 'Debugging'
@@ -1621,6 +1705,7 @@ phases:
     dependencies: []
     priority: 2
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-87'
     area: 'Tooling'
@@ -1638,6 +1723,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-88'
     area: 'Consistency'
@@ -1655,6 +1741,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-89'
     area: 'Stability'
@@ -1672,6 +1759,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-90'
     area: 'Code Quality'
@@ -1689,6 +1777,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-91'
     area: 'Maintainability'
@@ -1706,6 +1795,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-92'
     area: 'A11y'
@@ -1723,6 +1813,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-93'
     area: 'A11y'
@@ -1740,6 +1831,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-94'
     area: 'Community'
@@ -1757,6 +1849,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-95'
     area: 'Scalability'
@@ -1774,6 +1867,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-96'
     area: 'Architecture'
@@ -1791,6 +1885,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-97'
     area: 'Optimization'
@@ -1808,6 +1903,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-98'
     area: 'Scalability'
@@ -1825,6 +1921,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-99'
     area: 'Debugging'
@@ -1842,6 +1939,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-100'
     area: 'Debugging'
@@ -1859,6 +1957,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-101'
     area: 'Optimization'
@@ -1876,6 +1975,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-102'
     area: 'Maintenance'
@@ -1893,6 +1993,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-103'
     area: 'AI'
@@ -1910,6 +2011,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-104'
     area: 'AI'
@@ -1927,6 +2029,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-105'
     area: 'Data'
@@ -1944,6 +2047,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-106'
     area: 'Data'
@@ -1961,6 +2065,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-107'
     area: 'Testing'
@@ -1978,6 +2083,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-108'
     area: 'Testing'
@@ -1995,6 +2101,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-109'
     area: 'Security'
@@ -2012,6 +2119,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-110'
     area: 'UI'
@@ -2029,6 +2137,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-111'
     area: 'Operations'
@@ -2046,6 +2155,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-112'
     area: 'Documentation'
@@ -2063,6 +2173,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-113'
     area: 'Documentation'
@@ -2080,6 +2191,7 @@ phases:
     dependencies: []
     priority: 3
     status: pending
+    type: task
     command: null
     task_id: 'PIN-NEW-114'
     area: 'Cleanup'
@@ -2089,4 +2201,3 @@ phases:
       - 'Codebase is consistent and Python dependency removed.'
     assigned_to: 'codex-agent'
     epic: 'Phase 8: Review Tasks'
-
