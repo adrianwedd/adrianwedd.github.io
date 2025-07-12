@@ -12,5 +12,6 @@ All pages include example commands and sample output so you can reproduce the re
 | `build-search-index.mjs` | Builds `public/search-index.json` for site search. | none |
 | `build-rss.mjs` | Generates `public/rss.xml` from markdown metadata. | optional `BASE_URL` (defaults to `https://adrianwedd.github.io`) |
 | `agent-bus.mjs`      | Aggregates agent manifests and posts a summary issue on GitHub.          | `GH_TOKEN`, optional `GH_REPO`            |
+| `check-dns.mjs`      | Verifies A and CNAME records for the custom domain from `CNAME`. | none |
 
 See the individual files below for further details.
