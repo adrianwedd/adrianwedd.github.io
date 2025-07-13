@@ -128,7 +128,7 @@ describe('classify-inbox.mjs', () => {
     await classifyInbox.main();
     expect(fs.writeFile).toHaveBeenCalledWith(
       expect.stringContaining('content/untagged/file1.txt'),
-      'Test content'
+      expect.stringContaining('status: draft')
     );
     expect(fs.unlink).toHaveBeenCalledWith(
       expect.stringContaining('content/inbox/file1.txt')

@@ -235,7 +235,7 @@ async function main() {
     log.info(`Processing ${name}`);
     let targetDir;
     let tags = [];
-    let extra = {};
+    let extra = { status: 'draft' };
 
     try {
       const result = await classifyFile(filePath);
@@ -244,7 +244,7 @@ async function main() {
       } else if (result.confidence < 0.8) {
         targetDir = REVIEW_NEEDED_DIR;
         tags = result.tags || [];
-        extra = { confidence: result.confidence, reasoning: result.reasoning };
+        extra = { status: 'draft', confidence: result.confidence, reasoning: result.reasoning };
       } else {
         targetDir = path.join(CONTENT_DIR, result.section);
         if (result.tags && result.tags.length) {
