@@ -36,16 +36,14 @@ async function loadManifests(dir = AGENTS_DIR) {
 // Convert manifest objects to a simple markdown table for the GitHub issue body
 function manifestsToMarkdown(manifests) {
   if (manifests.length === 0) return 'No agents found.';
-  const headerRows = [
+  const lines = [
     '| id | status | last updated | owner | role |',
     '|---|---|---|---|---|',
   ];
-  let md = headerRows.join('\n') + '\n';
   for (const m of manifests) {
-    md += `| ${m.id} | ${m.status} | ${m.last_updated} | ${m.owner || ''} | ${m.role || ''} |
-`;
+    lines.push(`| ${m.id} | ${m.status} | ${m.last_updated} | ${m.owner || ''} | ${m.role || ''} |`);
   }
-  return md;
+  return lines.join('\n');
 }
 
 // Look up an open issue by title and return its number if found
