@@ -38,6 +38,11 @@ The CI pipeline expects several secrets configured under **GitHub repository set
 
 Set these as secrets before running the workflows.
 
+## Deployment
+
+Pushing to `main` runs the workflow in `.github/workflows/deploy.yml` which builds the Astro site and publishes `dist` to the `gh-pages` branch. GitHub Pages then serves the site from that branch.
+
+
 ## Development
 
 Install dependencies and run the dev server:
