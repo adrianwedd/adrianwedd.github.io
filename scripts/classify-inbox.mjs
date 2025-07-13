@@ -188,7 +188,7 @@ async function main() {
     }
   }
 
-  for (const name of filesToProcess) {
+  const tasks = filesToProcess.map(async (name) => {
     const filePath = path.join(inboxDir, name);
     const lockPath = `${filePath}.lock`;
 
@@ -200,7 +200,7 @@ async function main() {
       } else {
         log.error(`Unable to create lock file ${lockPath}:`, err.message);
       }
-      continue;
+      return;
     }
 
     log.info(`Processing ${name}`);
@@ -209,7 +209,6 @@ async function main() {
 
     try {
       const result = await classifyFile(filePath);
-      // Use dynamicSections for validation
       if (
         dynamicSections.includes(result.section) &&
         result.confidence >= 0.8
@@ -235,7 +234,9 @@ async function main() {
         log.error(`Error removing lock file ${lockPath}:`, err.message);
       }
     }
-  }
+  });
+
+  await Promise.all(tasks);
 }
 
 export {
