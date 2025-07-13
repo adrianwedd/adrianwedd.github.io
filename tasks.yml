@@ -2064,7 +2064,7 @@ phases:
     component: 'Testing'
     dependencies: []
     priority: 3
-    status: pending
+    status: done
     type: task
     command: null
     task_id: 'PIN-NEW-107'
@@ -2118,7 +2118,7 @@ phases:
     component: 'Frontend'
     dependencies: []
     priority: 3
-    status: pending
+    status: done
     type: task
     command: null
     task_id: 'PIN-NEW-110'
