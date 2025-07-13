@@ -29,19 +29,19 @@ Build a self-updating, agent-fed, static knowledge hub—a "personal intelligenc
 
 ### 2. Tech Stack Overview
 
-| Layer            | Choice / Notes                                        |
-| ---------------- | ----------------------------------------------------- |
-| Static Framework | Astro v4 (output: "static")                           |
-| Styling          | Tailwind CSS v3                                       |
-| Diagrams         | Mermaid.js (client-side)                              |
-| Markdown-with-JS | MDX (built-in to Astro)                               |
-| CI / CD          | GitHub Actions + JamesIves/github-pages-deploy-action |
-| Testing          | Vitest with coverage enforced                         |
-| Agent Scripting  | Node 20 ESM (`*.mjs` scripts)                         |
-| LLM APIs         | OpenAI, Gemini, or other—invoked from CI scripts      |
-| Code Quality     | ESLint and Prettier                                   |
-| Markdown Plugins | rehype-external-links for external link security      |
-| Image Optimization | @astrojs/image with sharp for responsive images      |
+| Layer              | Choice / Notes                                        |
+| ------------------ | ----------------------------------------------------- |
+| Static Framework   | Astro v4 (output: "static")                           |
+| Styling            | Tailwind CSS v3                                       |
+| Diagrams           | Mermaid.js (client-side)                              |
+| Markdown-with-JS   | MDX (built-in to Astro)                               |
+| CI / CD            | GitHub Actions + JamesIves/github-pages-deploy-action |
+| Testing            | Vitest with coverage enforced                         |
+| Agent Scripting    | Node 20 ESM (`*.mjs` scripts)                         |
+| LLM APIs           | OpenAI, Gemini, or other—invoked from CI scripts      |
+| Code Quality       | ESLint and Prettier                                   |
+| Markdown Plugins   | rehype-external-links for external link security      |
+| Image Optimization | @astrojs/image with sharp for responsive images       |
 
 ---
 
@@ -98,18 +98,24 @@ description: Handles GitHub automation tasks.
 The `agent-bus.mjs` script reads these manifests and updates the `#agent-bus`
 GitHub Issue with a summary table.
 
+### 3c. Content Schemas
+
+Each section under `content/` has its own Astro collection schema defined in
+`src/content/config.ts`. The build fails if a Markdown file's frontmatter does
+not satisfy the schema for its directory.
+
 ### 4. Automation Scripts (CI)
 
 All automation scripts accept a `--dry-run` flag to log actions without modifying files or remote resources.
 
-| Script                   | Purpose                                                                                                                                                                              | Invoked By            |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------- |
-| `fetch-gh-repos.mjs`     | Scan GitHub user/org, create `content/tools/<repo>.md` for any repo tagged tool.                                                                                                     | Manual & nightly cron |
+| Script                   | Purpose                                                                                                                                                                                                                                                                             | Invoked By            |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| `fetch-gh-repos.mjs`     | Scan GitHub user/org, create `content/tools/<repo>.md` for any repo tagged tool.                                                                                                                                                                                                    | Manual & nightly cron |
 | `classify-inbox.mjs`     | For every file in `content/inbox/`, call LLM → `{section,tags,confidence,reasoning}`. Files with confidence ≥ 0.8 go to their section; lower confidence files move to `review-needed/` with reasoning attached. Unknown sections go to `untagged/`. Uses `.lock` files and caching. | Before build step     |
-| `build-insights.mjs`     | Parse new/changed markdown (logs, garden, mirror); generate `<slug>.insight.md` with summary + cross-links. Caches summaries by file hash to avoid redundant LLM calls.                                                                          | After classification  |
-| `build-search-index.mjs` | Generate `public/search-index.json` for client-side Lunr search.                                                                                                                     | Before build step     |
-| `build-rss.mjs`          | Generate `public/rss.xml` feed from markdown metadata.                                                                                                                               | Before deploy step    |
-| `agent-bus.mjs`          | Read `content/agents/*.yml`, update or create GitHub Issue `#agent-bus` with latest agent statuses.                                                                                  | Last step in workflow |
+| `build-insights.mjs`     | Parse new/changed markdown (logs, garden, mirror); generate `<slug>.insight.md` with summary + cross-links. Caches summaries by file hash to avoid redundant LLM calls.                                                                                                             | After classification  |
+| `build-search-index.mjs` | Generate `public/search-index.json` for client-side Lunr search.                                                                                                                                                                                                                    | Before build step     |
+| `build-rss.mjs`          | Generate `public/rss.xml` feed from markdown metadata.                                                                                                                                                                                                                              | Before deploy step    |
+| `agent-bus.mjs`          | Read `content/agents/*.yml`, update or create GitHub Issue `#agent-bus` with latest agent statuses.                                                                                                                                                                                 | Last step in workflow |
 
 ---
 
