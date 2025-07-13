@@ -2201,3 +2201,22 @@ phases:
       - 'Codebase is consistent and Python dependency removed.'
     assigned_to: 'codex-agent'
     epic: 'Phase 8: Review Tasks'
+
+  - id: 115
+    title: 'Add IPv6 DNS Validation'
+    description: 'Extend check-dns.mjs and tests to verify AAAA records for GitHub Pages.'
+    component: 'Testing'
+    dependencies: [47]
+    priority: 3
+    status: done
+    type: task
+    command: null
+    task_id: 'PIN-NEW-115'
+    area: 'Security'
+    actionable_steps:
+      - 'Add IPv6 addresses to DNS check script.'
+      - 'Create tests covering AAAA lookups.'
+    acceptance_criteria:
+      - 'DNS validation passes for IPv6 records.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 8: Review Tasks'

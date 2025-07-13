@@ -1,5 +1,5 @@
 import fs from 'fs/promises';
-import { resolve4, resolveCname } from 'dns/promises';
+import { resolve4, resolve6, resolveCname } from 'dns/promises';
 import { pathToFileURL } from 'url';
 import { log } from './utils/logger.mjs';
 
@@ -8,6 +8,13 @@ const GITHUB_IPS = [
   '185.199.109.153',
   '185.199.110.153',
   '185.199.111.153',
+];
+
+const GITHUB_IPV6 = [
+  '2606:50c0:8000::153',
+  '2606:50c0:8001::153',
+  '2606:50c0:8002::153',
+  '2606:50c0:8003::153',
 ];
 
 // Read the domain from the CNAME file. Returns null if the file does not exist.
@@ -34,6 +41,14 @@ async function lookupA(domain) {
   }
 }
 
+async function lookupAAAA(domain) {
+  try {
+    return await resolve6(domain);
+  } catch {
+    return [];
+  }
+}
+
 async function lookupCNAME(domain) {
   try {
     return await resolveCname(domain);
@@ -46,6 +61,10 @@ function isGitHubA(records) {
   return records.some((ip) => GITHUB_IPS.includes(ip));
 }
 
+function isGitHubAAAA(records) {
+  return records.some((ip) => GITHUB_IPV6.includes(ip.toLowerCase()));
+}
+
 function isGitHubCNAME(records) {
   return records.some((cname) => cname.endsWith('.github.io'));
 }
@@ -54,21 +73,35 @@ async function main() {
   const domain = await getDomain();
   if (!domain) return;
   const aRecords = await lookupA(domain);
+  const aaaaRecords = await lookupAAAA(domain);
   const cnameRecords = await lookupCNAME(domain);
 
-  const ok = isGitHubA(aRecords) || isGitHubCNAME(cnameRecords);
+  const ok =
+    isGitHubA(aRecords) ||
+    isGitHubAAAA(aaaaRecords) ||
+    isGitHubCNAME(cnameRecords);
 
   if (ok) {
     log.info(`DNS PASS for ${domain}`);
   } else {
     log.error(`DNS FAIL for ${domain}`);
     if (aRecords.length) log.error('A records:', aRecords.join(', '));
+    if (aaaaRecords.length) log.error('AAAA records:', aaaaRecords.join(', '));
     if (cnameRecords.length)
       log.error('CNAME records:', cnameRecords.join(', '));
   }
 }
 
-export { getDomain, lookupA, lookupCNAME, isGitHubA, isGitHubCNAME, main };
+export {
+  getDomain,
+  lookupA,
+  lookupAAAA,
+  lookupCNAME,
+  isGitHubA,
+  isGitHubAAAA,
+  isGitHubCNAME,
+  main,
+};
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {
