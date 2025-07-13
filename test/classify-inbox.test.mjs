@@ -88,6 +88,11 @@ describe('classify-inbox.mjs', () => {
       reasoning: 'clear topic',
     });
     await classifyInbox.main();
+
+    const sentPrompt = callOpenAI.mock.calls[0][0];
+    const expectedPrompt = await classifyInbox.buildPrompt('Test content');
+    expect(sentPrompt).toBe(expectedPrompt);
+
     expect(fs.writeFile).toHaveBeenCalledWith(
       expect.stringContaining('content/garden/file1.txt'),
       expect.stringContaining('---')
