@@ -12,14 +12,15 @@ const GITHUB_IPS = [
 
 // Read the domain from the CNAME file. Returns null if the file does not exist.
 async function getDomain() {
+  const cnamePath = 'CNAME';
   try {
-    const data = await fs.readFile('CNAME', 'utf8');
+    const data = await fs.readFile(cnamePath, 'utf8');
     return data.trim();
   } catch (err) {
     if (err.code === 'ENOENT') {
-      log.error('CNAME file missing; DNS check skipped');
+      log.error(`CNAME file missing at ${cnamePath}; DNS check skipped`);
     } else {
-      log.error('Error reading CNAME file:', err.message);
+      log.error(`Error reading CNAME file at ${cnamePath}:`, err.message);
     }
     return null;
   }

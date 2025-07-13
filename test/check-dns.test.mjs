@@ -55,7 +55,7 @@ describe('check-dns', () => {
     await main();
     expect(errSpy).toHaveBeenCalledWith(
       '[ERROR]',
-      'CNAME file missing; DNS check skipped'
+      'CNAME file missing at CNAME; DNS check skipped'
     );
   });
 });
