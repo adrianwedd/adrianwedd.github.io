@@ -1011,7 +1011,7 @@ phases:
     component: 'CI/CD'
     dependencies: [3]
     priority: 5
-    status: in_progress
+    status: done
     type: task
     command: null
     task_id: 'PIN-DEBUG-1'
