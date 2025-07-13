@@ -82,9 +82,9 @@ jobs:
 
       - name: Lint & Validate tasks.yml
         run: |
-          pip install yamllint pyyaml jsonschema
+          pip install yamllint
           yamllint tasks.yml
-          python scripts/validate-tasks.py
+          node scripts/validate-tasks.mjs
 
       - name: Run Automation Scripts
         env:
