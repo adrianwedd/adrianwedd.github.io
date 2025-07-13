@@ -2,6 +2,10 @@ import path from 'path';
 import { pathToFileURL } from 'url';
 import { log } from './utils/logger.mjs';
 import {
+  CONTENT_DIR,
+  INSIGHTS_FAILED_DIR,
+} from './utils/constants.mjs';
+import {
   readFile,
   writeFile,
   readdir,
@@ -14,7 +18,7 @@ import { sanitizeMarkdown } from './utils/sanitize-markdown.mjs';
 
 // Discover which content subdirectories contain notes to summarise
 async function getTargetDirs() {
-  const contentDir = 'content';
+  const contentDir = CONTENT_DIR;
   try {
     const entries = await readdir(contentDir, { withFileTypes: true });
     return entries
@@ -47,7 +51,7 @@ async function validateMarkdown(text, filePath = '') {
 
 // Move an input file to the failure directory if processing fails
 async function moveToFailed(srcPath) {
-  const failedDir = path.join('content', 'insights-failed');
+  const failedDir = INSIGHTS_FAILED_DIR;
   try {
     await mkdir(failedDir, { recursive: true });
     const dest = path.join(failedDir, path.basename(srcPath));

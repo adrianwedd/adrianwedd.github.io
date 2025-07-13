@@ -4,10 +4,11 @@ import { pathToFileURL } from 'url';
 import { parse } from 'yaml';
 import { githubFetch } from './utils/github.mjs'; // Import the new utility
 import { log } from './utils/logger.mjs';
+import { AGENTS_DIR } from './utils/constants.mjs';
 
 // Read YAML manifest files from the given directory
 // Returns an array of parsed manifest objects
-async function loadManifests(dir = path.join('content', 'agents')) {
+async function loadManifests(dir = AGENTS_DIR) {
   let files = [];
   try {
     files = await fs.readdir(dir);

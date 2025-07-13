@@ -5,10 +5,16 @@ import { pathToFileURL } from 'url';
 import { callOpenAI } from './utils/llm-api.mjs';
 import { log } from './utils/logger.mjs';
 import { sanitizeMarkdown } from './utils/sanitize-markdown.mjs';
+import {
+  CONTENT_DIR,
+  INBOX_DIR,
+  INBOX_FAILED_DIR,
+  UNTAGGED_DIR,
+} from './utils/constants.mjs';
 
 // Discover valid content sections for classification
 async function getDynamicSections() {
-  const contentDir = path.join('content');
+  const contentDir = CONTENT_DIR;
   try {
     const entries = await fs.readdir(contentDir, { withFileTypes: true });
     const sections = entries
@@ -127,8 +133,8 @@ async function main() {
     return;
   }
 
-  const inboxDir = path.join('content', 'inbox');
-  const failedDir = path.join(inboxDir, 'failed');
+  const inboxDir = INBOX_DIR;
+  const failedDir = INBOX_FAILED_DIR;
 
   const dynamicSections = await getDynamicSections(); // Get dynamic sections for validation
   log.debug(`Available sections: ${dynamicSections.join(', ')}`);
@@ -208,12 +214,12 @@ async function main() {
         dynamicSections.includes(result.section) &&
         result.confidence >= 0.8
       ) {
-        targetDir = path.join('content', result.section);
+        targetDir = path.join(CONTENT_DIR, result.section);
         if (result.tags && result.tags.length) {
           tags = result.tags;
         }
       } else {
-        targetDir = path.join('content', 'untagged');
+        targetDir = UNTAGGED_DIR;
       }
 
       const dest = await moveFile(filePath, targetDir, tags);
