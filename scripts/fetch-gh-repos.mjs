@@ -3,7 +3,7 @@ import { pathToFileURL } from 'url';
 import { githubFetch } from './utils/github.mjs'; // Import the new utility
 import { log } from './utils/logger.mjs';
 import { mkdir, writeFile } from './utils/file-utils.mjs';
-import { CONTENT_DIR, TOOLS_DIR } from './utils/constants.mjs';
+import { TOOLS_DIR } from './utils/constants.mjs';
 
 // Determine the GitHub username for the current token
 async function getLogin() {
