@@ -69,6 +69,13 @@ jobs:
           node-version: '20'
           cache: ${{ steps.detect-package-manager.outputs.manager }}
           cache-dependency-path: ./${{ steps.detect-package-manager.outputs.lockfile }}
+      - name: Setup pnpm
+        if: steps.detect-package-manager.outputs.manager == 'pnpm'
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+          run_install: false
+
 
       - name: Setup Pages
         id: pages
@@ -161,6 +168,13 @@ jobs:
           cache: ${{ steps.detect-package-manager.outputs.manager }}
           cache-dependency-path: ./${{ steps.detect-package-manager.outputs.lockfile }}
 
+      - name: Setup pnpm
+        if: steps.detect-package-manager.outputs.manager == 'pnpm'
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+          run_install: false
+
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
 
@@ -231,6 +245,13 @@ jobs:
           node-version: '20'
           cache: ${{ steps.detect-package-manager.outputs.manager }}
           cache-dependency-path: ./${{ steps.detect-package-manager.outputs.lockfile }}
+
+      - name: Setup pnpm
+        if: steps.detect-package-manager.outputs.manager == 'pnpm'
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+          run_install: false
 
       - name: Setup Pages
         id: pages
