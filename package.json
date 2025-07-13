@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "preinstall": "npx only-allow pnpm",
     "test": "vitest run --coverage",
     "lint": "eslint . --ext .js,.mjs,.cjs,.ts",
     "format": "prettier --write .",
