@@ -23,7 +23,12 @@ beforeEach(() => {
   fs.unlink.mockResolvedValue();
   fs.mkdir.mockResolvedValue();
   callOpenAI.mockResolvedValue(
-    JSON.stringify({ section: 'garden', tags: [], confidence: 0.9 })
+    JSON.stringify({
+      section: 'garden',
+      tags: [],
+      confidence: 0.9,
+      reasoning: 'fine',
+    })
   );
   fs.readdir.mockResolvedValue([]);
 });
@@ -50,14 +55,14 @@ describe('classify-inbox error paths', () => {
 
   it('classifyFile throws on invalid confidence', async () => {
     callOpenAI.mockResolvedValueOnce(
-      JSON.stringify({ section: 'g', tags: [], confidence: 2 })
+      JSON.stringify({ section: 'g', tags: [], confidence: 2, reasoning: 'x' })
     );
     await expect(classifyFile('x')).rejects.toThrow('Invalid confidence');
   });
 
   it('classifyFile throws on invalid tags', async () => {
     callOpenAI.mockResolvedValueOnce(
-      JSON.stringify({ section: 'g', tags: 'bad', confidence: 0.9 })
+      JSON.stringify({ section: 'g', tags: 'bad', confidence: 0.9, reasoning: 'x' })
     );
     await expect(classifyFile('x')).rejects.toThrow('Invalid tags');
   });

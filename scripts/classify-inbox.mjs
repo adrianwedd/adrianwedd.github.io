@@ -6,11 +6,13 @@ import { callOpenAI } from './utils/llm-api.mjs';
 import { hashText } from './utils/llm-cache.mjs';
 import { log } from './utils/logger.mjs';
 import { sanitizeMarkdown } from './utils/sanitize-markdown.mjs';
+import yaml from 'yaml';
 import {
   CONTENT_DIR,
   INBOX_DIR,
   INBOX_FAILED_DIR,
   UNTAGGED_DIR,
+  REVIEW_NEEDED_DIR,
 } from './utils/constants.mjs';
 
 // Discover valid content sections for classification
@@ -21,7 +23,7 @@ async function getDynamicSections() {
     const sections = entries
       .filter((dirent) => dirent.isDirectory())
       .map((dirent) => dirent.name)
-      .filter((name) => !['inbox', 'untagged'].includes(name)); // Filter out special directories
+      .filter((name) => !['inbox', 'untagged', 'review-needed'].includes(name)); // Filter out special directories
     return sections;
   } catch (err) {
     log.error(`Error reading content directory ${contentDir}:`, err.message);
@@ -35,7 +37,7 @@ async function buildPrompt(content) {
   return (
     `You are an AI assistant helping organise a Personal Intelligence Node.\n` +
     `Classify the following text into one of these sections: ${dynamicSections.join(', ')}.\n` +
-    `Return JSON with keys section, tags (array), and confidence (0-1).\n` +
+    `Return JSON with keys section, tags (array), confidence (0-1), and reasoning.\n` +
     `Text:\n${content}`
   );
 }
@@ -66,11 +68,14 @@ async function classifyFile(filePath) {
     throw new Error(`Invalid JSON response: ${reply}`);
   }
 
-  const { section, tags, confidence } = result;
-  if (!section || !tags || confidence === undefined) {
+  const { section, tags, confidence, reasoning } = result;
+  if (!section || !tags || confidence === undefined || reasoning === undefined) {
     throw new Error(
       `Malformed response, missing keys: ${JSON.stringify(result)}`
     );
+  }
+  if (typeof reasoning !== 'string') {
+    throw new Error(`Invalid reasoning value: ${reasoning}`);
   }
   if (typeof confidence !== 'number' || confidence < 0 || confidence > 1) {
     throw new Error(`Invalid confidence value: ${confidence}`);
@@ -83,7 +88,7 @@ async function classifyFile(filePath) {
 }
 
 // Move the processed file to the destination directory and write tags front matter
-async function moveFile(src, destDir, tags = [], dryRun = false) {
+async function moveFile(src, destDir, tags = [], dryRun = false, extra = {}) {
   const dest = path.join(destDir, path.basename(src));
 
   if (dryRun) {
@@ -106,7 +111,12 @@ async function moveFile(src, destDir, tags = [], dryRun = false) {
     throw err;
   }
 
-  const fm = tags.length ? `---\ntags: [${tags.join(', ')}]\n---\n` : '';
+  const fmObj = {};
+  if (tags.length) fmObj.tags = tags;
+  Object.assign(fmObj, extra);
+  const fm = Object.keys(fmObj).length
+    ? `---\n${yaml.stringify(fmObj)}---\n`
+    : '';
   const output = sanitizeMarkdown(fm + data);
 
   try {
@@ -225,22 +235,24 @@ async function main() {
     log.info(`Processing ${name}`);
     let targetDir;
     let tags = [];
+    let extra = {};
 
     try {
       const result = await classifyFile(filePath);
-      if (
-        dynamicSections.includes(result.section) &&
-        result.confidence >= 0.8
-      ) {
+      if (!dynamicSections.includes(result.section)) {
+        targetDir = UNTAGGED_DIR;
+      } else if (result.confidence < 0.8) {
+        targetDir = REVIEW_NEEDED_DIR;
+        tags = result.tags || [];
+        extra = { confidence: result.confidence, reasoning: result.reasoning };
+      } else {
         targetDir = path.join(CONTENT_DIR, result.section);
         if (result.tags && result.tags.length) {
           tags = result.tags;
         }
-      } else {
-        targetDir = UNTAGGED_DIR;
       }
 
-      const dest = await moveFile(filePath, targetDir, tags, dryRun);
+      const dest = await moveFile(filePath, targetDir, tags, dryRun, extra);
       if (dryRun) {
         // log inside moveFile already
       } else {
