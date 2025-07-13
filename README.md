@@ -2,6 +2,8 @@
 
 This project hosts Adrian Wedd's static knowledge hub built with [Astro](https://astro.build/). GitHub Actions handle all data processing so the published site remains a simple static deployment on the `gh-pages` branch.
 
+Images are optimized at build time using [`@astrojs/image`](https://docs.astro.build/en/guides/images/).
+
 ## Repository Structure
 
 - `content/` – Markdown content organised by section
