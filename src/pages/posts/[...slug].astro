@@ -1,6 +1,9 @@
 ---
 import BaseLayout from '../../layouts/Base.astro';
 const { slug } = Astro.params;
+export async function getStaticPaths() {
+  return [];
+}
 ---
 <BaseLayout>
   <article class="prose mx-auto p-4">
