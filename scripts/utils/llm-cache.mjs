@@ -36,3 +36,7 @@ export async function setCachedResult(key, value) {
   c[key] = value;
   await saveCache();
 }
+
+export function _clearCache() {
+  cache = null;
+}

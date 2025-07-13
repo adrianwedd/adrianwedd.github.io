@@ -33,6 +33,7 @@ describe('E2E: classify inbox then build insights', () => {
     await fs.mkdir(path.join('content', 'logs'), { recursive: true });
     await fs.mkdir(path.join('content', 'mirror'), { recursive: true });
     await fs.mkdir(path.join('content', 'untagged'), { recursive: true });
+    await fs.mkdir(path.join('content', 'review-needed'), { recursive: true });
 
     // copy fixture inbox files
     const inboxSrc = path.join(fixtureDir, 'inbox');
@@ -61,16 +62,27 @@ describe('E2E: classify inbox then build insights', () => {
             section: 'garden',
             tags: ['plants'],
             confidence: 0.9,
+            reasoning: 'garden note',
           })
         );
       }
       if (prompt.includes('Log entry')) {
         return Promise.resolve(
-          JSON.stringify({ section: 'logs', tags: ['daily'], confidence: 0.9 })
+          JSON.stringify({
+            section: 'logs',
+            tags: ['daily'],
+            confidence: 0.9,
+            reasoning: 'log',
+          })
         );
       }
       return Promise.resolve(
-        JSON.stringify({ section: 'untagged', tags: [], confidence: 0.4 })
+        JSON.stringify({
+          section: 'garden',
+          tags: [],
+          confidence: 0.4,
+          reasoning: 'unclear',
+        })
       );
     });
 
@@ -84,7 +96,7 @@ describe('E2E: classify inbox then build insights', () => {
       fs.stat(path.join('content', 'logs', 'test-doc-log.md'))
     ).resolves.toBeDefined();
     await expect(
-      fs.stat(path.join('content', 'untagged', 'test-doc-untagged.txt'))
+      fs.stat(path.join('content', 'review-needed', 'test-doc-untagged.txt'))
     ).resolves.toBeDefined();
 
     // insight generation mock

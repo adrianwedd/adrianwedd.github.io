@@ -82,6 +82,7 @@ describe('Integration Test: Full Automation Pipeline', () => {
           { name: 'mirror', isDirectory: () => true },
           { name: 'inbox', isDirectory: () => true },
           { name: 'untagged', isDirectory: () => true },
+          { name: 'review-needed', isDirectory: () => true },
           { name: 'agents', isDirectory: () => true },
           { name: 'codex', isDirectory: () => true },
           { name: 'tools', isDirectory: () => true },
@@ -167,6 +168,7 @@ describe('Integration Test: Full Automation Pipeline', () => {
             section: 'garden',
             tags: ['plants', 'nature'],
             confidence: 0.95,
+            reasoning: 'garden note',
           })
         );
       }
@@ -176,12 +178,18 @@ describe('Integration Test: Full Automation Pipeline', () => {
             section: 'logs',
             tags: ['daily', 'activity'],
             confidence: 0.9,
+            reasoning: 'log entry',
           })
         );
       }
       // For unclassified files
       return Promise.resolve(
-        JSON.stringify({ section: 'untagged', tags: [], confidence: 0.4 })
+        JSON.stringify({
+          section: 'garden',
+          tags: [],
+          confidence: 0.4,
+          reasoning: 'unclear',
+        })
       );
     });
 
@@ -221,7 +229,7 @@ describe('Integration Test: Full Automation Pipeline', () => {
       expect.any(String)
     );
     expect(fs.writeFile).toHaveBeenCalledWith(
-      path.join('content', 'untagged', 'test-doc-untagged.txt'),
+      path.join('content', 'review-needed', 'test-doc-untagged.txt'),
       expect.any(String)
     );
     expect(fs.unlink).toHaveBeenCalledWith(

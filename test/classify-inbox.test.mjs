@@ -85,6 +85,7 @@ describe('classify-inbox.mjs', () => {
       section: 'garden',
       tags: ['a', 'b'],
       confidence: 0.9,
+      reasoning: 'clear topic',
     });
     await classifyInbox.main();
     expect(fs.writeFile).toHaveBeenCalledWith(
@@ -100,12 +101,17 @@ describe('classify-inbox.mjs', () => {
     expect(fs.rename).not.toHaveBeenCalled();
   });
 
-  it('should move a file to untagged for low confidence', async () => {
-    mockOpenAIResponse({ section: 'garden', tags: [], confidence: 0.7 });
+  it('should move a file to review-needed for low confidence', async () => {
+    mockOpenAIResponse({
+      section: 'garden',
+      tags: [],
+      confidence: 0.7,
+      reasoning: 'uncertain',
+    });
     await classifyInbox.main();
     expect(fs.writeFile).toHaveBeenCalledWith(
-      expect.stringContaining('content/untagged/file1.txt'),
-      'Test content'
+      expect.stringContaining('content/review-needed/file1.txt'),
+      expect.stringContaining('reasoning:')
     );
     expect(fs.unlink).toHaveBeenCalledWith(
       expect.stringContaining('content/inbox/file1.txt')
@@ -113,7 +119,12 @@ describe('classify-inbox.mjs', () => {
   });
 
   it('should move a file to untagged for unknown section', async () => {
-    mockOpenAIResponse({ section: 'unknown', tags: [], confidence: 0.9 });
+    mockOpenAIResponse({
+      section: 'unknown',
+      tags: [],
+      confidence: 0.9,
+      reasoning: 'no match',
+    });
     await classifyInbox.main();
     expect(fs.writeFile).toHaveBeenCalledWith(
       expect.stringContaining('content/untagged/file1.txt'),
@@ -172,7 +183,12 @@ describe('classify-inbox.mjs', () => {
 
   it('logs processing steps', async () => {
     const logSpy = vi.spyOn(console, 'log');
-    mockOpenAIResponse({ section: 'garden', tags: [], confidence: 0.9 });
+    mockOpenAIResponse({
+      section: 'garden',
+      tags: [],
+      confidence: 0.9,
+      reasoning: 'ok',
+    });
     await classifyInbox.main();
     expect(logSpy).toHaveBeenCalledWith(
       '[INFO]',
@@ -251,6 +267,7 @@ describe('classify-inbox.mjs', () => {
       section: 'garden',
       tags: ['odd'],
       confidence: 0.95,
+      reasoning: 'looks garden',
     });
 
     await classifyInbox.main();
