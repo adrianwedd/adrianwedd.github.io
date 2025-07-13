@@ -69,7 +69,7 @@ async function processMarkdownFile(filePath) {
     const summary = await callOpenAI(buildSummaryPrompt(content));
     const isValid = await validateMarkdown(summary, filePath);
     if (!isValid) {
-      log.error(`Invalid markdown summary for ${fileName}`);
+      log.error(`Invalid markdown summary for ${filePath}`);
       await moveToFailed(filePath);
       return;
     }
