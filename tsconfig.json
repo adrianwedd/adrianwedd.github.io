@@ -3,6 +3,12 @@
   "compilerOptions": {
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "exactOptionalPropertyTypes": true
+    "exactOptionalPropertyTypes": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@scripts/*": ["scripts/*"],
+      "@content/*": ["content/*"]
+    }
   }
 }

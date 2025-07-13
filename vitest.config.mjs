@@ -1,6 +1,8 @@
 import { defineConfig } from 'vitest/config';
+import alias from './paths.js';
 
 export default defineConfig({
+  resolve: { alias },
   test: {
     environment: 'node',
     include: ['test/**/*.test.{ts,js,mjs,cjs}'], // Include all test files
