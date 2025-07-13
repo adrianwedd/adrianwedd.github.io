@@ -5,7 +5,11 @@ import { JSDOM } from 'jsdom';
 const window = new JSDOM('').window;
 const DOMPurify = createDOMPurify(window);
 
-// Strip any potentially dangerous HTML from markdown strings
+/**
+ * Strip any potentially dangerous HTML from markdown strings.
+ * @param {string} text Markdown text containing HTML.
+ * @returns {string} Sanitized markdown string.
+ */
 export function sanitizeMarkdown(text) {
   return DOMPurify.sanitize(text);
 }
