@@ -69,6 +69,10 @@ async function main() {
   for (const file of files) {
     const raw = await fs.readFile(file, 'utf8');
     const { data, content } = matter(raw);
+    const status = data.status || 'draft';
+    if (status !== 'published') {
+      continue;
+    }
     const stats = await fs.stat(file);
     const title = data.title || path.basename(file, '.md');
     const description = data.description || content.split('\n')[0];

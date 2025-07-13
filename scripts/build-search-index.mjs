@@ -42,6 +42,10 @@ async function main() {
   for await (const file of walkMarkdown(CONTENT_DIR)) {
     const raw = await fs.readFile(file, 'utf8');
     const { data, content } = matter(raw);
+    const status = data.status || 'draft';
+    if (status !== 'published') {
+      continue;
+    }
     const meta = {
       url: slugify(file),
       title: data.title || path.basename(file, '.md'),
