@@ -8,6 +8,7 @@ This repository houses the **Personal Intelligence Node** project. Agents workin
 4. **Script Style** – Node scripts are written in ESM syntax (`.mjs`) and should pass `node --experimental-specifier-resolution=node` if needed. Use modern JavaScript and avoid deprecated APIs.
 5. **Testing** – Vitest tests live in the `test/` directory and must be run before committing.
 6. **Pull Requests** – when opening a PR, summarise major changes and reference relevant sections of `PLAN.md`.
+7. **Task Tracking** – update `tasks.yml` to reflect task status whenever work is performed or analysed, ensuring commits always capture the latest state.
 
 These guidelines apply to the entire repository.
 
