@@ -1,0 +1,27 @@
+<!DOCTYPE html><html lang="en"> <body class="min-h-screen flex flex-col"> <header class="bg-gray-800 text-white"> <div class="container mx-auto flex flex-col md:flex-row items-center justify-between p-4"> <a href="/" class="text-xl font-semibold mb-2 md:mb-0">Personal Intelligence Node</a> <nav class="flex flex-wrap gap-4"> <a href="/" class="hover:underline"> Home </a><a href="/tools/" class="hover:underline"> Tools </a><a href="/logs/" class="hover:underline"> Logs </a><a href="/garden/" class="hover:underline"> Garden </a><a href="/mirror/" class="hover:underline"> Mirror </a><a href="/resume/" class="hover:underline"> Resume </a><a href="/agents/" class="hover:underline"> Agents </a><a href="/codex/" class="hover:underline"> Codex </a><a href="/rss.xml" class="hover:underline"> RSS </a> </nav> </div> </header> <main class="flex-grow">  <h1 class="text-2xl font-bold my-4">Personal Intelligence Node</h1> <div class="my-4"> <input id="search-input" type="search" placeholder="Search..." class="border p-2 w-full mb-2"> <ul id="search-results" class="space-y-1"></ul> </div> <script client:load type="module">
+  import lunr from 'lunr';
+  const input = document.getElementById('search-input');
+  const list = document.getElementById('search-results');
+  let idx, docs;
+  fetch('/search-index.json')
+    .then(r => r.json())
+    .then(data => {
+      idx = lunr.Index.load(data.index);
+      docs = Object.fromEntries(data.docs.map(d => [d.url, d]));
+    });
+  input.addEventListener('input', () => {
+    const q = input.value.trim();
+    list.innerHTML = '';
+    if (!q || !idx) return;
+    idx.search(q).forEach(r => {
+      const doc = docs[r.ref];
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = doc.url;
+      a.textContent = doc.title;
+      a.className = 'text-blue-600 hover:underline';
+      li.appendChild(a);
+      list.appendChild(li);
+    });
+  });
+</script> <div class="grid gap-4 md:grid-cols-2"> <a href="/tools/" class="block p-4 border rounded-lg hover:bg-gray-50"> <h2 class="text-xl font-semibold">Tools</h2> <p class="text-sm text-gray-600">Code and utilities.</p> </a><a href="/logs/" class="block p-4 border rounded-lg hover:bg-gray-50"> <h2 class="text-xl font-semibold">Logs</h2> <p class="text-sm text-gray-600">Journals and transcripts.</p> </a><a href="/garden/" class="block p-4 border rounded-lg hover:bg-gray-50"> <h2 class="text-xl font-semibold">Garden</h2> <p class="text-sm text-gray-600">Zettels and notes.</p> </a><a href="/mirror/" class="block p-4 border rounded-lg hover:bg-gray-50"> <h2 class="text-xl font-semibold">Mirror</h2> <p class="text-sm text-gray-600">Narrative and creative work.</p> </a><a href="/resume/" class="block p-4 border rounded-lg hover:bg-gray-50"> <h2 class="text-xl font-semibold">Resume</h2> <p class="text-sm text-gray-600">Professional profile.</p> </a><a href="/agents/" class="block p-4 border rounded-lg hover:bg-gray-50"> <h2 class="text-xl font-semibold">Agents</h2> <p class="text-sm text-gray-600">Agent manifests.</p> </a><a href="/codex/" class="block p-4 border rounded-lg hover:bg-gray-50"> <h2 class="text-xl font-semibold">Codex</h2> <p class="text-sm text-gray-600">Agent blueprints.</p> </a> </div>  </main> </body></html>
