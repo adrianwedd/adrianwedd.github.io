@@ -1812,7 +1812,7 @@ phases:
     component: 'Accessibility'
     dependencies: []
     priority: 3
-    status: pending
+    status: done
     type: task
     command: null
     task_id: 'PIN-NEW-93'
