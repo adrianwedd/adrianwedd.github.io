@@ -21,6 +21,7 @@
     "husky": "^9.1.7",
     "markdownlint": "^0.38.0",
     "prettier": "^3.6.2",
+    "rehype-external-links": "^3.0.0",
     "vitest": "^3.2.4"
   },
   "dependencies": {
