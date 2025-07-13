@@ -83,7 +83,14 @@ async function classifyFile(filePath) {
 }
 
 // Move the processed file to the destination directory and write tags front matter
-async function moveFile(src, destDir, tags = []) {
+async function moveFile(src, destDir, tags = [], dryRun = false) {
+  const dest = path.join(destDir, path.basename(src));
+
+  if (dryRun) {
+    log.info(`[DRY] Would move ${src} to ${dest}`);
+    return dest;
+  }
+
   try {
     await fs.mkdir(destDir, { recursive: true });
   } catch (err) {
@@ -91,7 +98,6 @@ async function moveFile(src, destDir, tags = []) {
     throw err;
   }
 
-  const dest = path.join(destDir, path.basename(src));
   let data;
   try {
     data = await readFile(src);
@@ -132,6 +138,11 @@ async function moveFile(src, destDir, tags = []) {
 
 // Entry point for inbox classification logic
 async function main() {
+  const argv = process.argv.slice(2);
+  const dryIndex = argv.indexOf('--dry-run');
+  const dryRun = dryIndex !== -1;
+  if (dryRun) argv.splice(dryIndex, 1);
+
   if (!process.env.OPENAI_API_KEY) {
     log.error('OPENAI_API_KEY not set; skipping classification');
     return;
@@ -145,7 +156,7 @@ async function main() {
 
   // Get files to process from arguments or read from inboxDir
   let filesToProcess = [];
-  const args = process.argv.slice(2); // Get arguments after script name
+  const args = argv; // remaining arguments after removing flag
 
   if (args.length > 0) {
     // Arguments are provided, assume they are comma-separated file paths
@@ -196,15 +207,19 @@ async function main() {
     const filePath = path.join(inboxDir, name);
     const lockPath = `${filePath}.lock`;
 
-    try {
-      await fs.writeFile(lockPath, '', { flag: 'wx' });
-    } catch (err) {
-      if (err.code === 'EEXIST') {
-        log.info(`Skipping ${filePath}; lock file exists`);
-      } else {
-        log.error(`Unable to create lock file ${lockPath}:`, err.message);
+    if (dryRun) {
+      log.info(`[DRY] Would create lock file ${lockPath}`);
+    } else {
+      try {
+        await fs.writeFile(lockPath, '', { flag: 'wx' });
+      } catch (err) {
+        if (err.code === 'EEXIST') {
+          log.info(`Skipping ${filePath}; lock file exists`);
+        } else {
+          log.error(`Unable to create lock file ${lockPath}:`, err.message);
+        }
+        return;
       }
-      return;
     }
 
     log.info(`Processing ${name}`);
@@ -225,17 +240,25 @@ async function main() {
         targetDir = UNTAGGED_DIR;
       }
 
-      const dest = await moveFile(filePath, targetDir, tags);
-      log.info(`Moved ${name} to ${dest}`);
+      const dest = await moveFile(filePath, targetDir, tags, dryRun);
+      if (dryRun) {
+        // log inside moveFile already
+      } else {
+        log.info(`Moved ${name} to ${dest}`);
+      }
     } catch (err) {
       log.error(`Failed to classify ${filePath}:`, err.message);
-      const dest = await moveFile(filePath, failedDir, tags);
-      log.info(`Moved ${name} to ${dest}`);
+      const dest = await moveFile(filePath, failedDir, tags, dryRun);
+      if (!dryRun) log.info(`Moved ${name} to ${dest}`);
     } finally {
-      try {
-        await fs.unlink(lockPath);
-      } catch (err) {
-        log.error(`Error removing lock file ${lockPath}:`, err.message);
+      if (dryRun) {
+        log.info(`[DRY] Would remove lock file ${lockPath}`);
+      } else {
+        try {
+          await fs.unlink(lockPath);
+        } catch (err) {
+          log.error(`Error removing lock file ${lockPath}:`, err.message);
+        }
       }
     }
   });

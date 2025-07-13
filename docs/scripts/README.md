@@ -5,6 +5,7 @@ This directory contains documentation for the Node.js scripts that run during th
 All pages include example commands and sample output so you can reproduce the results locally.
 
 All scripts respect a `LOG_LEVEL` environment variable. Set it to `DEBUG`, `INFO`, `WARN` or `ERROR` to control verbosity (default: `INFO`).
+Pass `--dry-run` to preview actions without making changes.
 
 | Script               | Description                                                              | Environment Variables                     |
 | -------------------- | ------------------------------------------------------------------------ | ----------------------------------------- |

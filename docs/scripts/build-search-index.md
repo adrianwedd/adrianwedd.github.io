@@ -9,10 +9,13 @@ The script walks the `content` directory recursively, streaming files one at a t
 None.
 - `LOG_LEVEL` – optional log verbosity (`DEBUG`, `INFO`, `WARN`, `ERROR`).
 
+Pass `--dry-run` to skip writing the output file.
+
 Run manually with:
 
 ```bash
 node scripts/build-search-index.mjs
+node scripts/build-search-index.mjs --dry-run
 ```
 
 Example output:

@@ -98,6 +98,11 @@ async function updateIssue(number, body, owner, repo) {
 
 // Entry point when run as a script: update or create the agent bus issue
 async function main() {
+  const argv = process.argv.slice(2);
+  const dryIndex = argv.indexOf('--dry-run');
+  const dryRun = dryIndex !== -1;
+  if (dryRun) argv.splice(dryIndex, 1);
+
   if (!process.env.GH_TOKEN) {
     log.error('GH_TOKEN not set; skipping agent-bus update');
     return;
@@ -111,7 +116,13 @@ async function main() {
   const body = manifestsToMarkdown(manifests);
   const title = 'agent-bus';
   const num = await getIssueNumber(title, owner, repo);
-  if (num) {
+  if (dryRun) {
+    if (num) {
+      log.info(`[DRY] Would update issue #${num}`);
+    } else {
+      log.info(`[DRY] Would create issue '${title}'`);
+    }
+  } else if (num) {
     await updateIssue(num, body, owner, repo);
     log.info(`Updated issue #${num}`);
   } else {

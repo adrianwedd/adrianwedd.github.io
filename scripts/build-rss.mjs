@@ -59,6 +59,11 @@ function buildXml(items) {
 
 // Generate rss.xml in the public directory
 async function main() {
+  const argv = process.argv.slice(2);
+  const dryIndex = argv.indexOf('--dry-run');
+  const dryRun = dryIndex !== -1;
+  if (dryRun) argv.splice(dryIndex, 1);
+
   const files = await collectMarkdown(CONTENT_DIR);
   const items = [];
   for (const file of files) {
@@ -72,9 +77,14 @@ async function main() {
   }
   items.sort((a, b) => b.date - a.date);
   const xml = buildXml(items);
-  await fs.mkdir(PUBLIC_DIR, { recursive: true });
-  await fs.writeFile(path.join(PUBLIC_DIR, 'rss.xml'), xml);
-  log.info(`Wrote ${path.join(PUBLIC_DIR, 'rss.xml')}`);
+  const outPath = path.join(PUBLIC_DIR, 'rss.xml');
+  if (dryRun) {
+    log.info(`[DRY] Would write ${outPath}`);
+  } else {
+    await fs.mkdir(PUBLIC_DIR, { recursive: true });
+    await fs.writeFile(outPath, xml);
+    log.info(`Wrote ${outPath}`);
+  }
 }
 
 export { collectMarkdown, slugify, buildXml, main };

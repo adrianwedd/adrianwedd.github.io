@@ -39,6 +39,11 @@ function repoToMarkdown(repo) {
 
 // Fetch repos tagged "tool" and write one markdown file per repo
 async function main() {
+  const argv = process.argv.slice(2);
+  const dryIndex = argv.indexOf('--dry-run');
+  const dryRun = dryIndex !== -1;
+  if (dryRun) argv.splice(dryIndex, 1);
+
   if (!process.env.GH_TOKEN) {
     log.error('GH_TOKEN not set; skipping fetch-gh-repos');
     return;
@@ -50,19 +55,27 @@ async function main() {
   );
 
   const dir = TOOLS_DIR;
-  try {
-    await mkdir(dir, { recursive: true });
-  } catch (err) {
-    log.error(`Error creating directory ${dir}:`, err.message);
-    throw err;
+  if (dryRun) {
+    log.info(`[DRY] Would create directory ${dir}`);
+  } else {
+    try {
+      await mkdir(dir, { recursive: true });
+    } catch (err) {
+      log.error(`Error creating directory ${dir}:`, err.message);
+      throw err;
+    }
   }
 
   for (const repo of tools) {
     const md = repoToMarkdown(repo);
     const filePath = path.join(dir, `${repo.name}.md`);
     try {
-      await writeFile(filePath, md);
-      log.info(`Wrote ${filePath}`);
+      if (dryRun) {
+        log.info(`[DRY] Would write ${filePath}`);
+      } else {
+        await writeFile(filePath, md);
+        log.info(`Wrote ${filePath}`);
+      }
     } catch (err) {
       log.error(`Error writing file ${filePath}:`, err.message);
     }

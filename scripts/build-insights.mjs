@@ -48,11 +48,17 @@ async function validateMarkdown(text, filePath = '') {
 }
 
 // Move an input file to the failure directory if processing fails
-async function moveToFailed(srcPath) {
+async function moveToFailed(srcPath, dryRun = false) {
   const failedDir = INSIGHTS_FAILED_DIR;
+  const dest = path.join(failedDir, path.basename(srcPath));
+
+  if (dryRun) {
+    log.info(`[DRY] Would move ${path.basename(srcPath)} to ${dest}`);
+    return;
+  }
+
   try {
     await mkdir(failedDir, { recursive: true });
-    const dest = path.join(failedDir, path.basename(srcPath));
     await rename(srcPath, dest);
     log.info(`Moved ${path.basename(srcPath)} to ${dest}`);
   } catch (err) {
@@ -61,7 +67,7 @@ async function moveToFailed(srcPath) {
 }
 
 // Generate an insight markdown file next to the source markdown
-async function processMarkdownFile(filePath) {
+async function processMarkdownFile(filePath, dryRun = false) {
   const content = await readFile(filePath);
   const fileName = path.basename(filePath);
   const dirName = path.dirname(filePath);
@@ -80,16 +86,25 @@ async function processMarkdownFile(filePath) {
     const insightFileName = fileName.replace(/\.md$/, '.insight.md');
     const insightFilePath = path.join(dirName, insightFileName);
     const safeSummary = sanitizeMarkdown(summary);
-    await writeFile(insightFilePath, safeSummary);
-    log.info(`Generated insight for ${fileName} -> ${insightFileName}`);
+    if (dryRun) {
+      log.info(`[DRY] Would write ${insightFilePath}`);
+    } else {
+      await writeFile(insightFilePath, safeSummary);
+      log.info(`Generated insight for ${fileName} -> ${insightFileName}`);
+    }
   } catch (err) {
     log.error(`Failed to generate insight for ${filePath}:`, err.message);
-    await moveToFailed(filePath);
+    await moveToFailed(filePath, dryRun);
   }
 }
 
 // Entry point for the insights generator
 async function main() {
+  const argv = process.argv.slice(2);
+  const dryIndex = argv.indexOf('--dry-run');
+  const dryRun = dryIndex !== -1;
+  if (dryRun) argv.splice(dryIndex, 1);
+
   if (!process.env.OPENAI_API_KEY) {
     log.error('OPENAI_API_KEY not set; skipping insight generation');
     return;
@@ -99,7 +114,7 @@ async function main() {
 
   // Get files to process from arguments or read from target directories
   let filesToProcess = [];
-  const args = process.argv.slice(2); // Get arguments after script name
+  const args = argv; // remaining arguments after removing flag
 
   if (args.length > 0) {
     // Arguments are provided, assume they are comma-separated file paths
@@ -153,7 +168,7 @@ async function main() {
   }
 
   const tasks = filesToProcess.map((filePath) =>
-    processMarkdownFile(filePath).catch((err) => {
+    processMarkdownFile(filePath, dryRun).catch((err) => {
       log.error(`Error processing ${filePath}:`, err.message);
     })
   );
