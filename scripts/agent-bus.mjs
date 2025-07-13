@@ -2,12 +2,20 @@ import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { parse } from 'yaml';
+import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
+import schema from '../docs/agent-manifest-schema.json' assert { type: 'json' };
 import { githubFetch } from './utils/github.mjs'; // Import the new utility
 import { log } from './utils/logger.mjs';
+import { AGENTS_DIR } from './utils/constants.mjs';
+
+const ajv = new Ajv();
+addFormats(ajv);
+const validateManifest = ajv.compile(schema);
 
 // Read YAML manifest files from the given directory
 // Returns an array of parsed manifest objects
-async function loadManifests(dir = path.join('content', 'agents')) {
+async function loadManifests(dir = AGENTS_DIR) {
   let files = [];
   try {
     files = await fs.readdir(dir);
@@ -21,6 +29,13 @@ async function loadManifests(dir = path.join('content', 'agents')) {
     try {
       const data = await fs.readFile(path.join(dir, file), 'utf8');
       const doc = parse(data);
+      if (!validateManifest(doc)) {
+        log.error(
+          `Invalid agent manifest ${file}:`,
+          ajv.errorsText(validateManifest.errors)
+        );
+        continue;
+      }
       manifests.push({ file, ...doc });
     } catch (err) {
       log.error(
@@ -35,16 +50,16 @@ async function loadManifests(dir = path.join('content', 'agents')) {
 // Convert manifest objects to a simple markdown table for the GitHub issue body
 function manifestsToMarkdown(manifests) {
   if (manifests.length === 0) return 'No agents found.';
-  const headerRows = [
+  const lines = [
     '| id | status | last updated | owner | role |',
     '|---|---|---|---|---|',
   ];
-  let md = headerRows.join('\n') + '\n';
   for (const m of manifests) {
-    md += `| ${m.id} | ${m.status} | ${m.last_updated} | ${m.owner || ''} | ${m.role || ''} |
-`;
+    lines.push(
+      `| ${m.id} | ${m.status} | ${m.last_updated} | ${m.owner || ''} | ${m.role || ''} |`
+    );
   }
-  return md;
+  return lines.join('\n');
 }
 
 // Look up an open issue by title and return its number if found
@@ -83,6 +98,11 @@ async function updateIssue(number, body, owner, repo) {
 
 // Entry point when run as a script: update or create the agent bus issue
 async function main() {
+  const argv = process.argv.slice(2);
+  const dryIndex = argv.indexOf('--dry-run');
+  const dryRun = dryIndex !== -1;
+  if (dryRun) argv.splice(dryIndex, 1);
+
   if (!process.env.GH_TOKEN) {
     log.error('GH_TOKEN not set; skipping agent-bus update');
     return;
@@ -96,7 +116,13 @@ async function main() {
   const body = manifestsToMarkdown(manifests);
   const title = 'agent-bus';
   const num = await getIssueNumber(title, owner, repo);
-  if (num) {
+  if (dryRun) {
+    if (num) {
+      log.info(`[DRY] Would update issue #${num}`);
+    } else {
+      log.info(`[DRY] Would create issue '${title}'`);
+    }
+  } else if (num) {
     await updateIssue(num, body, owner, repo);
     log.info(`Updated issue #${num}`);
   } else {

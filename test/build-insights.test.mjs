@@ -17,7 +17,7 @@ import { log } from '../scripts/utils/logger.mjs';
 
 // Mock file-utils before any imports
 vi.mock('../scripts/utils/file-utils.mjs', () => ({
-  readFileStream: vi.fn(),
+  readFile: vi.fn(),
   writeFile: vi.fn(),
   readdir: vi.fn(),
   mkdir: vi.fn(),
@@ -28,7 +28,7 @@ vi.mock('../scripts/utils/file-utils.mjs', () => ({
 import * as buildInsights from '../scripts/build-insights.mjs';
 import { callOpenAI } from '../scripts/utils/llm-api.mjs';
 import {
-  readFileStream,
+  readFile,
   writeFile,
   readdir,
   mkdir,
@@ -47,7 +47,7 @@ describe('build-insights.mjs', () => {
 
   beforeEach(() => {
     vi.restoreAllMocks();
-    readFileStream.mockResolvedValue(mockMarkdownContent);
+    readFile.mockResolvedValue(mockMarkdownContent);
     writeFile.mockResolvedValue(undefined);
     readdir.mockImplementation((dirPath, options) => {
       if (dirPath === 'content' && options && options.withFileTypes) {
@@ -79,18 +79,22 @@ describe('build-insights.mjs', () => {
     process.argv = originalArgv.slice();
   });
 
-  it('buildSummaryPrompt should generate a correct prompt', () => {
-    const prompt = buildInsights.buildSummaryPrompt(mockMarkdownContent);
-    expect(prompt).toContain('Summarize the following text concisely');
+  it('buildSummaryPrompt should generate a category-specific prompt', () => {
+    const prompt = buildInsights.buildSummaryPrompt(mockMarkdownContent, 'logs');
+    expect(prompt).toContain('daily log entry');
     expect(prompt).toContain(mockMarkdownContent);
   });
 
   it('processMarkdownFile should generate an insight file', async () => {
     const filePath = path.join('content', 'garden', 'file1.md');
     await buildInsights.processMarkdownFile(filePath);
-    expect(callOpenAI).toHaveBeenCalledWith(
-      buildInsights.buildSummaryPrompt(mockMarkdownContent)
+    const [prompt] = callOpenAI.mock.calls[0];
+    const expected = buildInsights.buildSummaryPrompt(
+      mockMarkdownContent,
+      'garden'
     );
+    expect(prompt).toBe(expected);
+    expect(callOpenAI).toHaveBeenCalledWith(expected, expect.any(String));
     expect(writeFile).toHaveBeenCalledWith(
       path.join('content', 'garden', 'file1.insight.md'),
       mockSummary

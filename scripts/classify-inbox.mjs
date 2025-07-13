@@ -1,20 +1,29 @@
 import fs from 'fs/promises';
-import { readFileStream } from './utils/file-utils.mjs';
+import { readFile } from './utils/file-utils.mjs';
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { callOpenAI } from './utils/llm-api.mjs';
+import { hashText } from './utils/llm-cache.mjs';
 import { log } from './utils/logger.mjs';
 import { sanitizeMarkdown } from './utils/sanitize-markdown.mjs';
+import yaml from 'yaml';
+import {
+  CONTENT_DIR,
+  INBOX_DIR,
+  INBOX_FAILED_DIR,
+  UNTAGGED_DIR,
+  REVIEW_NEEDED_DIR,
+} from './utils/constants.mjs';
 
 // Discover valid content sections for classification
 async function getDynamicSections() {
-  const contentDir = path.join('content');
+  const contentDir = CONTENT_DIR;
   try {
     const entries = await fs.readdir(contentDir, { withFileTypes: true });
     const sections = entries
       .filter((dirent) => dirent.isDirectory())
       .map((dirent) => dirent.name)
-      .filter((name) => !['inbox', 'untagged'].includes(name)); // Filter out special directories
+      .filter((name) => !['inbox', 'untagged', 'review-needed'].includes(name)); // Filter out special directories
     return sections;
   } catch (err) {
     log.error(`Error reading content directory ${contentDir}:`, err.message);
@@ -28,7 +37,7 @@ async function buildPrompt(content) {
   return (
     `You are an AI assistant helping organise a Personal Intelligence Node.\n` +
     `Classify the following text into one of these sections: ${dynamicSections.join(', ')}.\n` +
-    `Return JSON with keys section, tags (array), and confidence (0-1).\n` +
+    `Return JSON with keys section, tags (array), confidence (0-1), and reasoning.\n` +
     `Text:\n${content}`
   );
 }
@@ -37,7 +46,7 @@ async function buildPrompt(content) {
 async function classifyFile(filePath) {
   let content;
   try {
-    content = await readFileStream(filePath);
+    content = await readFile(filePath);
   } catch (err) {
     log.error(
       `Error reading file ${filePath} for classification:`,
@@ -47,7 +56,10 @@ async function classifyFile(filePath) {
   }
 
   log.debug(`Classifying file ${filePath}`);
-  const reply = await callOpenAI(await buildPrompt(content));
+  const reply = await callOpenAI(
+    await buildPrompt(content),
+    hashText(content)
+  );
   log.debug(`Raw response for ${filePath}: ${reply}`);
   let result;
   try {
@@ -56,11 +68,14 @@ async function classifyFile(filePath) {
     throw new Error(`Invalid JSON response: ${reply}`);
   }
 
-  const { section, tags, confidence } = result;
-  if (!section || !tags || confidence === undefined) {
+  const { section, tags, confidence, reasoning } = result;
+  if (!section || !tags || confidence === undefined || reasoning === undefined) {
     throw new Error(
       `Malformed response, missing keys: ${JSON.stringify(result)}`
     );
+  }
+  if (typeof reasoning !== 'string') {
+    throw new Error(`Invalid reasoning value: ${reasoning}`);
   }
   if (typeof confidence !== 'number' || confidence < 0 || confidence > 1) {
     throw new Error(`Invalid confidence value: ${confidence}`);
@@ -73,7 +88,14 @@ async function classifyFile(filePath) {
 }
 
 // Move the processed file to the destination directory and write tags front matter
-async function moveFile(src, destDir, tags = []) {
+async function moveFile(src, destDir, tags = [], dryRun = false, extra = {}) {
+  const dest = path.join(destDir, path.basename(src));
+
+  if (dryRun) {
+    log.info(`[DRY] Would move ${src} to ${dest}`);
+    return dest;
+  }
+
   try {
     await fs.mkdir(destDir, { recursive: true });
   } catch (err) {
@@ -81,16 +103,20 @@ async function moveFile(src, destDir, tags = []) {
     throw err;
   }
 
-  const dest = path.join(destDir, path.basename(src));
   let data;
   try {
-    data = await readFileStream(src);
+    data = await readFile(src);
   } catch (err) {
     log.error(`Error reading file ${src}:`, err.message);
     throw err;
   }
 
-  const fm = tags.length ? `---\ntags: [${tags.join(', ')}]\n---\n` : '';
+  const fmObj = {};
+  if (tags.length) fmObj.tags = tags;
+  Object.assign(fmObj, extra);
+  const fm = Object.keys(fmObj).length
+    ? `---\n${yaml.stringify(fmObj)}---\n`
+    : '';
   const output = sanitizeMarkdown(fm + data);
 
   try {
@@ -122,20 +148,25 @@ async function moveFile(src, destDir, tags = []) {
 
 // Entry point for inbox classification logic
 async function main() {
+  const argv = process.argv.slice(2);
+  const dryIndex = argv.indexOf('--dry-run');
+  const dryRun = dryIndex !== -1;
+  if (dryRun) argv.splice(dryIndex, 1);
+
   if (!process.env.OPENAI_API_KEY) {
     log.error('OPENAI_API_KEY not set; skipping classification');
     return;
   }
 
-  const inboxDir = path.join('content', 'inbox');
-  const failedDir = path.join(inboxDir, 'failed');
+  const inboxDir = INBOX_DIR;
+  const failedDir = INBOX_FAILED_DIR;
 
   const dynamicSections = await getDynamicSections(); // Get dynamic sections for validation
   log.debug(`Available sections: ${dynamicSections.join(', ')}`);
 
   // Get files to process from arguments or read from inboxDir
   let filesToProcess = [];
-  const args = process.argv.slice(2); // Get arguments after script name
+  const args = argv; // remaining arguments after removing flag
 
   if (args.length > 0) {
     // Arguments are provided, assume they are comma-separated file paths
@@ -182,54 +213,69 @@ async function main() {
     }
   }
 
-  for (const name of filesToProcess) {
+  const tasks = filesToProcess.map(async (name) => {
     const filePath = path.join(inboxDir, name);
     const lockPath = `${filePath}.lock`;
 
-    try {
-      await fs.writeFile(lockPath, '', { flag: 'wx' });
-    } catch (err) {
-      if (err.code === 'EEXIST') {
-        log.info(`Skipping ${filePath}; lock file exists`);
-      } else {
-        log.error(`Unable to create lock file ${lockPath}:`, err.message);
+    if (dryRun) {
+      log.info(`[DRY] Would create lock file ${lockPath}`);
+    } else {
+      try {
+        await fs.writeFile(lockPath, '', { flag: 'wx' });
+      } catch (err) {
+        if (err.code === 'EEXIST') {
+          log.info(`Skipping ${filePath}; lock file exists`);
+        } else {
+          log.error(`Unable to create lock file ${lockPath}:`, err.message);
+        }
+        return;
       }
-      continue;
     }
 
     log.info(`Processing ${name}`);
     let targetDir;
     let tags = [];
+    let extra = { status: 'draft' };
 
     try {
       const result = await classifyFile(filePath);
-      // Use dynamicSections for validation
-      if (
-        dynamicSections.includes(result.section) &&
-        result.confidence >= 0.8
-      ) {
-        targetDir = path.join('content', result.section);
+      if (!dynamicSections.includes(result.section)) {
+        targetDir = UNTAGGED_DIR;
+      } else if (result.confidence < 0.8) {
+        targetDir = REVIEW_NEEDED_DIR;
+        tags = result.tags || [];
+        extra = { status: 'draft', confidence: result.confidence, reasoning: result.reasoning };
+      } else {
+        targetDir = path.join(CONTENT_DIR, result.section);
         if (result.tags && result.tags.length) {
           tags = result.tags;
         }
-      } else {
-        targetDir = path.join('content', 'untagged');
       }
 
-      const dest = await moveFile(filePath, targetDir, tags);
-      log.info(`Moved ${name} to ${dest}`);
+      const dest = await moveFile(filePath, targetDir, tags, dryRun, extra);
+      if (dryRun) {
+        // log inside moveFile already
+      } else {
+        log.info(`Moved ${name} to ${dest}`);
+      }
     } catch (err) {
       log.error(`Failed to classify ${filePath}:`, err.message);
-      const dest = await moveFile(filePath, failedDir, tags);
-      log.info(`Moved ${name} to ${dest}`);
+      const dest = await moveFile(filePath, failedDir, tags, dryRun);
+      if (!dryRun) log.info(`Moved ${name} to ${dest}`);
     } finally {
-      try {
-        await fs.unlink(lockPath);
-      } catch (err) {
-        log.error(`Error removing lock file ${lockPath}:`, err.message);
+      if (dryRun) {
+        log.info(`[DRY] Would remove lock file ${lockPath}`);
+      } else {
+        try {
+          await fs.unlink(lockPath);
+        } catch (err) {
+          log.error(`Error removing lock file ${lockPath}:`, err.message);
+        }
       }
     }
-  }
+  });
+
+  await Promise.all(tasks);
 }
 
 export {

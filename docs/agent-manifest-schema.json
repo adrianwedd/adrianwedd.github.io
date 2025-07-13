@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["id", "name", "status", "last_updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique short identifier"
+    },
+    "name": { "type": "string" },
+    "role": { "type": "string" },
+    "owner": {
+      "type": "string",
+      "description": "GitHub username of maintainer"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "idle", "offline", "error"]
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "description": { "type": "string" }
+  }
+}

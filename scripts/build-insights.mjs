@@ -1,20 +1,22 @@
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { log } from './utils/logger.mjs';
+import { CONTENT_DIR, INSIGHTS_FAILED_DIR } from './utils/constants.mjs';
 import {
-  readFileStream,
+  readFile,
   writeFile,
   readdir,
   mkdir,
   rename,
 } from './utils/file-utils.mjs';
 import { callOpenAI } from './utils/llm-api.mjs';
+import { hashText } from './utils/llm-cache.mjs';
 import { lint } from 'markdownlint/promise';
 import { sanitizeMarkdown } from './utils/sanitize-markdown.mjs';
 
 // Discover which content subdirectories contain notes to summarise
 async function getTargetDirs() {
-  const contentDir = 'content';
+  const contentDir = CONTENT_DIR;
   try {
     const entries = await readdir(contentDir, { withFileTypes: true });
     return entries
@@ -28,9 +30,39 @@ async function getTargetDirs() {
   }
 }
 
-// Prompt template used when requesting a summary from the LLM
-function buildSummaryPrompt(content) {
-  return `Summarize the following text concisely, highlighting key insights and cross-references. Format the output as markdown.\nText:\n${content}`;
+// Prompt templates keyed by content category
+const PROMPT_TEMPLATES = {
+  agents: (text) =>
+    `Summarize this agent profile, focusing on purpose and current status.\nText:\n${text}`,
+  codex: (text) =>
+    `Provide a concise reference summary of this codex entry.\nText:\n${text}`,
+  garden: (text) =>
+    `Summarize this personal knowledge note highlighting key ideas and references.\nText:\n${text}`,
+  logs: (text) =>
+    `You are summarizing a daily log entry. List notable events and tasks as bullet points.\nText:\n${text}`,
+  mirror: (text) =>
+    `Summarize the mirrored content below and note its significance.\nText:\n${text}`,
+  resume: (text) =>
+    `Summarize this resume document emphasizing skills and accomplishments.\nText:\n${text}`,
+  tools: (text) =>
+    `Summarize this tool description, focusing on usage instructions.\nText:\n${text}`,
+};
+
+// Default summary prompt used when no category-specific template exists
+function defaultPrompt(text) {
+  return `Summarize the following text concisely, highlighting key insights and cross-references. Format the output as markdown.\nText:\n${text}`;
+}
+
+// Determine the content category from the file path
+function getCategoryFromPath(filePath) {
+  const relative = path.relative(CONTENT_DIR, path.dirname(filePath));
+  return relative.split(path.sep)[0] || '';
+}
+
+// Build the OpenAI prompt for the given content and category
+function buildSummaryPrompt(content, category = '') {
+  const template = PROMPT_TEMPLATES[category];
+  return template ? template(content) : defaultPrompt(content);
 }
 
 // Run markdownlint on the generated summary
@@ -46,11 +78,17 @@ async function validateMarkdown(text, filePath = '') {
 }
 
 // Move an input file to the failure directory if processing fails
-async function moveToFailed(srcPath) {
-  const failedDir = path.join('content', 'insights-failed');
+async function moveToFailed(srcPath, dryRun = false) {
+  const failedDir = INSIGHTS_FAILED_DIR;
+  const dest = path.join(failedDir, path.basename(srcPath));
+
+  if (dryRun) {
+    log.info(`[DRY] Would move ${path.basename(srcPath)} to ${dest}`);
+    return;
+  }
+
   try {
     await mkdir(failedDir, { recursive: true });
-    const dest = path.join(failedDir, path.basename(srcPath));
     await rename(srcPath, dest);
     log.info(`Moved ${path.basename(srcPath)} to ${dest}`);
   } catch (err) {
@@ -59,32 +97,45 @@ async function moveToFailed(srcPath) {
 }
 
 // Generate an insight markdown file next to the source markdown
-async function processMarkdownFile(filePath) {
-  const content = await readFileStream(filePath);
+async function processMarkdownFile(filePath, dryRun = false) {
+  const content = await readFile(filePath);
   const fileName = path.basename(filePath);
   const dirName = path.dirname(filePath);
+  const category = getCategoryFromPath(filePath);
 
   try {
-    const summary = await callOpenAI(buildSummaryPrompt(content));
+    const summary = await callOpenAI(
+      buildSummaryPrompt(content, category),
+      hashText(content)
+    );
     const isValid = await validateMarkdown(summary, filePath);
     if (!isValid) {
-      log.error(`Invalid markdown summary for ${fileName}`);
+      log.error(`Invalid markdown summary for ${filePath}`);
       await moveToFailed(filePath);
       return;
     }
     const insightFileName = fileName.replace(/\.md$/, '.insight.md');
     const insightFilePath = path.join(dirName, insightFileName);
     const safeSummary = sanitizeMarkdown(summary);
-    await writeFile(insightFilePath, safeSummary);
-    log.info(`Generated insight for ${fileName} -> ${insightFileName}`);
+    if (dryRun) {
+      log.info(`[DRY] Would write ${insightFilePath}`);
+    } else {
+      await writeFile(insightFilePath, safeSummary);
+      log.info(`Generated insight for ${fileName} -> ${insightFileName}`);
+    }
   } catch (err) {
     log.error(`Failed to generate insight for ${filePath}:`, err.message);
-    await moveToFailed(filePath);
+    await moveToFailed(filePath, dryRun);
   }
 }
 
 // Entry point for the insights generator
 async function main() {
+  const argv = process.argv.slice(2);
+  const dryIndex = argv.indexOf('--dry-run');
+  const dryRun = dryIndex !== -1;
+  if (dryRun) argv.splice(dryIndex, 1);
+
   if (!process.env.OPENAI_API_KEY) {
     log.error('OPENAI_API_KEY not set; skipping insight generation');
     return;
@@ -94,7 +145,7 @@ async function main() {
 
   // Get files to process from arguments or read from target directories
   let filesToProcess = [];
-  const args = process.argv.slice(2); // Get arguments after script name
+  const args = argv; // remaining arguments after removing flag
 
   if (args.length > 0) {
     // Arguments are provided, assume they are comma-separated file paths
@@ -147,9 +198,12 @@ async function main() {
     }
   }
 
-  for (const filePath of filesToProcess) {
-    await processMarkdownFile(filePath);
-  }
+  const tasks = filesToProcess.map((filePath) =>
+    processMarkdownFile(filePath, dryRun).catch((err) => {
+      log.error(`Error processing ${filePath}:`, err.message);
+    })
+  );
+  await Promise.all(tasks);
   log.info('Insight generation complete.');
 }
 
@@ -160,6 +214,7 @@ export {
   getTargetDirs,
   validateMarkdown,
   moveToFailed,
+  getCategoryFromPath,
 };
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {

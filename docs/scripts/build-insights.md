@@ -12,11 +12,15 @@ Output is logged with `[INFO]`, `[WARN]`, and `[ERROR]` prefixes via `logger.mjs
 
 - `OPENAI_API_KEY` – **required** for contacting the OpenAI API.
 - `OPENAI_MODEL` – optional model name (defaults to `gpt-3.5-turbo-1106`).
+- `LOG_LEVEL` – optional log verbosity (`DEBUG`, `INFO`, `WARN`, `ERROR`).
+
+Pass `--dry-run` to log intended summaries without writing files.
 
 Run manually with:
 
 ```bash
 OPENAI_API_KEY=sk-test node scripts/build-insights.mjs "content/garden/note.md"
+OPENAI_API_KEY=sk-test node scripts/build-insights.mjs --dry-run
 ```
 
 Example output:

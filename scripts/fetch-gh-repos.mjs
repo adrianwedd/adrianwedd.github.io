@@ -3,6 +3,7 @@ import { pathToFileURL } from 'url';
 import { githubFetch } from './utils/github.mjs'; // Import the new utility
 import { log } from './utils/logger.mjs';
 import { mkdir, writeFile } from './utils/file-utils.mjs';
+import { TOOLS_DIR } from './utils/constants.mjs';
 
 // Determine the GitHub username for the current token
 async function getLogin() {
@@ -19,6 +20,10 @@ async function fetchRepos(login) {
   for (;;) {
     const url = `https://api.github.com/users/${login}/repos?per_page=${perPage}&page=${page}`;
     const data = await githubFetch(url); // Use githubFetch
+    if (!Array.isArray(data)) {
+      log.error(`Invalid response fetching repos: ${JSON.stringify(data)}`);
+      break;
+    }
     repos.push(...data);
     if (data.length < perPage) break;
     page += 1;
@@ -34,6 +39,11 @@ function repoToMarkdown(repo) {
 
 // Fetch repos tagged "tool" and write one markdown file per repo
 async function main() {
+  const argv = process.argv.slice(2);
+  const dryIndex = argv.indexOf('--dry-run');
+  const dryRun = dryIndex !== -1;
+  if (dryRun) argv.splice(dryIndex, 1);
+
   if (!process.env.GH_TOKEN) {
     log.error('GH_TOKEN not set; skipping fetch-gh-repos');
     return;
@@ -44,20 +54,28 @@ async function main() {
     (r) => Array.isArray(r.topics) && r.topics.includes('tool')
   );
 
-  const dir = path.join('content', 'tools');
-  try {
-    await mkdir(dir, { recursive: true });
-  } catch (err) {
-    log.error(`Error creating directory ${dir}:`, err.message);
-    throw err;
+  const dir = TOOLS_DIR;
+  if (dryRun) {
+    log.info(`[DRY] Would create directory ${dir}`);
+  } else {
+    try {
+      await mkdir(dir, { recursive: true });
+    } catch (err) {
+      log.error(`Error creating directory ${dir}:`, err.message);
+      throw err;
+    }
   }
 
   for (const repo of tools) {
     const md = repoToMarkdown(repo);
     const filePath = path.join(dir, `${repo.name}.md`);
     try {
-      await writeFile(filePath, md);
-      log.info(`Wrote ${filePath}`);
+      if (dryRun) {
+        log.info(`[DRY] Would write ${filePath}`);
+      } else {
+        await writeFile(filePath, md);
+        log.info(`Wrote ${filePath}`);
+      }
     } catch (err) {
       log.error(`Error writing file ${filePath}:`, err.message);
     }

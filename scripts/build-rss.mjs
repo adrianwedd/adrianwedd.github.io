@@ -3,6 +3,7 @@ import path from 'path';
 import { pathToFileURL } from 'url';
 import matter from 'gray-matter';
 import { log } from './utils/logger.mjs';
+import { CONTENT_DIR, PUBLIC_DIR } from './utils/constants.mjs';
 
 const BASE_URL = process.env.BASE_URL || 'https://adrianwedd.github.io';
 
@@ -23,7 +24,7 @@ async function collectMarkdown(dir) {
 
 // Convert a markdown file path in content/ to a URL slug
 function slugify(filePath) {
-  const relative = filePath.replace(/^content\//, '');
+  const relative = filePath.replace(new RegExp(`^${CONTENT_DIR}/`), '');
   return '/' + relative.replace(/\.md$/, '') + '/';
 }
 
@@ -58,11 +59,20 @@ function buildXml(items) {
 
 // Generate rss.xml in the public directory
 async function main() {
-  const files = await collectMarkdown('content');
+  const argv = process.argv.slice(2);
+  const dryIndex = argv.indexOf('--dry-run');
+  const dryRun = dryIndex !== -1;
+  if (dryRun) argv.splice(dryIndex, 1);
+
+  const files = await collectMarkdown(CONTENT_DIR);
   const items = [];
   for (const file of files) {
     const raw = await fs.readFile(file, 'utf8');
     const { data, content } = matter(raw);
+    const status = data.status || 'draft';
+    if (status !== 'published') {
+      continue;
+    }
     const stats = await fs.stat(file);
     const title = data.title || path.basename(file, '.md');
     const description = data.description || content.split('\n')[0];
@@ -71,9 +81,14 @@ async function main() {
   }
   items.sort((a, b) => b.date - a.date);
   const xml = buildXml(items);
-  await fs.mkdir('public', { recursive: true });
-  await fs.writeFile('public/rss.xml', xml);
-  log.info('Wrote public/rss.xml');
+  const outPath = path.join(PUBLIC_DIR, 'rss.xml');
+  if (dryRun) {
+    log.info(`[DRY] Would write ${outPath}`);
+  } else {
+    await fs.mkdir(PUBLIC_DIR, { recursive: true });
+    await fs.writeFile(outPath, xml);
+    log.info(`Wrote ${outPath}`);
+  }
 }
 
 export { collectMarkdown, slugify, buildXml, main };

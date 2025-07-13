@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 
 vi.mock('fs/promises');
 vi.mock('../scripts/utils/llm-api.mjs', () => ({ callOpenAI: vi.fn() }));
-vi.mock('../scripts/utils/file-utils.mjs', () => ({ readFileStream: vi.fn() }));
+vi.mock('../scripts/utils/file-utils.mjs', () => ({ readFile: vi.fn() }));
 vi.mock('../scripts/utils/sanitize-markdown.mjs', () => ({
   sanitizeMarkdown: (s) => s,
 }));
@@ -14,16 +14,21 @@ import {
   getDynamicSections,
 } from '../scripts/classify-inbox.mjs';
 import { callOpenAI } from '../scripts/utils/llm-api.mjs';
-import { readFileStream } from '../scripts/utils/file-utils.mjs';
+import { readFile } from '../scripts/utils/file-utils.mjs';
 
 beforeEach(() => {
   vi.restoreAllMocks();
-  readFileStream.mockResolvedValue('content');
+  readFile.mockResolvedValue('content');
   fs.writeFile.mockResolvedValue();
   fs.unlink.mockResolvedValue();
   fs.mkdir.mockResolvedValue();
   callOpenAI.mockResolvedValue(
-    JSON.stringify({ section: 'garden', tags: [], confidence: 0.9 })
+    JSON.stringify({
+      section: 'garden',
+      tags: [],
+      confidence: 0.9,
+      reasoning: 'fine',
+    })
   );
   fs.readdir.mockResolvedValue([]);
 });
@@ -34,7 +39,7 @@ afterEach(() => {
 
 describe('classify-inbox error paths', () => {
   it('classifyFile throws on read error', async () => {
-    readFileStream.mockRejectedValueOnce(new Error('fail'));
+    readFile.mockRejectedValueOnce(new Error('fail'));
     await expect(classifyFile('x')).rejects.toThrow('fail');
   });
 
@@ -50,14 +55,14 @@ describe('classify-inbox error paths', () => {
 
   it('classifyFile throws on invalid confidence', async () => {
     callOpenAI.mockResolvedValueOnce(
-      JSON.stringify({ section: 'g', tags: [], confidence: 2 })
+      JSON.stringify({ section: 'g', tags: [], confidence: 2, reasoning: 'x' })
     );
     await expect(classifyFile('x')).rejects.toThrow('Invalid confidence');
   });
 
   it('classifyFile throws on invalid tags', async () => {
     callOpenAI.mockResolvedValueOnce(
-      JSON.stringify({ section: 'g', tags: 'bad', confidence: 0.9 })
+      JSON.stringify({ section: 'g', tags: 'bad', confidence: 0.9, reasoning: 'x' })
     );
     await expect(classifyFile('x')).rejects.toThrow('Invalid tags');
   });
