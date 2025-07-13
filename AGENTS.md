@@ -40,3 +40,37 @@ The `status` field allows scripts to exclude drafts from the site until they are
 - Use lowercase kebab-case for filenames.
 - Prefix notes with the date in `YYYY-MM-DD` format when applicable (e.g. `2024-05-01-my-note.md`).
 - Insight files created by automation use the `.insight.md` suffix and live next to their source file.
+
+## Agent Interaction Protocol
+
+Agents collaborate through pull requests and must maintain a manifest in
+`content/agents/` that conforms to
+[`docs/agent-manifest-schema.json`](docs/agent-manifest-schema.json). This
+metadata keeps the Agent Bus issue up to date.
+
+### Status Reporting
+
+Every agent must also record its latest activity in a shared `status.json` file
+at the repository root. Each agent updates only its own entry to avoid merge
+conflicts. A minimal example:
+
+```json
+{
+  "codex-agent": {
+    "status": "running",
+    "updated": "2024-05-01T12:00:00Z",
+    "message": "processing inbox"
+  }
+}
+```
+
+### Idempotent Scripts
+
+Automation scripts should be **idempotent** so they can run repeatedly without
+producing duplicates or inconsistent state. Examples include:
+
+- `classify-inbox.mjs` skipping files that were already moved
+- `build-insights.mjs` overwriting existing insight files
+- `agent-bus.mjs` updating the same issue instead of creating new ones
+
+Following these rules keeps the CI pipeline stable and repeatable.
