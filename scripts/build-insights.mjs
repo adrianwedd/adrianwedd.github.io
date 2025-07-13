@@ -148,9 +148,12 @@ async function main() {
     }
   }
 
-  for (const filePath of filesToProcess) {
-    await processMarkdownFile(filePath);
-  }
+  const tasks = filesToProcess.map((filePath) =>
+    processMarkdownFile(filePath).catch((err) => {
+      log.error(`Error processing ${filePath}:`, err.message);
+    })
+  );
+  await Promise.all(tasks);
   log.info('Insight generation complete.');
 }
 
