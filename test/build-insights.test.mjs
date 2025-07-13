@@ -89,7 +89,8 @@ describe('build-insights.mjs', () => {
     const filePath = path.join('content', 'garden', 'file1.md');
     await buildInsights.processMarkdownFile(filePath);
     expect(callOpenAI).toHaveBeenCalledWith(
-      buildInsights.buildSummaryPrompt(mockMarkdownContent)
+      buildInsights.buildSummaryPrompt(mockMarkdownContent),
+      expect.any(String)
     );
     expect(writeFile).toHaveBeenCalledWith(
       path.join('content', 'garden', 'file1.insight.md'),

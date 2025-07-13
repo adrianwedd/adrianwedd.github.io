@@ -3,6 +3,7 @@ import { readFile } from './utils/file-utils.mjs';
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { callOpenAI } from './utils/llm-api.mjs';
+import { hashText } from './utils/llm-cache.mjs';
 import { log } from './utils/logger.mjs';
 import { sanitizeMarkdown } from './utils/sanitize-markdown.mjs';
 import {
@@ -53,7 +54,10 @@ async function classifyFile(filePath) {
   }
 
   log.debug(`Classifying file ${filePath}`);
-  const reply = await callOpenAI(await buildPrompt(content));
+  const reply = await callOpenAI(
+    await buildPrompt(content),
+    hashText(content)
+  );
   log.debug(`Raw response for ${filePath}: ${reply}`);
   let result;
   try {

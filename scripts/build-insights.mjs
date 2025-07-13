@@ -10,6 +10,7 @@ import {
   rename,
 } from './utils/file-utils.mjs';
 import { callOpenAI } from './utils/llm-api.mjs';
+import { hashText } from './utils/llm-cache.mjs';
 import { lint } from 'markdownlint/promise';
 import { sanitizeMarkdown } from './utils/sanitize-markdown.mjs';
 
@@ -66,7 +67,10 @@ async function processMarkdownFile(filePath) {
   const dirName = path.dirname(filePath);
 
   try {
-    const summary = await callOpenAI(buildSummaryPrompt(content));
+    const summary = await callOpenAI(
+      buildSummaryPrompt(content),
+      hashText(content)
+    );
     const isValid = await validateMarkdown(summary, filePath);
     if (!isValid) {
       log.error(`Invalid markdown summary for ${filePath}`);
