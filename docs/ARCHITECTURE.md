@@ -2,7 +2,21 @@
 
 This document explains how the Personal Intelligence Node works today. It focuses on the current data flow and automation pipeline.
 
+## Directory Layout
+
+```
+.
+├── .github/workflows/     # CI pipelines
+├── scripts/               # Node automation tasks
+├── content/               # Markdown source data
+│   ├── inbox/             # Unsorted contributions
+│   └── agents/            # Agent manifests
+└── public/                # Static assets and generated files
+```
+
 ## Components
+- **LLM Integration** – OpenAI is used by `classify-inbox.mjs` and `build-insights.mjs` for tagging and summarising content.
+
 
 - **Content Repository** – Markdown files live under `content/`. Agents drop new files in `content/inbox/` and update their manifests in `content/agents/`.
 - **Node Scripts** – Automation tasks are implemented as ESM scripts in `scripts/`:

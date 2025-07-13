@@ -22,6 +22,10 @@ pnpm run dev
 - `.github/workflows/` – CI configuration for building and deploying the site
 - `docs/` – Additional architecture and script documentation
 
+## Project Architecture
+
+For an overview of the automation pipeline see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
 ## Environment Variables
 
 The CI pipeline expects several secrets configured under **GitHub repository settings → Secrets**:
