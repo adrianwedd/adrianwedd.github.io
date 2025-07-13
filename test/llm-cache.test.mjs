@@ -21,7 +21,11 @@ describe('llm cache integration', () => {
     vi.restoreAllMocks();
     delete process.env.LLM_CACHE_FILE;
     delete process.env.OPENAI_API_KEY;
-    try { await fs.unlink(cacheFile); } catch {}
+    try {
+      await fs.unlink(cacheFile);
+    } catch {
+      // ignore cleanup errors
+    }
   });
 
   it('reuses cached result for same key', async () => {

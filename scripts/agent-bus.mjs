@@ -1,10 +1,12 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
+import { createRequire } from 'module';
 import { parse } from 'yaml';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
-import schema from '../docs/agent-manifest-schema.json' assert { type: 'json' };
+const require = createRequire(import.meta.url);
+const schema = require('../docs/agent-manifest-schema.json');
 import { githubFetch } from './utils/github.mjs'; // Import the new utility
 import { log } from './utils/logger.mjs';
 import { AGENTS_DIR } from './utils/constants.mjs';
@@ -140,7 +142,8 @@ export {
   main,
 };
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+const entryHref = process.argv[1] ? pathToFileURL(process.argv[1]).href : null;
+if (entryHref && import.meta.url === entryHref) {
   main().catch((err) => {
     log.error('agent-bus main error:', err);
     process.exit(1);
