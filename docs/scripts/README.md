@@ -15,3 +15,6 @@ All pages include example commands and sample output so you can reproduce the re
 | `check-dns.mjs`      | Verifies A and CNAME records for the custom domain from `CNAME`. | none |
 
 See the individual files below for further details.
+
+- [build-search-index.mjs](build-search-index.md) – builds `public/search-index.json` for Lunr search.
+- [build-rss.mjs](build-rss.md) – generates the site's RSS feed.
