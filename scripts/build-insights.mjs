@@ -1,10 +1,7 @@
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { log } from './utils/logger.mjs';
-import {
-  CONTENT_DIR,
-  INSIGHTS_FAILED_DIR,
-} from './utils/constants.mjs';
+import { CONTENT_DIR, INSIGHTS_FAILED_DIR } from './utils/constants.mjs';
 import {
   readFile,
   writeFile,

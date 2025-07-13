@@ -41,7 +41,9 @@ function manifestsToMarkdown(manifests) {
     '|---|---|---|---|---|',
   ];
   for (const m of manifests) {
-    lines.push(`| ${m.id} | ${m.status} | ${m.last_updated} | ${m.owner || ''} | ${m.role || ''} |`);
+    lines.push(
+      `| ${m.id} | ${m.status} | ${m.last_updated} | ${m.owner || ''} | ${m.role || ''} |`
+    );
   }
   return lines.join('\n');
 }
