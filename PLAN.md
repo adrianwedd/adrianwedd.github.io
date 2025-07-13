@@ -82,7 +82,7 @@ See [`docs/architecture.mmd`](docs/architecture.mmd) for a mermaid diagram depic
 ### 3b. Agent Manifest Schema
 
 Agent status files live in `content/agents/` and must conform to the schema in
-[`docs/agent-manifest-schema.yml`](docs/agent-manifest-schema.yml). A minimal
+[`docs/agent-manifest-schema.json`](docs/agent-manifest-schema.json). A minimal
 example looks like:
 
 ```yaml
