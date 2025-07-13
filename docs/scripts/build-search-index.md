@@ -2,7 +2,7 @@
 
 Creates a Lunr.js search index from markdown files under `content/` and writes it to `public/search-index.json`.
 
-The script walks the `content` directory recursively, reads front matter with `gray-matter`, and indexes each file's title and body for use in client-side search.
+The script walks the `content` directory recursively, streaming files one at a time. Each file's title and body is indexed with `gray-matter` and Lunr, while only minimal metadata is kept in memory. The final JSON is written via a Node stream to keep memory usage low.
 
 ## Environment Variables
 
