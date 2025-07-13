@@ -79,9 +79,9 @@ describe('build-insights.mjs', () => {
     process.argv = originalArgv.slice();
   });
 
-  it('buildSummaryPrompt should generate a correct prompt', () => {
-    const prompt = buildInsights.buildSummaryPrompt(mockMarkdownContent);
-    expect(prompt).toContain('Summarize the following text concisely');
+  it('buildSummaryPrompt should generate a category-specific prompt', () => {
+    const prompt = buildInsights.buildSummaryPrompt(mockMarkdownContent, 'logs');
+    expect(prompt).toContain('daily log entry');
     expect(prompt).toContain(mockMarkdownContent);
   });
 
@@ -89,7 +89,7 @@ describe('build-insights.mjs', () => {
     const filePath = path.join('content', 'garden', 'file1.md');
     await buildInsights.processMarkdownFile(filePath);
     expect(callOpenAI).toHaveBeenCalledWith(
-      buildInsights.buildSummaryPrompt(mockMarkdownContent),
+      buildInsights.buildSummaryPrompt(mockMarkdownContent, 'garden'),
       expect.any(String)
     );
     expect(writeFile).toHaveBeenCalledWith(

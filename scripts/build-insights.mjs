@@ -30,9 +30,39 @@ async function getTargetDirs() {
   }
 }
 
-// Prompt template used when requesting a summary from the LLM
-function buildSummaryPrompt(content) {
-  return `Summarize the following text concisely, highlighting key insights and cross-references. Format the output as markdown.\nText:\n${content}`;
+// Prompt templates keyed by content category
+const PROMPT_TEMPLATES = {
+  agents: (text) =>
+    `Summarize this agent profile, focusing on purpose and current status.\nText:\n${text}`,
+  codex: (text) =>
+    `Provide a concise reference summary of this codex entry.\nText:\n${text}`,
+  garden: (text) =>
+    `Summarize this personal knowledge note highlighting key ideas and references.\nText:\n${text}`,
+  logs: (text) =>
+    `You are summarizing a daily log entry. List notable events and tasks as bullet points.\nText:\n${text}`,
+  mirror: (text) =>
+    `Summarize the mirrored content below and note its significance.\nText:\n${text}`,
+  resume: (text) =>
+    `Summarize this resume document emphasizing skills and accomplishments.\nText:\n${text}`,
+  tools: (text) =>
+    `Summarize this tool description, focusing on usage instructions.\nText:\n${text}`,
+};
+
+// Default summary prompt used when no category-specific template exists
+function defaultPrompt(text) {
+  return `Summarize the following text concisely, highlighting key insights and cross-references. Format the output as markdown.\nText:\n${text}`;
+}
+
+// Determine the content category from the file path
+function getCategoryFromPath(filePath) {
+  const relative = path.relative(CONTENT_DIR, path.dirname(filePath));
+  return relative.split(path.sep)[0] || '';
+}
+
+// Build the OpenAI prompt for the given content and category
+function buildSummaryPrompt(content, category = '') {
+  const template = PROMPT_TEMPLATES[category];
+  return template ? template(content) : defaultPrompt(content);
 }
 
 // Run markdownlint on the generated summary
@@ -71,10 +101,11 @@ async function processMarkdownFile(filePath, dryRun = false) {
   const content = await readFile(filePath);
   const fileName = path.basename(filePath);
   const dirName = path.dirname(filePath);
+  const category = getCategoryFromPath(filePath);
 
   try {
     const summary = await callOpenAI(
-      buildSummaryPrompt(content),
+      buildSummaryPrompt(content, category),
       hashText(content)
     );
     const isValid = await validateMarkdown(summary, filePath);
@@ -183,6 +214,7 @@ export {
   getTargetDirs,
   validateMarkdown,
   moveToFailed,
+  getCategoryFromPath,
 };
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
