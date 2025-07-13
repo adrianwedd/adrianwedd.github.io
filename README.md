@@ -4,6 +4,17 @@ This project hosts Adrian Wedd's static knowledge hub built with [Astro](https:/
 
 Images are optimized at build time using [`@astrojs/image`](https://docs.astro.build/en/guides/images/).
 
+
+## Getting Started
+
+```bash
+git clone https://github.com/adrianwedd/adrianwedd.github.io.git
+cd adrianwedd.github.io
+pnpm install
+pnpm test
+pnpm run dev
+```
+
 ## Repository Structure
 
 - `content/` – Markdown content organised by section
@@ -28,14 +39,14 @@ Set these as secrets before running the workflows.
 Install dependencies and run the dev server:
 
 ```bash
-npm ci
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 Run the automated tests with:
 
 ```bash
-npm test
+pnpm test
 ```
 
 These tests also run automatically in the GitHub Actions workflow to prevent deployments when the automation pipeline fails.
@@ -43,13 +54,13 @@ These tests also run automatically in the GitHub Actions workflow to prevent dep
 Lint all files and automatically fix issues with:
 
 ```bash
-npm run lint
+pnpm run lint
 ```
 
 Format the codebase using Prettier:
 
 ```bash
-npm run format
+pnpm run format
 ```
 
 See [docs/scripts/README.md](docs/scripts/README.md) for script usage and environment variables. Troubleshooting tips live in [docs/DEBUGGING.md](docs/DEBUGGING.md). Current technical challenges are summarised in [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md).
