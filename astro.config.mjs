@@ -1,11 +1,12 @@
 import { defineConfig } from 'astro/config';
 import rehypeExternalLinks from 'rehype-external-links';
-import image from '@astrojs/image';
+// Use Astro's built-in asset pipeline instead of the deprecated `@astrojs/image` plugin.
+// See https://docs.astro.build/en/guides/assets/ for details.
 import alias from './paths.js';
 
 export default defineConfig({
   site: 'https://github.adrianwedd.com',
-  integrations: [image()],
+  // built-in assets require no integration setup
   markdown: {
     rehypePlugins: [
       [
