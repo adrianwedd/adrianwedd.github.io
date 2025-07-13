@@ -4,6 +4,7 @@ import { pathToFileURL } from 'url';
 import lunr from 'lunr';
 import matter from 'gray-matter';
 import { log } from './utils/logger.mjs';
+import { CONTENT_DIR, PUBLIC_DIR } from './utils/constants.mjs';
 
 // Recursively collect all markdown files for indexing
 async function collectMarkdown(dir) {
@@ -22,13 +23,13 @@ async function collectMarkdown(dir) {
 
 // Convert a markdown path into a site-relative URL
 function slugify(filePath) {
-  const relative = filePath.replace(/^content\//, '');
+  const relative = filePath.replace(new RegExp(`^${CONTENT_DIR}/`), '');
   return '/' + relative.replace(/\.md$/, '') + '/';
 }
 
 // Build lunr.js index and write to public/search-index.json
 async function main() {
-  const files = await collectMarkdown('content');
+  const files = await collectMarkdown(CONTENT_DIR);
   const docs = [];
   for (const file of files) {
     const raw = await fs.readFile(file, 'utf8');
@@ -48,9 +49,12 @@ async function main() {
   });
 
   const output = { index: idx.toJSON(), docs };
-  await fs.mkdir('public', { recursive: true });
-  await fs.writeFile('public/search-index.json', JSON.stringify(output));
-  log.info('Wrote public/search-index.json');
+  await fs.mkdir(PUBLIC_DIR, { recursive: true });
+  await fs.writeFile(
+    path.join(PUBLIC_DIR, 'search-index.json'),
+    JSON.stringify(output)
+  );
+  log.info(`Wrote ${path.join(PUBLIC_DIR, 'search-index.json')}`);
 }
 
 export { collectMarkdown, slugify, main };

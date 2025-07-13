@@ -3,6 +3,7 @@ import { pathToFileURL } from 'url';
 import { githubFetch } from './utils/github.mjs'; // Import the new utility
 import { log } from './utils/logger.mjs';
 import { mkdir, writeFile } from './utils/file-utils.mjs';
+import { CONTENT_DIR, TOOLS_DIR } from './utils/constants.mjs';
 
 // Determine the GitHub username for the current token
 async function getLogin() {
@@ -48,7 +49,7 @@ async function main() {
     (r) => Array.isArray(r.topics) && r.topics.includes('tool')
   );
 
-  const dir = path.join('content', 'tools');
+  const dir = TOOLS_DIR;
   try {
     await mkdir(dir, { recursive: true });
   } catch (err) {
