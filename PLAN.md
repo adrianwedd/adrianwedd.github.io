@@ -41,6 +41,7 @@ Build a self-updating, agent-fed, static knowledge hub—a "personal intelligenc
 | LLM APIs         | OpenAI, Gemini, or other—invoked from CI scripts      |
 | Code Quality     | ESLint and Prettier                                   |
 | Markdown Plugins | rehype-external-links for external link security      |
+| Image Optimization | @astrojs/image with sharp for responsive images      |
 
 ---
 

@@ -1,7 +1,10 @@
+import { defineConfig } from 'astro/config';
 import rehypeExternalLinks from 'rehype-external-links';
+import image from '@astrojs/image';
 
-export default {
+export default defineConfig({
   site: 'https://github.adrianwedd.com',
+  integrations: [image()],
   markdown: {
     rehypePlugins: [
       [
@@ -13,4 +16,4 @@ export default {
       ],
     ],
   },
-};
+});
