@@ -6,6 +6,7 @@ Fetches repositories from GitHub for a given user and generates markdown files i
 
 - `GH_TOKEN` – **required**. GitHub token used to authenticate API calls.
 - `GH_USER` – optional override for the user whose repositories are fetched. Defaults to the user associated with `GH_TOKEN`.
+- `LOG_LEVEL` – optional log verbosity (`DEBUG`, `INFO`, `WARN`, `ERROR`).
 
 Run manually with:
 

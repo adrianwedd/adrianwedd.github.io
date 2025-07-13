@@ -8,6 +8,7 @@ To avoid concurrent runs processing the same file, the script creates a `.lock` 
 
 - `OPENAI_API_KEY` – **required** for contacting the OpenAI API.
 - `OPENAI_MODEL` – optional model name (defaults to `gpt-3.5-turbo-1106`).
+- `LOG_LEVEL` – optional log verbosity (`DEBUG`, `INFO`, `WARN`, `ERROR`).
 
 Run manually with:
 

@@ -7,6 +7,7 @@ The script walks the `content` directory recursively, streaming files one at a t
 ## Environment Variables
 
 None.
+- `LOG_LEVEL` – optional log verbosity (`DEBUG`, `INFO`, `WARN`, `ERROR`).
 
 Run manually with:
 

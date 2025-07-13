@@ -12,6 +12,7 @@ Output is logged with `[INFO]`, `[WARN]`, and `[ERROR]` prefixes via `logger.mjs
 
 - `OPENAI_API_KEY` – **required** for contacting the OpenAI API.
 - `OPENAI_MODEL` – optional model name (defaults to `gpt-3.5-turbo-1106`).
+- `LOG_LEVEL` – optional log verbosity (`DEBUG`, `INFO`, `WARN`, `ERROR`).
 
 Run manually with:
 

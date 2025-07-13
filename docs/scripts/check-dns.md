@@ -4,7 +4,7 @@ Checks DNS records for the custom domain listed in the `CNAME` file. The script 
 
 ## Environment Variables
 
-None.
+- `LOG_LEVEL` – optional log verbosity (`DEBUG`, `INFO`, `WARN`, `ERROR`).
 
 Run manually with:
 

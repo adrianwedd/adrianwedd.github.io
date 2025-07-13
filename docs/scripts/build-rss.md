@@ -7,6 +7,7 @@ This script walks the `content` directory recursively, reads front-matter using 
 ## Environment Variables
 
 - `BASE_URL` – optional root URL for the feed. Defaults to `https://adrianwedd.github.io`.
+- `LOG_LEVEL` – optional log verbosity (`DEBUG`, `INFO`, `WARN`, `ERROR`).
 
 Run manually with:
 

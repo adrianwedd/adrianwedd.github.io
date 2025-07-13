@@ -6,6 +6,7 @@ Reads all YAML agent manifests in `content/agents`, aggregates their status, and
 
 - `GH_TOKEN` – **required** token for creating or updating issues.
 - `GH_REPO` – optional `owner/repo` override. Defaults to `GITHUB_REPOSITORY`.
+- `LOG_LEVEL` – optional log verbosity (`DEBUG`, `INFO`, `WARN`, `ERROR`).
 
 Run manually with:
 
