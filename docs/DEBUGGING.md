@@ -24,6 +24,8 @@ This guide collects tips for diagnosing failures in the GitHub Actions pipeline 
    ```bash
    export GH_TOKEN=...
    export OPENAI_API_KEY=...
+   # Optional: adjust logging verbosity
+   export LOG_LEVEL=DEBUG
    ```
 3. Execute the script directly using Node 20:
    ```bash

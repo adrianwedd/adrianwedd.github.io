@@ -4,6 +4,8 @@
 This directory contains documentation for the Node.js scripts that run during the CI workflow. Each script is written in ESM and executed with Node 20.
 All pages include example commands and sample output so you can reproduce the results locally.
 
+All scripts respect a `LOG_LEVEL` environment variable. Set it to `DEBUG`, `INFO`, `WARN` or `ERROR` to control verbosity (default: `INFO`).
+
 | Script               | Description                                                              | Environment Variables                     |
 | -------------------- | ------------------------------------------------------------------------ | ----------------------------------------- |
 | `fetch-gh-repos.mjs` | Fetches public repositories from GitHub and creates tool markdown files. | `GH_TOKEN`, optional `GH_USER`            |
