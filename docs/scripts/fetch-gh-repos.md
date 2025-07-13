@@ -8,10 +8,13 @@ Fetches repositories from GitHub for a given user and generates markdown files i
 - `GH_USER` – optional override for the user whose repositories are fetched. Defaults to the user associated with `GH_TOKEN`.
 - `LOG_LEVEL` – optional log verbosity (`DEBUG`, `INFO`, `WARN`, `ERROR`).
 
+Pass `--dry-run` to list repositories without writing files.
+
 Run manually with:
 
 ```bash
 GH_TOKEN=ghp_yourtoken GH_USER=octocat node scripts/fetch-gh-repos.mjs
+GH_TOKEN=ghp_yourtoken node scripts/fetch-gh-repos.mjs --dry-run
 ```
 
 Example output:

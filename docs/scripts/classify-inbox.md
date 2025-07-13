@@ -10,10 +10,13 @@ To avoid concurrent runs processing the same file, the script creates a `.lock` 
 - `OPENAI_MODEL` – optional model name (defaults to `gpt-3.5-turbo-1106`).
 - `LOG_LEVEL` – optional log verbosity (`DEBUG`, `INFO`, `WARN`, `ERROR`).
 
+Pass `--dry-run` to preview actions without moving files.
+
 Run manually with:
 
 ```bash
 OPENAI_API_KEY=sk-test node scripts/classify-inbox.mjs
+OPENAI_API_KEY=sk-test node scripts/classify-inbox.mjs --dry-run
 ```
 
 Place a markdown file in `content/inbox/` before running.

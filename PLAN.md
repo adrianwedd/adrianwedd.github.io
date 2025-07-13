@@ -100,6 +100,8 @@ GitHub Issue with a summary table.
 
 ### 4. Automation Scripts (CI)
 
+All automation scripts accept a `--dry-run` flag to log actions without modifying files or remote resources.
+
 | Script                   | Purpose                                                                                                                                                                              | Invoked By            |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------- |
 | `fetch-gh-repos.mjs`     | Scan GitHub user/org, create `content/tools/<repo>.md` for any repo tagged tool.                                                                                                     | Manual & nightly cron |
