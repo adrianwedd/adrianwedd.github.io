@@ -1,6 +1,12 @@
 import { log } from './logger.mjs';
 
-// Fetch with exponential backoff retry behaviour
+/**
+ * Fetch with exponential backoff retry behaviour.
+ * @param {string} url URL to request.
+ * @param {RequestInit} [options={}] Standard fetch options.
+ * @param {{retries?: number, backoff?: number}} [retryOpts={}] Retry settings.
+ * @returns {Promise<Response>} The fetch Response object.
+ */
 export async function retryFetch(
   url,
   options = {},
