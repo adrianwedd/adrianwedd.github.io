@@ -1704,7 +1704,7 @@ phases:
     component: 'Dependency Management'
     dependencies: []
     priority: 2
-    status: pending
+    status: done
     type: task
     command: null
     task_id: 'PIN-NEW-87'
