@@ -72,7 +72,7 @@ Format the codebase using Prettier:
 pnpm run format
 ```
 
-See [docs/scripts/README.md](docs/scripts/README.md) for script usage and environment variables. Troubleshooting tips live in [docs/DEBUGGING.md](docs/DEBUGGING.md). Current technical challenges are summarised in [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md).
+See [docs/scripts/README.md](docs/scripts/README.md) for script usage and environment variables. Troubleshooting tips live in [docs/DEBUGGING.md](docs/DEBUGGING.md). Additional steps for Pages errors are in [docs/TROUBLESHOOTING_PAGES.md](docs/TROUBLESHOOTING_PAGES.md). Current technical challenges are summarised in [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md).
 
 ## License
 
