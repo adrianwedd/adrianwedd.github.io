@@ -40,6 +40,7 @@ Build a self-updating, agent-fed, static knowledge hub—a "personal intelligenc
 | Agent Scripting  | Node 20 ESM (`*.mjs` scripts)                         |
 | LLM APIs         | OpenAI, Gemini, or other—invoked from CI scripts      |
 | Code Quality     | ESLint and Prettier                                   |
+| Markdown Plugins | rehype-external-links for external link security      |
 
 ---
 
@@ -98,14 +99,14 @@ GitHub Issue with a summary table.
 
 ### 4. Automation Scripts (CI)
 
-| Script                   | Purpose                                                                                                                         | Invoked By            |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
-| `fetch-gh-repos.mjs`     | Scan GitHub user/org, create `content/tools/<repo>.md` for any repo tagged tool.                                                | Manual & nightly cron |
+| Script                   | Purpose                                                                                                                                                                              | Invoked By            |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------- |
+| `fetch-gh-repos.mjs`     | Scan GitHub user/org, create `content/tools/<repo>.md` for any repo tagged tool.                                                                                                     | Manual & nightly cron |
 | `classify-inbox.mjs`     | For every file in `content/inbox/`, call LLM → `{section,tags}`; move file accordingly. Confidence < 0.8 ⇒ move to `untagged/`. Uses `.lock` files to prevent concurrent processing. | Before build step     |
-| `build-insights.mjs`     | Parse new/changed markdown (logs, garden, mirror); generate `<slug>.insight.md` with summary + cross-links.                     | After classification  |
-| `build-search-index.mjs` | Generate `public/search-index.json` for client-side Lunr search.                                                                | Before build step     |
-| `build-rss.mjs`          | Generate `public/rss.xml` feed from markdown metadata.                                                                          | Before deploy step    |
-| `agent-bus.mjs`          | Read `content/agents/*.yml`, update or create GitHub Issue `#agent-bus` with latest agent statuses.                             | Last step in workflow |
+| `build-insights.mjs`     | Parse new/changed markdown (logs, garden, mirror); generate `<slug>.insight.md` with summary + cross-links.                                                                          | After classification  |
+| `build-search-index.mjs` | Generate `public/search-index.json` for client-side Lunr search.                                                                                                                     | Before build step     |
+| `build-rss.mjs`          | Generate `public/rss.xml` feed from markdown metadata.                                                                                                                               | Before deploy step    |
+| `agent-bus.mjs`          | Read `content/agents/*.yml`, update or create GitHub Issue `#agent-bus` with latest agent statuses.                                                                                  | Last step in workflow |
 
 ---
 
@@ -181,15 +182,15 @@ jobs:
 
 ### 8. Phased Execution Plan
 
-| Phase                            | Objective                        | Key Tasks                                                                                                                                                                               |
-| -------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1. Bootstrap                     | Repository + CI running          | • Commit scaffold • Configure Pages to `gh-pages`. • Verify manual `npm run dev` / `npm run build`.                                                                                     |
-| 2. Automation Hooks              | Data ingestion operational       | • Add `GH_TOKEN` secret. • Finish & test `fetch-gh-repos.mjs`. • Push – confirm tools page autogenerates.                                                                               |
-| 3. LLM Integration               | Classification & insights        | • Implement `classify-inbox.mjs` with chosen LLM. • Implement `build-insights.mjs`. • Store API keys in Secrets. • Dry-run on sample inbox files.                                       |
-| 4. Process Hardening & Agent Bus | Status visibility & quality gate | • Enforce branch protection on `main` requiring passing checks and one approving review. • Require Conventional Commits via a Husky `commit-msg` hook. • Design simple YAML manifest schema. • Implement `agent-bus.mjs` to update Issue.             |
-| 5. UI Expansion                  | Flesh out components & pages     | • Build ToolCard, AgentDiagram, etc. • Style with Tailwind. • Populate content folders.                                                                                                 |
-| 6. Iterative Growth              | Continuous enhancement           | • Add more scripts (dataset stats, changelog diffing). • Hook additional agents via commits. • Refine design/branding. • Introduce `npm audit` and Snyk checks with Slack alerts for CI failures. |
-| 7. Debugging & Stability         | Harden automation reliability    | • Document troubleshooting workflow. • Add file locking and dead-letter queues. • Use `retryFetch` with exponential backoff for all API calls. • Perform dependency audits with Snyk and performance tests. |
+| Phase                            | Objective                        | Key Tasks                                                                                                                                                                                                                                 |
+| -------------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1. Bootstrap                     | Repository + CI running          | • Commit scaffold • Configure Pages to `gh-pages`. • Verify manual `npm run dev` / `npm run build`.                                                                                                                                       |
+| 2. Automation Hooks              | Data ingestion operational       | • Add `GH_TOKEN` secret. • Finish & test `fetch-gh-repos.mjs`. • Push – confirm tools page autogenerates.                                                                                                                                 |
+| 3. LLM Integration               | Classification & insights        | • Implement `classify-inbox.mjs` with chosen LLM. • Implement `build-insights.mjs`. • Store API keys in Secrets. • Dry-run on sample inbox files.                                                                                         |
+| 4. Process Hardening & Agent Bus | Status visibility & quality gate | • Enforce branch protection on `main` requiring passing checks and one approving review. • Require Conventional Commits via a Husky `commit-msg` hook. • Design simple YAML manifest schema. • Implement `agent-bus.mjs` to update Issue. |
+| 5. UI Expansion                  | Flesh out components & pages     | • Build ToolCard, AgentDiagram, etc. • Style with Tailwind. • Populate content folders.                                                                                                                                                   |
+| 6. Iterative Growth              | Continuous enhancement           | • Add more scripts (dataset stats, changelog diffing). • Hook additional agents via commits. • Refine design/branding. • Introduce `npm audit` and Snyk checks with Slack alerts for CI failures.                                         |
+| 7. Debugging & Stability         | Harden automation reliability    | • Document troubleshooting workflow. • Add file locking and dead-letter queues. • Use `retryFetch` with exponential backoff for all API calls. • Perform dependency audits with Snyk and performance tests.                               |
 
 ---
 

@@ -1300,7 +1300,7 @@ phases:
       - 'Commit messages not following the convention are rejected.'
     assigned_to: 'codex-agent'
     epic: 'Phase 6: Iterative Growth'
-# tasks 65-114 from detailed code reviews
+  # tasks 65-114 from detailed code reviews
   - id: 65
     title: 'Formalize Agent Interaction Model'
     description: 'Expand AGENTS.md with a detailed specification for agent contributions, including expected metadata and file naming.'
@@ -1596,7 +1596,7 @@ phases:
     component: 'Security'
     dependencies: []
     priority: 3
-    status: pending
+    status: done
     type: task
     command: null
     task_id: 'PIN-NEW-81'
