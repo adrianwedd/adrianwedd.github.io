@@ -2,9 +2,16 @@ import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { parse } from 'yaml';
+import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
+import schema from '../docs/agent-manifest-schema.json' assert { type: 'json' };
 import { githubFetch } from './utils/github.mjs'; // Import the new utility
 import { log } from './utils/logger.mjs';
 import { AGENTS_DIR } from './utils/constants.mjs';
+
+const ajv = new Ajv();
+addFormats(ajv);
+const validateManifest = ajv.compile(schema);
 
 // Read YAML manifest files from the given directory
 // Returns an array of parsed manifest objects
@@ -22,6 +29,13 @@ async function loadManifests(dir = AGENTS_DIR) {
     try {
       const data = await fs.readFile(path.join(dir, file), 'utf8');
       const doc = parse(data);
+      if (!validateManifest(doc)) {
+        log.error(
+          `Invalid agent manifest ${file}:`,
+          ajv.errorsText(validateManifest.errors)
+        );
+        continue;
+      }
       manifests.push({ file, ...doc });
     } catch (err) {
       log.error(

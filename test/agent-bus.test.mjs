@@ -12,7 +12,7 @@ beforeEach(() => {
   vi.restoreAllMocks();
   fs.readdir.mockResolvedValue(['agent.yml']);
   fs.readFile.mockResolvedValue(
-    'id: test\nstatus: active\nlast_updated: 2025-01-01\nowner: me\nrole: tester'
+    'id: test\nname: Test Agent\nstatus: active\nlast_updated: 2025-01-01T00:00:00Z\nowner: me\nrole: tester'
   );
   githubFetch.mockReset();
   delete process.env.GH_REPO;
@@ -47,7 +47,7 @@ describe('agent-bus.mjs', () => {
     fs.readFile.mockImplementation((file) => {
       if (file.endsWith('good.yml'))
         return Promise.resolve(
-          'id: good\nstatus: active\nlast_updated: 2025-01-01\nowner: me\nrole: r'
+          'id: good\nname: Good\nstatus: active\nlast_updated: 2025-01-01T00:00:00Z\nowner: me\nrole: r'
         );
       if (file.endsWith('bad.yml')) return Promise.resolve(': : : :');
       return Promise.resolve('');
@@ -57,6 +57,16 @@ describe('agent-bus.mjs', () => {
     const res = await agentBus.loadManifests('agents');
     expect(res.length).toBe(1);
     expect(res[0].id).toBe('good');
+    expect(errSpy).toHaveBeenCalled();
+  });
+
+  it('loadManifests skips files failing schema validation', async () => {
+    fs.readdir.mockResolvedValueOnce(['bad.yml']);
+    fs.readFile.mockResolvedValueOnce('id: oops\nstatus: active\nlast_updated: 2025-01-01T00:00:00Z');
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const agentBus = await loadAgentBus();
+    const res = await agentBus.loadManifests('agents');
+    expect(res).toEqual([]);
     expect(errSpy).toHaveBeenCalled();
   });
 
