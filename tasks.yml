@@ -366,7 +366,7 @@ phases:
     title: 'Investigate and Fix Vitest Module Resolution for agent-bus.mjs'
     description: 'The unit tests for `agent-bus.mjs` are currently excluded from the test suite due to a module resolution error in Vitest. This task involves investigating the root cause of this error and implementing a fix to allow the `agent-bus.test.mjs` tests to run successfully.'
     component: 'Testing'
-    dependencies: [16] # Depends on the tests being written (even if excluded)
+    dependencies: [16]  # Depends on the tests being written (even if excluded)
     priority: 4
     status: done
     type: task
@@ -510,7 +510,12 @@ phases:
 
   - id: 23
     title: Dynamically Discover Content Sections in classify-inbox.mjs
-    description: The `classify-inbox.mjs` script uses a hardcoded array of section names. This means that if a new content directory (e.g., `content/projects/`) is added, the script must be manually updated. This task refactors the script to discover these sections dynamically by reading the directory structure, making the system more maintainable and extensible.
+    description: >
+      The `classify-inbox.mjs` script uses a hardcoded array of section names.
+      This means that if a new content directory (e.g., `content/projects/`) is added,
+      the script must be manually updated. This task refactors the script to discover
+      these sections dynamically by reading the directory structure, making the system
+      more maintainable and extensible.
     component: Automation Scripts
     dependencies: [6]
     priority: 3
