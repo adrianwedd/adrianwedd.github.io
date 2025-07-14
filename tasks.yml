@@ -2220,3 +2220,61 @@ phases:
       - 'DNS validation passes for IPv6 records.'
     assigned_to: 'codex-agent'
     epic: 'Phase 8: Review Tasks'
+
+  - id: 116
+    title: 'Modularize Large Automation Scripts'
+    description: 'Break down monolithic scripts into smaller modules for maintainability.'
+    component: 'Automation Scripts'
+    dependencies: []
+    priority: 3
+    status: pending
+    type: task
+    command: null
+    task_id: 'PIN-NEW-116'
+    area: 'Maintainability'
+    actionable_steps:
+      - 'Extract reusable functions from classify-inbox.mjs and build-insights.mjs into utilities.'
+      - 'Refactor main scripts to import these modules.'
+    acceptance_criteria:
+      - 'Scripts are modular with no duplicated logic.'
+      - 'All existing tests pass after refactor.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 9: Improvements'
+
+  - id: 117
+    title: 'Expand End-to-End Test Coverage'
+    description: 'Add additional E2E tests covering classification workflow and RSS feed generation.'
+    component: 'Testing'
+    dependencies: [108]
+    priority: 3
+    status: pending
+    type: task
+    command: null
+    task_id: 'PIN-NEW-117'
+    area: 'Testing'
+    actionable_steps:
+      - 'Write tests that run classify-inbox and build scripts in a temp directory.'
+      - 'Verify RSS feed output and classified content.'
+    acceptance_criteria:
+      - 'E2E suite fails if any step in the workflow breaks.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 9: Improvements'
+
+  - id: 118
+    title: 'Set Up Renovate for Dependency Updates'
+    description: 'Evaluate and integrate Renovate to supplement Dependabot for automated dependency upgrades.'
+    component: 'CI/CD'
+    dependencies: [25]
+    priority: 2
+    status: pending
+    type: task
+    command: null
+    task_id: 'PIN-NEW-118'
+    area: 'Tooling'
+    actionable_steps:
+      - 'Create `renovate.json` with basic configuration.'
+      - 'Enable Renovate app in the repository.'
+    acceptance_criteria:
+      - 'Renovate opens pull requests for outdated dependencies.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 9: Improvements'
