@@ -2278,3 +2278,151 @@ phases:
       - 'Renovate opens pull requests for outdated dependencies.'
     assigned_to: 'codex-agent'
     epic: 'Phase 9: Improvements'
+
+  - id: 119
+    title: 'Implement Dead-Letter Queue for Inbox'
+    description: 'Move unclassifiable inbox files to a failed directory after repeated classification attempts.'
+    component: 'Automation Scripts'
+    dependencies: []
+    priority: 3
+    status: pending
+    type: task
+    command: null
+    task_id: 'PIN-NEW-119'
+    area: 'Reliability'
+    actionable_steps:
+      - 'Track classification attempts for each inbox file.'
+      - 'After three failures, move the file to content/inbox/failed.'
+    acceptance_criteria:
+      - 'Files failing three times are relocated for manual review.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 9: Improvements'
+
+  - id: 120
+    title: 'Refactor fetch-gh-repos into Modular Functions'
+    description: 'Split fetch-gh-repos.mjs into smaller reusable functions for easier testing.'
+    component: 'Automation Scripts'
+    dependencies: []
+    priority: 3
+    status: pending
+    type: task
+    command: null
+    task_id: 'PIN-NEW-120'
+    area: 'Maintainability'
+    actionable_steps:
+      - 'Create fetchRepositories, transformRepoToMarkdown and writeMarkdownToFile utilities.'
+      - 'Update existing code to use these functions.'
+    acceptance_criteria:
+      - 'Each function can be tested independently.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 9: Improvements'
+
+  - id: 121
+    title: 'Enhance LLM Cache Key'
+    description: 'Include model name and parameters in the cache key to prevent stale results.'
+    component: 'Automation Scripts'
+    dependencies: []
+    priority: 3
+    status: pending
+    type: task
+    command: null
+    task_id: 'PIN-NEW-121'
+    area: 'Optimization'
+    actionable_steps:
+      - 'Update cache key generation to hash prompt plus model settings.'
+    acceptance_criteria:
+      - 'Changing the model or temperature results in a cache miss.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 9: Improvements'
+
+  - id: 122
+    title: 'Add Mocked Error Tests for APIs'
+    description: 'Create tests that simulate API failures for fetch-gh-repos and classify-inbox scripts.'
+    component: 'Testing'
+    dependencies: []
+    priority: 3
+    status: pending
+    type: task
+    command: null
+    task_id: 'PIN-NEW-122'
+    area: 'Testing'
+    actionable_steps:
+      - 'Use Vitest mocks to return failing responses.'
+      - 'Assert scripts log errors and exit appropriately.'
+    acceptance_criteria:
+      - 'Test suite covers API failure scenarios.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 9: Improvements'
+
+  - id: 123
+    title: 'Validate tasks.yml with JSON Schema'
+    description: 'Add schema validation using Zod or another library to ensure tasks.yml integrity.'
+    component: 'Automation Scripts'
+    dependencies: []
+    priority: 3
+    status: pending
+    type: task
+    command: null
+    task_id: 'PIN-NEW-123'
+    area: 'Process'
+    actionable_steps:
+      - 'Define tasks.yml schema.'
+      - 'Update validate-tasks.mjs to enforce the schema.'
+    acceptance_criteria:
+      - 'tasks.yml errors are reported clearly.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 9: Improvements'
+
+  - id: 124
+    title: 'Pin GitHub Action Versions'
+    description: 'Use full commit SHAs for third-party actions to improve workflow security.'
+    component: 'CI/CD'
+    dependencies: []
+    priority: 3
+    status: pending
+    type: task
+    command: null
+    task_id: 'PIN-NEW-124'
+    area: 'Security'
+    actionable_steps:
+      - 'Replace version tags in workflow files with commit SHAs.'
+    acceptance_criteria:
+      - 'Workflows reference immutable action versions.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 9: Improvements'
+
+  - id: 125
+    title: 'Cache PNPM Dependencies in deploy.yml'
+    description: 'Add actions/cache step to store the pnpm store between runs.'
+    component: 'CI/CD'
+    dependencies: []
+    priority: 3
+    status: pending
+    type: task
+    command: null
+    task_id: 'PIN-NEW-125'
+    area: 'Optimization'
+    actionable_steps:
+      - 'Cache ~/.pnpm-store using pnpm-lock.yaml hash as key.'
+    acceptance_criteria:
+      - 'Subsequent deploy runs install dependencies faster.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 9: Improvements'
+
+  - id: 126
+    title: 'Document Security Reporting Process'
+    description: 'Add a section to CONTRIBUTING.md describing how to privately report vulnerabilities.'
+    component: 'Documentation'
+    dependencies: []
+    priority: 2
+    status: done
+    type: task
+    command: null
+    task_id: 'PIN-NEW-126'
+    area: 'Security'
+    actionable_steps:
+      - 'Create a "Security Vulnerabilities" section in CONTRIBUTING.'
+    acceptance_criteria:
+      - 'CONTRIBUTING.md directs reporters to a private disclosure method.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 9: Improvements'
