@@ -14,7 +14,8 @@
  */
 
 const levelMap = { DEBUG: 0, INFO: 1, WARN: 2, ERROR: 3 };
-const envLevel = process.env.LOG_LEVEL || (process.env.DEBUG ? 'DEBUG' : 'INFO');
+const envLevel =
+  process.env.LOG_LEVEL || (process.env.DEBUG ? 'DEBUG' : 'INFO');
 const currentLevel = levelMap[envLevel.toUpperCase()] ?? levelMap.INFO;
 
 const shouldLog = (level) => levelMap[level] >= currentLevel;

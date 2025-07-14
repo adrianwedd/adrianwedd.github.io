@@ -1,10 +1,6 @@
 import { log } from './logger.mjs';
 import { retryFetch } from './retryFetch.mjs';
-import {
-  hashText,
-  getCachedResult,
-  setCachedResult,
-} from './llm-cache.mjs';
+import { hashText, getCachedResult, setCachedResult } from './llm-cache.mjs';
 
 // Model name can be overridden via the OPENAI_MODEL env var
 const MODEL = process.env.OPENAI_MODEL || 'gpt-3.5-turbo-1106';

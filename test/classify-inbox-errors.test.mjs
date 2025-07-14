@@ -62,7 +62,12 @@ describe('classify-inbox error paths', () => {
 
   it('classifyFile throws on invalid tags', async () => {
     callOpenAI.mockResolvedValueOnce(
-      JSON.stringify({ section: 'g', tags: 'bad', confidence: 0.9, reasoning: 'x' })
+      JSON.stringify({
+        section: 'g',
+        tags: 'bad',
+        confidence: 0.9,
+        reasoning: 'x',
+      })
     );
     await expect(classifyFile('x')).rejects.toThrow('Invalid tags');
   });

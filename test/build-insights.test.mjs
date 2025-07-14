@@ -80,7 +80,10 @@ describe('build-insights.mjs', () => {
   });
 
   it('buildSummaryPrompt should generate a category-specific prompt', () => {
-    const prompt = buildInsights.buildSummaryPrompt(mockMarkdownContent, 'logs');
+    const prompt = buildInsights.buildSummaryPrompt(
+      mockMarkdownContent,
+      'logs'
+    );
     expect(prompt).toContain('daily log entry');
     expect(prompt).toContain(mockMarkdownContent);
   });

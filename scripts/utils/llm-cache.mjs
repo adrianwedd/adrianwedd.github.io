@@ -3,7 +3,8 @@ import crypto from 'crypto';
 import path from 'path';
 import { mkdir } from './file-utils.mjs';
 
-const CACHE_FILE = process.env.LLM_CACHE_FILE || path.join('.cache', 'llm-cache.json');
+const CACHE_FILE =
+  process.env.LLM_CACHE_FILE || path.join('.cache', 'llm-cache.json');
 let cache = null;
 
 async function loadCache() {
