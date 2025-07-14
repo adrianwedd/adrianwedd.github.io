@@ -8,10 +8,10 @@ Thank you for wanting to improve the **Personal Intelligence Node**. This projec
 2. Clone the repository and install dependencies:
 
    ```bash
-   npm ci
-   npm run dev
+   pnpm install
+   pnpm run dev
    ```
-3. Husky manages Git hooks. `npm ci` installs them automatically, but you can run `npm run prepare` if they are missing.
+3. Husky manages Git hooks. `pnpm install` installs them automatically, but you can run `pnpm run prepare` if they are missing.
 4. Copy any required secrets to your GitHub repository settings. Never commit API keys or tokens.
 
 ## Development Workflow
@@ -19,14 +19,14 @@ Thank you for wanting to improve the **Personal Intelligence Node**. This projec
 - Run the tests with:
 
   ```bash
-  npm test
+  pnpm test
   ```
 
 - Lint and format before committing:
 
   ```bash
-  npm run lint
-  npm run format
+  pnpm run lint
+  pnpm run format
   ```
 
 - Follow the existing ESLint and Prettier configuration. All scripts use modern ESM syntax (`*.mjs`).
@@ -35,7 +35,7 @@ Thank you for wanting to improve the **Personal Intelligence Node**. This projec
 ## Pull Request Process
 
 1. Create feature branches from `main`.
-2. Ensure `npm test` passes and code is linted.
+2. Ensure `pnpm test` passes and code is linted.
 3. Update `PLAN.md` and `tasks.yml` if your work changes scope or completes a task.
 4. Open a PR targeting `main` and summarise your changes, referencing relevant PLAN.md sections.
 
