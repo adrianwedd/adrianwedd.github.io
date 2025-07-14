@@ -27,7 +27,9 @@ export async function validateTasks(filePath = 'tasks.yml') {
       process.exitCode = 1;
       return;
     }
-    console.log(`Successfully validated ${doc.phases.length} tasks in ${filePath}.`);
+    console.log(
+      `Successfully validated ${doc.phases.length} tasks in ${filePath}.`
+    );
   } catch (err) {
     console.error(`An unexpected error occurred: ${err.message}`);
     process.exitCode = 1;

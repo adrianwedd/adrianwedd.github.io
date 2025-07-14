@@ -56,10 +56,7 @@ async function classifyFile(filePath) {
   }
 
   log.debug(`Classifying file ${filePath}`);
-  const reply = await callOpenAI(
-    await buildPrompt(content),
-    hashText(content)
-  );
+  const reply = await callOpenAI(await buildPrompt(content), hashText(content));
   log.debug(`Raw response for ${filePath}: ${reply}`);
   let result;
   try {
@@ -69,7 +66,12 @@ async function classifyFile(filePath) {
   }
 
   const { section, tags, confidence, reasoning } = result;
-  if (!section || !tags || confidence === undefined || reasoning === undefined) {
+  if (
+    !section ||
+    !tags ||
+    confidence === undefined ||
+    reasoning === undefined
+  ) {
     throw new Error(
       `Malformed response, missing keys: ${JSON.stringify(result)}`
     );
@@ -244,7 +246,11 @@ async function main() {
       } else if (result.confidence < 0.8) {
         targetDir = REVIEW_NEEDED_DIR;
         tags = result.tags || [];
-        extra = { status: 'draft', confidence: result.confidence, reasoning: result.reasoning };
+        extra = {
+          status: 'draft',
+          confidence: result.confidence,
+          reasoning: result.reasoning,
+        };
       } else {
         targetDir = path.join(CONTENT_DIR, result.section);
         if (result.tags && result.tags.length) {

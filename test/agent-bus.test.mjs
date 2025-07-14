@@ -62,7 +62,9 @@ describe('agent-bus.mjs', () => {
 
   it('loadManifests skips files failing schema validation', async () => {
     fs.readdir.mockResolvedValueOnce(['bad.yml']);
-    fs.readFile.mockResolvedValueOnce('id: oops\nstatus: active\nlast_updated: 2025-01-01T00:00:00Z');
+    fs.readFile.mockResolvedValueOnce(
+      'id: oops\nstatus: active\nlast_updated: 2025-01-01T00:00:00Z'
+    );
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const agentBus = await loadAgentBus();
     const res = await agentBus.loadManifests('agents');
