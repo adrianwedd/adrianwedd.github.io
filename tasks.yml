@@ -2470,3 +2470,21 @@ phases:
       - 'Running retry-failed processes files from failed directories.'
     assigned_to: 'codex-agent'
     epic: 'Phase 9: Improvements'
+  - id: 129
+    title: 'Remove Dependabot reviewers field'
+    description: 'Dependabot now uses CODEOWNERS for review assignment. Update configuration accordingly.'
+    component: 'CI/CD'
+    dependencies: []
+    priority: 2
+    status: done
+    type: task
+    command: null
+    task_id: 'PIN-NEW-129'
+    area: 'Maintainability'
+    actionable_steps:
+      - 'Edit .github/dependabot.yml to remove the deprecated `reviewers` setting.'
+      - 'Ensure CODEOWNERS specifies reviewers.'
+    acceptance_criteria:
+      - 'Dependabot PRs rely on CODEOWNERS without `reviewers` field.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 9: Improvements'
