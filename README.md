@@ -77,3 +77,7 @@ See [docs/scripts/README.md](docs/scripts/README.md) for script usage and enviro
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
+## Security
+
+For details on reporting vulnerabilities, see [SECURITY.md](SECURITY.md).
