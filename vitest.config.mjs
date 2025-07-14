@@ -13,6 +13,7 @@ export default defineConfig({
         'scripts/agent-bus.mjs',
         'scripts/utils/github.mjs',
         'scripts/build-insights.mjs',
+        'scripts/retry-failed.mjs',
       ],
       reporter: ['text', 'lcov'],
       statements: 80,
