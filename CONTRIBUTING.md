@@ -46,4 +46,5 @@ For more details about the automation scripts, see the documentation in `docs/`.
 Please do **not** create public issues for security problems. Instead, report
 them privately by emailing [security@adrianwedd.com](mailto:security@adrianwedd.com)
 or by opening a pull request from a temporary **private** fork. This allows us
-to fix the issue before full disclosure.
+to fix the issue before full disclosure. See [SECURITY.md](SECURITY.md) for the
+full reporting policy.
