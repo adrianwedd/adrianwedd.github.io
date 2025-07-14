@@ -2446,3 +2446,22 @@ phases:
       - 'README links to the security policy.'
     assigned_to: 'codex-agent'
     epic: 'Phase 9: Improvements'
+
+  - id: 128
+    title: 'Add retry-failed script'
+    description: 'Provide a script to reattempt classification and insight generation for items moved to failed queues.'
+    component: 'Automation Scripts'
+    dependencies: [56, 119]
+    priority: 3
+    status: done
+    type: task
+    command: null
+    task_id: 'PIN-NEW-128'
+    area: 'Reliability'
+    actionable_steps:
+      - 'Create scripts/retry-failed.mjs to process inbox and insight failures.'
+      - 'Write tests covering success and missing API key cases.'
+    acceptance_criteria:
+      - 'Running retry-failed processes files from failed directories.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 9: Improvements'
