@@ -11,7 +11,11 @@ vi.mock('../scripts/build-insights.mjs', () => ({
   processMarkdownFile: vi.fn(),
 }));
 
-import { classifyFile, moveFile, getDynamicSections } from '../scripts/classify-inbox.mjs';
+import {
+  classifyFile,
+  moveFile,
+  getDynamicSections,
+} from '../scripts/classify-inbox.mjs';
 import { processMarkdownFile } from '../scripts/build-insights.mjs';
 import { main } from '../scripts/retry-failed.mjs';
 
@@ -49,7 +53,9 @@ describe('retry-failed.mjs', () => {
       false,
       { status: 'draft' }
     );
-    expect(classifyFile).toHaveBeenCalledWith('content/insights-failed/note.md');
+    expect(classifyFile).toHaveBeenCalledWith(
+      'content/insights-failed/note.md'
+    );
     expect(moveFile).toHaveBeenCalledWith(
       'content/insights-failed/note.md',
       'content/garden',
@@ -57,7 +63,10 @@ describe('retry-failed.mjs', () => {
       false,
       { status: 'draft' }
     );
-    expect(processMarkdownFile).toHaveBeenCalledWith('content/garden/file1.txt', false);
+    expect(processMarkdownFile).toHaveBeenCalledWith(
+      'content/garden/file1.txt',
+      false
+    );
   });
 
   it('skips when API key missing', async () => {
