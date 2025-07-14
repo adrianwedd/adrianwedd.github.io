@@ -19,7 +19,7 @@
     "eslint": "8.57.1",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.5.1",
-    "execa": "^8.0.0",
+    "execa": "^9.6.0",
     "fast-check": "^4.2.0",
     "husky": "^9.1.7",
     "markdownlint": "^0.38.0",
