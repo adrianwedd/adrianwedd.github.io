@@ -16,8 +16,10 @@ Pass `--dry-run` to preview actions without making changes.
 | `build-rss.mjs` | Generates `public/rss.xml` from markdown metadata. | optional `BASE_URL` (defaults to `https://adrianwedd.github.io`) |
 | `agent-bus.mjs`      | Aggregates agent manifests and posts a summary issue on GitHub.          | `GH_TOKEN`, optional `GH_REPO`            |
 | `check-dns.mjs`      | Verifies A, AAAA and CNAME records for the custom domain from `CNAME`. Runs hourly via GitHub Actions. | none |
+| `retry-failed.mjs`   | Reprocesses files in `content/inbox/failed` and `content/insights-failed` using the same logic as the main scripts. | `OPENAI_API_KEY`, optional `OPENAI_MODEL` |
 
 See the individual files below for further details.
 
 - [build-search-index.mjs](build-search-index.md) – builds `public/search-index.json` for Lunr search.
 - [build-rss.mjs](build-rss.md) – generates the site's RSS feed.
+- [retry-failed.mjs](retry-failed.md) – reprocesses failed inbox and insight files.
