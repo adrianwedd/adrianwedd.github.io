@@ -33,7 +33,7 @@ The CI pipeline expects several secrets configured under **GitHub repository set
 | Name                | Used By                           | Purpose                            |
 | ------------------- | --------------------------------- | ---------------------------------- |
 | `GH_TOKEN`          | fetch-gh-repos.mjs, agent-bus.mjs | Minimal GitHub token for API calls |
-| `OPENAI_API_KEY`    | classify-inbox.mjs                | Access to OpenAI API               |
+| `OPENAI_API_KEY`    | classify-inbox.mjs, build-insights.mjs, retry-failed.mjs | Access to OpenAI API               |
 | `SLACK_WEBHOOK_URL` | deploy workflow                   | Post CI failure notifications      |
 
 Set these as secrets before running the workflows.
