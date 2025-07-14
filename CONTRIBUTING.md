@@ -40,3 +40,10 @@ Thank you for wanting to improve the **Personal Intelligence Node**. This projec
 4. Open a PR targeting `main` and summarise your changes, referencing relevant PLAN.md sections.
 
 For more details about the automation scripts, see the documentation in `docs/`.
+
+## Security Vulnerabilities
+
+Please do **not** create public issues for security problems. Instead, report
+them privately by emailing [security@adrianwedd.com](mailto:security@adrianwedd.com)
+or by opening a pull request from a temporary **private** fork. This allows us
+to fix the issue before full disclosure.
