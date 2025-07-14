@@ -22,3 +22,4 @@ See the individual files below for further details.
 
 - [build-search-index.mjs](build-search-index.md) – builds `public/search-index.json` for Lunr search.
 - [build-rss.mjs](build-rss.md) – generates the site's RSS feed.
+- [retry-failed.mjs](retry-failed.md) – reprocesses failed inbox and insight files.
