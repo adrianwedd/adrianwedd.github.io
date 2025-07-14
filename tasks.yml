@@ -2426,3 +2426,23 @@ phases:
       - 'CONTRIBUTING.md directs reporters to a private disclosure method.'
     assigned_to: 'codex-agent'
     epic: 'Phase 9: Improvements'
+
+  - id: 127
+    title: 'Publish SECURITY policy'
+    description: 'Create SECURITY.md summarizing disclosure steps and link to README.'
+    component: 'Documentation'
+    dependencies: []
+    priority: 2
+    status: done
+    type: task
+    command: null
+    task_id: 'PIN-NEW-127'
+    area: 'Security'
+    actionable_steps:
+      - 'Write SECURITY.md referencing security@adrianwedd.com for private reports.'
+      - 'Link SECURITY.md from README.'
+    acceptance_criteria:
+      - 'Repository contains SECURITY.md matching CONTRIBUTING guidance.'
+      - 'README links to the security policy.'
+    assigned_to: 'codex-agent'
+    epic: 'Phase 9: Improvements'
