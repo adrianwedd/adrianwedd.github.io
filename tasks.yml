@@ -2252,7 +2252,7 @@ phases:
     component: 'Testing'
     dependencies: [108]
     priority: 3
-    status: pending
+    status: in_progress
     type: task
     command: null
     task_id: 'PIN-NEW-117'
